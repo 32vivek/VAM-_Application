@@ -2,16 +2,17 @@ import React from 'react';
 import Button from '@mui/material/Button';
 import { FormControl } from '@mui/material';
 
-const ButtonComponent = ({ name, size, color, onClick, style }) => {
+const ButtonComponent = ({ name, size, color, onClick, style, variant, fullWidth }) => {
     return (
         <FormControl>
             <Button
-                variant="contained"
+                variant={variant}
                 size={size}
                 color={color}
                 onClick={onClick}
                 style={style}
                 sx={{ borderRadius: "12px" }}
+                fullWidth={fullWidth}
             >
                 {name}
             </Button>

@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Box, SwipeableDrawer, Grid } from '@mui/material';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import FloatingActionButtons from '../components/FloatingButton';
 import Texxt from '../components/Textfield';
 import ButtonComponent from "../components/Button";
@@ -98,7 +100,6 @@ export default function SwipeableTemporaryDrawer() {
 
                 console.log('Form data saved:', response.data);
 
-                // Clear form values
                 setFormValues({
                     Name: '',
                     Email: '',
@@ -110,9 +111,20 @@ export default function SwipeableTemporaryDrawer() {
 
                 handleCloseDrawer();
                 fetchData(); // Fetch updated data
+                toast.success('Form submitted successfully!', {
+                    position: "top-right",
+                    autoClose: 3000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                });
             } catch (error) {
                 console.error('There was a problem with the Axios request:', error);
+
             }
+
         }
     };
 
@@ -173,9 +185,12 @@ export default function SwipeableTemporaryDrawer() {
     ];
 
     const list = (
+
+
         <Box component="form" sx={{ mt: "70px", mb: "20px" }}>
+
             <Grid container spacing={2} sx={{ p: 3 }}>
-                <Grid item lg={6} md={6} sm={12} xs={12}>
+                <Grid item lg={6} md={6} xs={12}>
                     <Box>
                         <Texxt
                             name="Name"
@@ -191,7 +206,7 @@ export default function SwipeableTemporaryDrawer() {
                         />
                     </Box>
                 </Grid>
-                <Grid item lg={6} md={6} sm={12} xs={12}>
+                <Grid item lg={6} md={6} xs={12}>
                     <Box>
                         <Texxt
                             name="Email"
@@ -206,7 +221,7 @@ export default function SwipeableTemporaryDrawer() {
                         />
                     </Box>
                 </Grid>
-                <Grid item lg={6} md={6} sm={12} xs={12}>
+                <Grid item lg={6} md={6} xs={12}>
                     <Box>
                         <Texxt
                             name="Number"
@@ -222,7 +237,7 @@ export default function SwipeableTemporaryDrawer() {
                         />
                     </Box>
                 </Grid>
-                <Grid item lg={6} md={6} sm={12} xs={12}>
+                <Grid item lg={6} md={6} xs={12}>
                     <Box>
                         <Texxt
                             name="Address"
@@ -235,7 +250,7 @@ export default function SwipeableTemporaryDrawer() {
                         />
                     </Box>
                 </Grid>
-                <Grid item lg={6} md={6} sm={12} xs={12}>
+                <Grid item lg={6} md={6} xs={12}>
                     <Box>
                         <Autocmp
                             name="Department"
@@ -247,7 +262,7 @@ export default function SwipeableTemporaryDrawer() {
                         />
                     </Box>
                 </Grid>
-                <Grid item lg={6} md={6} sm={12} xs={12}>
+                <Grid item lg={6} md={6} xs={12}>
                     <Box>
                         <Texxt
                             name="Details"
@@ -264,7 +279,7 @@ export default function SwipeableTemporaryDrawer() {
                 </Grid>
             </Grid>
             <Grid container>
-                <Grid item lg={6} md={6} sm={12} xs={12}>
+                <Grid item lg={6} md={6} xs={12}>
                     <Box sx={{ display: "flex", ml: "25px", flexDirection: "row", gap: "20px" }}>
                         <Box>
                             <ButtonComponent
@@ -287,10 +302,12 @@ export default function SwipeableTemporaryDrawer() {
                 </Grid>
             </Grid>
         </Box>
+
     );
 
     return (
         <>
+            <ToastContainer />
             <SwipeableDrawer
                 anchor="top"
                 open={open}

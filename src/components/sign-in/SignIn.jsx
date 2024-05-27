@@ -1,114 +1,218 @@
-import * as React from 'react';
-import Avatar from '@mui/material/Avatar';
+import React, { useState } from 'react';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
 import Link from '@mui/material/Link';
 import Paper from '@mui/material/Paper';
 import Box from '@mui/material/Box';
+import { Card, CardContent } from '@mui/material';
 import Grid from '@mui/material/Grid';
-import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
-
-const theme = createTheme();
+import InputAdornment from '@mui/material/InputAdornment';
+import IconButton from '@mui/material/IconButton';
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import { useNavigate } from 'react-router-dom';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+// import TokenRefresh from '../refreshToken'; // Commented out as it's not used in the simulation
 
 export default function SignInSide() {
-    const handleSubmit = (event) => {
-        event.preventDefault();
-        const data = new FormData(event.currentTarget);
-        console.log({
-            email: data.get('email'),
-            password: data.get('password'),
+    const [showPassword, setShowPassword] = useState(false);
+    const navigate = useNavigate();
+    const [formData, setFormData] = useState({
+        email: '',
+        password: ''
+    });
+    const [errors, setErrors] = useState({
+        email: '',
+        password: ''
+    });
+
+    const validateEmail = (email) => {
+        const re = /\S+@\S+\.\S+/;
+        return re.test(email);
+    };
+
+    const handleChange = (event) => {
+        const { name, value } = event.target;
+        setFormData({
+            ...formData,
+            [name]: value
+        });
+
+        let error = '';
+        if (value.trim() === '') {
+            error = `${name.charAt(0).toUpperCase() + name.slice(1)} is required`;
+        } else if (name === 'email' && !validateEmail(value)) {
+            error = 'Invalid email address';
+        }
+
+        setErrors({
+            ...errors,
+            [name]: error
         });
     };
 
+    const handleSubmit = async (event) => {
+        event.preventDefault();
+        const { email, password } = formData;
+
+        if (!email || !password || errors.email || errors.password) {
+            toast.error("Please fill all required fields");
+            return;
+        }
+
+
+        if (email === 'vivek@gmail.com' && password === '12345') {
+
+            toast.success("Login successful");
+            navigate("/home");
+        } else {
+
+            toast.error("Invalid email or password");
+        }
+
+        // Commented out the actual API call as it's not currently used
+        /*
+        try {
+            const response = await fetch("", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ email, password }),
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                document.cookie = token=${data.access_token}; path=/;
+                localStorage.setItem("refreshToken", data.refresh_token);
+                navigate("/home");
+            } else {
+                const errorData = await response.json();
+                toast.error(errorData.message);
+            }
+        } catch (error) {
+            console.error("Error:", error);
+            toast.error("An unexpected error occurred");
+        }
+        */
+    };
+
+    const handleClickShowPassword = () => {
+        setShowPassword(!showPassword);
+    };
+
+    const handleMouseDownPassword = (event) => {
+        event.preventDefault();
+    };
+
     return (
-        <ThemeProvider theme={theme}>
-            <Grid container component="main" sx={{ height: '100vh' }}>
+        <>
+            <ToastContainer />
+            <Grid container component="main" sx={{ height: '100vh', position: 'relative' }}>
                 <CssBaseline />
                 <Grid
                     item
-                    xs={false}
+                    xs={12}
                     sm={4}
                     md={7}
                     sx={{
-                        backgroundImage: 'url(https://source.unsplash.com/random?wallpapers)',
-                        backgroundRepeat: 'no-repeat',
-                        backgroundColor: (t) =>
-                            t.palette.mode === 'light' ? t.palette.grey[50] : t.palette.grey[900],
-                        backgroundSize: 'cover',
-                        backgroundPosition: 'center',
+
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        p: 4,
+                        backgroundColor: "rgb(240,242,245)"
                     }}
-                />
-                <Grid item xs={12} sm={8} md={5} component={Paper} elevation={6} square>
-                    <Box
-                        sx={{
-                            display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            height: '100%',
-                            p: 4,
-                        }}
-                    >
-                        <Avatar sx={{ m: 1, bgcolor: 'primary.main' }}>
-                            <LockOutlinedIcon />
-                        </Avatar>
-                        <Typography component="h1" variant="h5" sx={{ mb: 2 }}>
-                            Sign in
-                        </Typography>
-                        <Box component="form" onSubmit={handleSubmit} sx={{ width: '100%' }}>
-                            <TextField
-                                margin="normal"
-                                required
-                                fullWidth
-                                id="email"
-                                label="Email Address"
-                                name="email"
-                                autoComplete="email"
-                            />
-                            <TextField
-                                margin="normal"
-                                required
-                                fullWidth
-                                name="password"
-                                label="Password"
-                                type="password"
-                                id="password"
-                                autoComplete="current-password"
-                            />
-                            <FormControlLabel
-                                control={<Checkbox value="remember" color="primary" />}
-                                label="Remember me"
-                                sx={{ mt: 1 }}
-                            />
-                            <Button
-                                type="submit"
-                                fullWidth
-                                variant="contained"
-                                sx={{ mt: 3, mb: 2 }}
-                            >
-                                Sign In
-                            </Button>
-                            <Grid container>
-                                <Grid item xs>
-                                    <Link href="#" variant="body2">
-                                        Forgot password?
-                                    </Link>
-                                </Grid>
-                                <Grid item>
-                                    <Link href="/signup" variant="body2">
-                                        {"Don't have an account? Sign Up"}
-                                    </Link>
-                                </Grid>
-                            </Grid>
+                >
+                    <Box>
+                        <Box mb="30px" display="flex" justifyContent="center" alignItems="center" flexDirection="column">
+                            <img src="/jbmlogo.png" alt="JBM Logo" style={{ width: "30%" }} />
+                            <Typography variant='h5' mt="20px" fontWeight="bold" color="rgb(9,90,163)">
+                                VISITOR ALERT MANAGEMENT SYSTEM
+                            </Typography>
+                        </Box>
+                        <Box mt="30px" style={{ display: "flex", justifyContent: "center", alignItems: "center" }} >
+                            <Typography  >
+                                For any help or assistance please reach out to
+                                <Link href="https://dreamsol.biz/contact/" target="_blank" style={{ cursor: "pointer", fontWeight: "bold" }} > DreamSol</Link>
+                            </Typography>
                         </Box>
                     </Box>
                 </Grid>
-            </Grid>
-        </ThemeProvider>
+                <Grid item xs={12} sm={8} md={5} component={Paper} square sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: "center", }}>
+                    <Card sx={{ my: 8, mx: 4, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: "center", boxShadow: 3 }}>
+                        <CardContent sx={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}  >
+                            <Box mb="30px" display="flex" justifyContent="center" alignItems="center" flexDirection="column" >
+                                <Typography variant='h5' mt="20px" fontWeight="bold" color="rgb(9,90,163)">
+                                    SIGN IN
+                                </Typography>
+                            </Box>
+                            <Box component="form" onSubmit={handleSubmit} sx={{ width: '100%' }}>
+                                <TextField
+                                    margin="normal"
+                                    fullWidth
+                                    id="email"
+                                    label="Email Address"
+                                    name="email"
+                                    size="small"
+                                    variant='standard'
+                                    autoComplete="email"
+                                    value={formData.email}
+                                    onChange={handleChange}
+                                    error={!!errors.email}
+                                    helperText={errors.email}
+                                />
+                                <TextField
+                                    fullWidth
+                                    size="small"
+                                    name="password"
+                                    label="Password"
+                                    variant='standard'
+                                    type={showPassword ? "text" : "password"}
+                                    id="password"
+                                    autoComplete="current-password"
+                                    value={formData.password}
+                                    onChange={handleChange}
+                                    error={!!errors.password}
+                                    helperText={errors.password}
+                                    InputProps={{
+                                        endAdornment: (
+                                            <InputAdornment position="end">
+                                                <IconButton
+                                                    aria-label="toggle password visibility"
+                                                    onClick={handleClickShowPassword}
+                                                    onMouseDown={handleMouseDownPassword}
+                                                    edge="end"
+                                                >
+                                                    {showPassword ? <Visibility /> : <VisibilityOff />}
+                                                </IconButton>
+                                            </InputAdornment>
+                                        ),
+                                    }}
+                                />
+                                <Button
+                                    type="submit"
+                                    fullWidth
+                                    variant="contained"
+                                    sx={{ mt: 3, mb: 2, backgroundColor: "rgb(9,90,163)" }}
+                                >
+                                    Sign In
+                                </Button>
+                                <Grid container justifyContent="flex-end">
+                                    <Grid item>
+                                        <Link href="#" variant="body2">
+                                            Forgot password?
+                                        </Link>
+                                    </Grid>
+                                </Grid>
+                            </Box>
+                        </CardContent>
+                    </Card>
+                </Grid>
+            </Grid >
+        </>
     );
 }

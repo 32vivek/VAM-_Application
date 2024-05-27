@@ -1,8 +1,12 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import DataTable from "react-data-table-component";
-import { Box, TextField } from "@mui/material";
+import { Box, TextField, CircularProgress, createTheme, ThemeProvider } from "@mui/material";
+
 
 const CustomDataTable = ({ columns, filteredData, filterText, handleSearch }) => {
+
+
+    const [loading, setLoading] = useState(true);
     const tableCustomStyles = {
         headCells: {
             style: {
@@ -67,29 +71,57 @@ const CustomDataTable = ({ columns, filteredData, filterText, handleSearch }) =>
         },
     };
 
+    useEffect(() => {
+
+        const timer = setTimeout(() => {
+            setLoading(false);
+        }, 2000);
+
+
+        return () => clearTimeout(timer);
+    }, []);
+
+    const theme = createTheme({
+        palette: {
+            primary: {
+                main: "#3C565B",
+            },
+        },
+    });
+
     return (
-        <Box>
-            <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 1 }}>
-                <TextField
-                    size="small"
-                    variant="standard"
-                    placeholder="Search"
-                    value={filterText}
-                    onChange={handleSearch}
-                />
+        <ThemeProvider theme={theme}>
+            <Box>
+                {/* <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 1 }}>
+                    <TextField
+                        size="small"
+                        variant="standard"
+                        placeholder="Search"
+                        value={filterText}
+                        onChange={handleSearch}
+                    />
+                </Box> */}
+                {loading ? (
+                    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '300px' }}>
+                        <CircularProgress color="primary" />
+                    </Box>
+                ) : (
+                    <DataTable
+                        customStyles={tableCustomStyles}
+                        columns={columns}
+                        data={filteredData}
+                        pagination
+                        fixedHeader
+                        fixedHeaderScrollHeight="300px"
+                        selectableRowsHighlight
+                        highlightOnHover
+                        striped
+                        dense
+                    // responsive
+                    />
+                )}
             </Box>
-            <DataTable
-                customStyles={tableCustomStyles}
-                columns={columns}
-                data={filteredData}
-                pagination
-                fixedHeader
-                fixedHeaderScrollHeight="300px"
-                selectableRowsHighlight
-                highlightOnHover
-                striped
-            />
-        </Box>
+        </ThemeProvider>
     );
 };
 

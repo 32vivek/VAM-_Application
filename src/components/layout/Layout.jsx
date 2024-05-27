@@ -17,11 +17,14 @@ import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import InboxIcon from '@mui/icons-material/MoveToInbox';
-import MailIcon from '@mui/icons-material/Mail';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import PersonIcon from '@mui/icons-material/Person';
-import Footer from './Footer';
-import { Outlet, useNavigate } from "react-router-dom";
+import HomeIcon from '@mui/icons-material/Home';
+import SettingsIcon from '@mui/icons-material/Settings';
+import ExpandLess from '@mui/icons-material/ExpandLess';
+import ExpandMore from '@mui/icons-material/ExpandMore';
+import Collapse from '@mui/material/Collapse';
+import { Outlet, useNavigate, useLocation } from "react-router-dom";
 
 const drawerWidth = 240;
 
@@ -49,7 +52,7 @@ const closedMixin = (theme) => ({
 const DrawerHeader = styled('div')(({ theme }) => ({
     display: 'flex',
     alignItems: 'center',
-    justifyContent: 'flex-end',
+    justifyContent: 'space-between',
     padding: theme.spacing(0, 1),
     ...theme.mixins.toolbar,
 }));
@@ -93,7 +96,12 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
 export default function MiniDrawer() {
     const theme = useTheme();
     const [open, setOpen] = React.useState(false);
+    const [dashboardOpen, setDashboardOpen] = React.useState(false);
+    const [visitorOpen, setVisitorOpen] = React.useState(false);
+    const [startingUpOpen, setStartingUpOpen] = React.useState(false);
+    const [settingsOpen, setSettingsOpen] = React.useState(false);
     const navigate = useNavigate();
+    const location = useLocation();
 
     const handleDrawerOpen = () => {
         setOpen(true);
@@ -104,12 +112,26 @@ export default function MiniDrawer() {
     };
 
     const handleItemClick = (route) => {
-        if (route === '/home') {
-            navigate('/home');
-        } else {
-            navigate(route);
-        }
+        navigate(route);
     };
+
+    const handleDashboardClick = () => {
+        setDashboardOpen(!dashboardOpen);
+    };
+
+    const handleVisitorClick = () => {
+        setVisitorOpen(!visitorOpen);
+    };
+
+    const handleStartingUpClick = () => {
+        setStartingUpOpen(!startingUpOpen);
+    };
+
+    const handleSettingsClick = () => {
+        setSettingsOpen(!settingsOpen);
+    };
+
+    const isActiveRoute = (route) => location.pathname.startsWith(route);
 
     return (
         <Box sx={{ display: 'flex' }}>
@@ -128,7 +150,7 @@ export default function MiniDrawer() {
                     >
                         <MenuIcon />
                     </IconButton>
-                    <Typography variant="h6" noWrap component="div" marginLeft="auto">
+                    <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
                         USER
                     </Typography>
                 </Toolbar>
@@ -146,10 +168,13 @@ export default function MiniDrawer() {
                 </DrawerHeader>
                 <Divider />
                 <List>
-                    {['Dashboard', 'UserForm', 'Send email', 'Drafts'].map((text, index) => (
-                        <ListItem key={text} disablePadding sx={{ display: 'block' }}>
+                    {[
+                        { text: 'Home', icon: <HomeIcon />, route: '/home' }
+                    ].map((item) => (
+                        <ListItem key={item.text} disablePadding sx={{ display: 'block' }}>
                             <ListItemButton
-                                onClick={() => handleItemClick(`/${text.toLowerCase()}`)}
+                                onClick={() => handleItemClick(item.route)}
+                                selected={isActiveRoute(item.route)}
                                 sx={{
                                     minHeight: 48,
                                     justifyContent: open ? 'initial' : 'center',
@@ -161,40 +186,221 @@ export default function MiniDrawer() {
                                         minWidth: 0,
                                         mr: open ? 3 : 'auto',
                                         justifyContent: 'center',
+                                        color: isActiveRoute(item.route) ? theme.palette.primary.main : 'inherit'
                                     }}
                                 >
-                                    {text === 'Dashboard' && <DashboardIcon />} {/* Render DashboardIcon for Dashboard item */}
-                                    {text === 'UserForm' && <PersonIcon />} {/* Render PersonIcon for UserForm item */}
+                                    {item.icon}
                                 </ListItemIcon>
-                                <ListItemText primary={text} sx={{ opacity: open ? 1 : 0 }} />
+                                <ListItemText primary={item.text} sx={{ opacity: open ? 1 : 0 }} />
                             </ListItemButton>
                         </ListItem>
                     ))}
                 </List>
                 <Divider />
                 <List>
-                    {['All mail', 'Trash', 'Spam'].map((text, index) => (
-                        <ListItem key={text} disablePadding sx={{ display: 'block' }}>
-                            <ListItemButton
+                    <ListItem disablePadding sx={{ display: 'block' }}>
+                        <ListItemButton
+                            onClick={handleDashboardClick}
+                            sx={{
+                                minHeight: 48,
+                                justifyContent: open ? 'initial' : 'center',
+                                px: 2.5,
+                            }}
+                            selected={isActiveRoute('/dashboard')}
+                        >
+                            <ListItemIcon
                                 sx={{
-                                    minHeight: 48,
-                                    justifyContent: open ? 'initial' : 'center',
-                                    px: 2.5,
+                                    minWidth: 0,
+                                    mr: open ? 3 : 'auto',
+                                    justifyContent: 'center',
+                                    color: isActiveRoute('/dashboard') ? theme.palette.primary.main : 'inherit'
                                 }}
                             >
-                                <ListItemIcon
-                                    sx={{
-                                        minWidth: 0,
-                                        mr: open ? 3 : 'auto',
-                                        justifyContent: 'center',
-                                    }}
+                                <DashboardIcon />
+                            </ListItemIcon>
+                            <ListItemText primary="Dashboard" sx={{ opacity: open ? 1 : 0 }} />
+                            {dashboardOpen ? <ExpandLess /> : <ExpandMore />}
+                        </ListItemButton>
+                        <Collapse in={dashboardOpen} timeout="auto" unmountOnExit>
+                            <List component="div" disablePadding>
+                                <ListItemButton
+                                    sx={{ pl: 4 }}
+                                    onClick={() => handleItemClick('/dashboard/visitorsstatus')}
+                                    selected={isActiveRoute('/dashboard/visitorsstatus')}
                                 >
-                                    {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-                                </ListItemIcon>
-                                <ListItemText primary={text} sx={{ opacity: open ? 1 : 0 }} />
-                            </ListItemButton>
-                        </ListItem>
-                    ))}
+                                    <ListItemText primary="Visitor Status" />
+                                </ListItemButton>
+                            </List>
+                        </Collapse>
+                    </ListItem>
+                    <ListItem disablePadding sx={{ display: 'block' }}>
+                        <ListItemButton
+                            onClick={handleVisitorClick}
+                            sx={{
+                                minHeight: 48,
+                                justifyContent: open ? 'initial' : 'center',
+                                px: 2.5,
+                            }}
+                            selected={isActiveRoute('/visitor')}
+                        >
+                            <ListItemIcon
+                                sx={{
+                                    minWidth: 0,
+                                    mr: open ? 3 : 'auto',
+                                    justifyContent: 'center',
+                                    color: isActiveRoute('/visitor') ? theme.palette.primary.main : 'inherit'
+                                }}
+                            >
+                                <PersonIcon />
+                            </ListItemIcon>
+                            <ListItemText primary="Visitor" sx={{ opacity: open ? 1 : 0 }} />
+                            {visitorOpen ? <ExpandLess /> : <ExpandMore />}
+                        </ListItemButton>
+                        <Collapse in={visitorOpen} timeout="auto" unmountOnExit>
+                            <List component="div" disablePadding>
+                                <ListItemButton
+                                    sx={{ pl: 4 }}
+                                    onClick={() => handleItemClick('/visitor/visitoractivity')}
+                                    selected={isActiveRoute('/visitor/visitoractivity')}
+                                >
+                                    <ListItemText primary="Visitor Entry" />
+                                </ListItemButton>
+                                <ListItemButton
+                                    sx={{ pl: 4 }}
+                                    onClick={() => handleItemClick('/visitor/subitem1')}
+                                    selected={isActiveRoute('/visitor/subitem2')}
+                                >
+                                    <ListItemText primary="Pre Request" />
+                                </ListItemButton>
+                                <ListItemButton
+                                    sx={{ pl: 4 }}
+                                    onClick={() => handleItemClick('/visitorstatus')}
+                                    selected={isActiveRoute('/visitorstatus')}
+                                >
+                                    <ListItemText primary="Visitor Status" />
+                                </ListItemButton>
+                            </List>
+                        </Collapse>
+                    </ListItem>
+                    <ListItem disablePadding sx={{ display: 'block' }}>
+                        <ListItemButton
+                            onClick={handleStartingUpClick}
+                            sx={{
+                                minHeight: 48,
+                                justifyContent: open ? 'initial' : 'center',
+                                px: 2.5,
+                            }}
+                            selected={isActiveRoute('/startingup')}
+                        >
+                            <ListItemIcon
+                                sx={{
+                                    minWidth: 0,
+                                    mr: open ? 3 : 'auto',
+                                    justifyContent: 'center',
+                                    color: isActiveRoute('/startingup') ? theme.palette.primary.main : 'inherit'
+                                }}
+                            >
+                                <InboxIcon />
+                            </ListItemIcon>
+                            <ListItemText primary="Starting Up" sx={{ opacity: open ? 1 : 0 }} />
+                            {startingUpOpen ? <ExpandLess /> : <ExpandMore />}
+                        </ListItemButton>
+                        <Collapse in={startingUpOpen} timeout="auto" unmountOnExit>
+                            <List component="div" disablePadding>
+                                <ListItemButton
+                                    sx={{ pl: 4 }}
+                                    onClick={() => handleItemClick('/startingup/subitem1')}
+                                    selected={isActiveRoute('/startingup/subitem1')}
+                                >
+                                    <ListItemText primary="Purpose" />
+                                </ListItemButton>
+                                <ListItemButton
+                                    sx={{ pl: 4 }}
+                                    onClick={() => handleItemClick('/startingup/purpose')}
+                                    selected={isActiveRoute('/startingup/purpose')}
+                                >
+                                    <ListItemText primary="Plant" />
+                                </ListItemButton>
+                                <ListItemButton
+                                    sx={{ pl: 4 }}
+                                    onClick={() => handleItemClick('/startingup/plant')}
+                                    selected={isActiveRoute('/startingup/plant')}
+                                >
+                                    <ListItemText primary="Unit Settings" />
+                                </ListItemButton>
+                                <ListItemButton
+                                    sx={{ pl: 4 }}
+                                    onClick={() => handleItemClick('/startingup/unit')}
+                                    selected={isActiveRoute('/startingup/unit')}
+                                >
+                                    <ListItemText primary="Summary Report" />
+                                </ListItemButton>
+                                <ListItemButton
+                                    sx={{ pl: 4 }}
+                                    onClick={() => handleItemClick('/startingup/summary')}
+                                    selected={isActiveRoute('/startingup/summary')}
+                                >
+                                    <ListItemText primary="Driver Licence" />
+                                </ListItemButton>
+                                <ListItemButton
+                                    sx={{ pl: 4 }}
+                                    onClick={() => handleItemClick('/startingup/d-licence')}
+                                    selected={isActiveRoute('/startingup/d-licence')}
+                                >
+                                    <ListItemText primary="Vehicle Licence" />
+                                </ListItemButton>
+                            </List>
+                        </Collapse>
+                    </ListItem>
+                    <ListItem disablePadding sx={{ display: 'block' }}>
+                        <ListItemButton
+                            onClick={handleSettingsClick}
+                            sx={{
+                                minHeight: 48,
+                                justifyContent: open ? 'initial' : 'center',
+                                px: 2.5,
+                            }}
+                            selected={isActiveRoute('/settings')}
+                        >
+                            <ListItemIcon
+                                sx={{
+                                    minWidth: 0,
+                                    mr: open ? 3 : 'auto',
+                                    justifyContent: 'center',
+                                    color: isActiveRoute('/settings') ? theme.palette.primary.main : 'inherit'
+                                }}
+                            >
+                                <SettingsIcon />
+                            </ListItemIcon>
+                            <ListItemText primary="Settings" sx={{ opacity: open ? 1 : 0 }} />
+                            {settingsOpen ? <ExpandLess /> : <ExpandMore />}
+                        </ListItemButton>
+                        <Collapse in={settingsOpen} timeout="auto" unmountOnExit>
+                            <List component="div" disablePadding>
+                                <ListItemButton
+                                    sx={{ pl: 4 }}
+                                    onClick={() => handleItemClick('/settings/department')}
+                                    selected={isActiveRoute('/settings/department')}
+                                >
+                                    <ListItemText primary="Department" />
+                                </ListItemButton>
+                                <ListItemButton
+                                    sx={{ pl: 4 }}
+                                    onClick={() => handleItemClick('/settings/contact')}
+                                    selected={isActiveRoute('/settings/contact')}
+                                >
+                                    <ListItemText primary="Contact" />
+                                </ListItemButton>
+                                <ListItemButton
+                                    sx={{ pl: 4 }}
+                                    onClick={() => handleItemClick('/settings/user')}
+                                    selected={isActiveRoute('/settings/user')}
+                                >
+                                    <ListItemText primary="User" />
+                                </ListItemButton>
+                            </List>
+                        </Collapse>
+                    </ListItem>
                 </List>
             </Drawer>
             <Box component="main" sx={{ flexGrow: 1, p: 3 }}>

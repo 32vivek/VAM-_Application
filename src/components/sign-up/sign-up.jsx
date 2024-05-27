@@ -62,7 +62,7 @@ export default function SignUpSide() {
                         <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1, width: '100%' }}>
                             <TextField
                                 margin="normal"
-                                required
+                                // required
                                 fullWidth
                                 id="name"
                                 label="Name"
@@ -73,7 +73,7 @@ export default function SignUpSide() {
                             />
                             <TextField
                                 margin="normal"
-                                required
+                                // required
                                 fullWidth
                                 id="email"
                                 label="Email Address"
@@ -83,7 +83,7 @@ export default function SignUpSide() {
                             />
                             <TextField
                                 margin="normal"
-                                required
+                                // required
                                 fullWidth
                                 name="password"
                                 label="Password"
