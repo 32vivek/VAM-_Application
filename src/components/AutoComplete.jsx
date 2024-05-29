@@ -2,14 +2,24 @@ import React from 'react';
 import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
 
-const Autocmp = ({ name, label, size, required, options }) => {
+const Autocmp = ({ name, label, size, required, options, value, onChange }) => {
     return (
         <Autocomplete
             options={options}
-            renderInput={(params) => <TextField {...params} label={label} />}
+            getOptionLabel={(option) => option.label}
+            renderInput={(params) => (
+                <TextField
+                    {...params}
+                    label={label}
+                    required={required}
+                    InputLabelProps={{ style: { color: 'black' } }}
+                />
+            )}
             size={size}
-            required={required}
+            value={value}
+            onChange={(event, newValue) => onChange(name, newValue)}
         />
+
     );
 };
 

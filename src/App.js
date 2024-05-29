@@ -15,6 +15,9 @@ import VisitedPurpose from './pages/totalvisitor/VisitedPurpose';
 import VisitedDepartment from './pages/totalvisitor/VisitedDepartment';
 import VisitedStatus from './pages/totalvisitor/VisitorStatus';
 import VisitorActivity from './pages/visitorEntry/VisitorEntry';
+import AddPreVisitors from './pages/visitorEntry/AddPreVisitors';
+import AddInstantVisitors from './pages/visitorEntry/AddinstantVisitors';
+import PreRequest from './pages/visitorEntry/PreRequest';
 function App() {
   return (
     <div className="App">
@@ -36,7 +39,11 @@ function App() {
                 <Route path='/dashboard/visitorsstatus/purpose' element={<VisitedPurpose />} />
                 <Route path='/dashboard/visitorsstatus/department' element={<VisitedDepartment />} />
               </Route>
-              <Route path="/visitor/visitoractivity" element={<VisitorActivity />} />
+              <Route path="/visitor/visitoractivity" element={<VisitorActivity />} >
+                <Route path="/visitor/visitoractivity" element={<AddInstantVisitors />} />
+                <Route path="/visitor/visitoractivity/addprevisitors" element={<AddPreVisitors />} />
+              </Route>
+              <Route path='/visitor/prerequest' element={<PreRequest />} />
             </Route>
             {/* </Route> */}
           </Routes>

@@ -4,17 +4,17 @@ import { Checkbox, FormControlLabel, FormGroup, FormControl, FormLabel } from '@
 const ReusableCheckbox = ({ label, options, onChange }) => {
     return (
         <FormControl component="fieldset">
-            <FormLabel component="legend">{label}</FormLabel>
-            <FormGroup>
-                {options.map((option) => (
+            <FormLabel component="legend" style={{ color: 'black' }}>{label}</FormLabel>
+            <FormGroup row>
+                {options.map((option, index) => (
                     <FormControlLabel
-                        key={option}
+                        key={index}
                         control={
                             <Checkbox
-                                onChange={(e) => onChange(e, option)}
+                                onChange={(e) => onChange(e, option.value)}
                             />
                         }
-                        label={option}
+                        label={option.label}
                     />
                 ))}
             </FormGroup>

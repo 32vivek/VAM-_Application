@@ -5,6 +5,7 @@ import Stack from '@mui/material/Stack';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { FormControl } from '@mui/material';
 
 const ProSpan = styled('span')({
     display: 'inline-block',
@@ -46,25 +47,27 @@ function Label({ componentName, valueType, isProOnly }) {
 
 const SmallDatePicker = styled(DatePicker)(({ theme }) => ({
     '& .MuiInputBase-root': {
-        fontSize: theme.typography.body2.fontSize, // Set font size to match body2 font size
-        padding: theme.spacing(0.25, 0.5), // Set smaller padding
-        boxSizing: 'border-box', // Ensure box-sizing is border-box
-        height: '40px', // Adjust the height
+        height: '25px', // Adjust the height here
+        fontSize: theme.typography.body2.fontSize,
+        padding: theme.spacing(3.0),
+        boxSizing: 'border-box',
+        // width: "auto"
     },
-    '& input': {
-        width: 'calc(100% - 12px)', // Adjusted width to accommodate padding
-        overflow: 'hidden', // Hide any overflow text
-        textOverflow: 'ellipsis', // Use ellipsis for overflow text
+    '& .MuiFormLabel-root': {
+        color: 'black', // Change the label color to black
     },
+    // '& input': {
+    //     padding: '35px', // Adjust padding for input text
+    //     height: '35px', // Ensure the input takes full height
+    // },
 }));
 
 export default function ReusableDatePicker({ label, ...props }) {
     return (
         <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <div>
-                {/* <Label componentName={label || "DatePicker"} valueType="date" /> */}
+            <FormControl fullWidth>
                 <SmallDatePicker label={label} size="small" variant="standard" {...props} />
-            </div>
+            </FormControl>
         </LocalizationProvider>
     );
 }

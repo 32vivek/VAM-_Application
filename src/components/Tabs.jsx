@@ -1,0 +1,32 @@
+import React from 'react';
+import { Box, Tabs, Tab } from '@mui/material';
+
+const ReusableTabs = ({ tabs, selectedTab, onChange }) => {
+    return (
+        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+            <Tabs
+                value={selectedTab}
+                onChange={onChange}
+                variant="scrollable"
+                scrollButtons="auto"
+                aria-label="scrollable auto tabs example"
+            >
+                {tabs.map((tab, index) => (
+                    <Tab
+                        key={index}
+                        label={tab.label}
+                        value={index}
+                        sx={{
+                            color: 'white',
+                            '&.Mui-selected': {
+                                color: 'white', // Keep the color white for selected tab
+                            },
+                        }}
+                    />
+                ))}
+            </Tabs>
+        </Box>
+    );
+};
+
+export default ReusableTabs;

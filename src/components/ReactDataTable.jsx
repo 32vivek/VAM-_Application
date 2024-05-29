@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from "react";
 import DataTable from "react-data-table-component";
-import { Box, TextField, CircularProgress, createTheme, ThemeProvider } from "@mui/material";
+import { Box, CircularProgress, createTheme, ThemeProvider } from "@mui/material";
 
-
-const CustomDataTable = ({ columns, filteredData, filterText, handleSearch }) => {
-
-
+const CustomDataTable = ({ columns, filteredData, onSearch }) => {
     const [loading, setLoading] = useState(true);
+
     const tableCustomStyles = {
         headCells: {
             style: {
@@ -14,13 +12,13 @@ const CustomDataTable = ({ columns, filteredData, filterText, handleSearch }) =>
                 fontSize: "14px",
                 color: "white",
                 backgroundColor: "#3C565B",
-                // height: "40px",
             },
         },
         cells: {
             style: {
                 fontSize: "12px",
-                padding: "8px",
+                padding: "4px",
+                margin: "0px",
             },
         },
         rows: {
@@ -31,17 +29,6 @@ const CustomDataTable = ({ columns, filteredData, filterText, handleSearch }) =>
                     borderBottomWidth: '1px',
                     borderBottomColor: '#E0E0E0',
                 },
-            },
-            stripedStyle: {
-                '&:nth-of-type(odd)': {
-                    backgroundColor: '#F9F9F9',
-                },
-            },
-            highlightOnHoverStyle: {
-                backgroundColor: '#EEE',
-                borderBottomColor: '#FFF',
-                outline: '1px solid #FFF',
-                cursor: 'pointer',
             },
         },
         pagination: {
@@ -72,14 +59,14 @@ const CustomDataTable = ({ columns, filteredData, filterText, handleSearch }) =>
     };
 
     useEffect(() => {
-
         const timer = setTimeout(() => {
             setLoading(false);
         }, 2000);
 
-
         return () => clearTimeout(timer);
     }, []);
+
+
 
     const theme = createTheme({
         palette: {
@@ -91,16 +78,7 @@ const CustomDataTable = ({ columns, filteredData, filterText, handleSearch }) =>
 
     return (
         <ThemeProvider theme={theme}>
-            <Box>
-                {/* <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 1 }}>
-                    <TextField
-                        size="small"
-                        variant="standard"
-                        placeholder="Search"
-                        value={filterText}
-                        onChange={handleSearch}
-                    />
-                </Box> */}
+            <Box sx={{ overflowX: 'auto', width: "98.5%" }}>
                 {loading ? (
                     <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '300px' }}>
                         <CircularProgress color="primary" />
@@ -113,12 +91,31 @@ const CustomDataTable = ({ columns, filteredData, filterText, handleSearch }) =>
                         pagination
                         fixedHeader
                         fixedHeaderScrollHeight="300px"
-                        selectableRowsHighlight
+                        responsive
+
+                        selectableRowHighlight
                         highlightOnHover
                         striped
                         dense
-                    // responsive
+                        subHeader
+                        subHeaderComponent={
+                            <input
+                                type="text"
+                                placeholder="Search..."
+                                onChange={(e) => onSearch(e.target.value)}
+                                style={{
+                                    width: '15%',
+                                    height: '40px', // Increased height
+                                    padding: '10px',
+                                    fontSize: '14px',
+                                    borderRadius: '5px',
+                                    border: '1px solid #ddd',
+                                }}
+                            />
+                        }
+
                     />
+
                 )}
             </Box>
         </ThemeProvider>

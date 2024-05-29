@@ -267,18 +267,12 @@ export default function MiniDrawer() {
                                 </ListItemButton>
                                 <ListItemButton
                                     sx={{ pl: 4 }}
-                                    onClick={() => handleItemClick('/visitor/subitem1')}
-                                    selected={isActiveRoute('/visitor/subitem2')}
+                                    onClick={() => handleItemClick('/visitor/prerequest')}
+                                    selected={isActiveRoute('/visitor/prerequest')}
                                 >
                                     <ListItemText primary="Pre Request" />
                                 </ListItemButton>
-                                <ListItemButton
-                                    sx={{ pl: 4 }}
-                                    onClick={() => handleItemClick('/visitorstatus')}
-                                    selected={isActiveRoute('/visitorstatus')}
-                                >
-                                    <ListItemText primary="Visitor Status" />
-                                </ListItemButton>
+
                             </List>
                         </Collapse>
                     </ListItem>
