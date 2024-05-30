@@ -13,7 +13,7 @@ const ThisWeekVisitor = () => {
                         <Box display="flex" flexDirection="column" justifyContent="center" alignItems="center" height="100%">
                             <PeopleIcon style={{ fontSize: 50, color: 'white' }} />
                             <Typography variant="h5" textAlign="center" color="white">Total Visitor</Typography>
-                            <Typography variant="h6" textAlign="center" color="white">0</Typography>
+                            <Typography variant="h6" textAlign="center" color="white">9</Typography>
                         </Box>
                     </Paper>
                 </Box>
@@ -24,7 +24,7 @@ const ThisWeekVisitor = () => {
                         <Box display="flex" flexDirection="column" justifyContent="center" alignItems="center" height="100%">
                             <ExitToAppIcon style={{ fontSize: 50, color: 'white' }} />
                             <Typography variant="h5" textAlign="center" color="white">Visitor Out</Typography>
-                            <Typography variant="h6" textAlign="center" color="white">0</Typography>
+                            <Typography variant="h6" textAlign="center" color="white">4</Typography>
                         </Box>
                     </Paper>
                 </Box>
@@ -35,7 +35,7 @@ const ThisWeekVisitor = () => {
                         <Box display="flex" flexDirection="column" justifyContent="center" alignItems="center" height="100%">
                             <PersonAddIcon style={{ fontSize: 50, color: 'white' }} />
                             <Typography variant="h5" textAlign="center" color="white">Visitor In</Typography>
-                            <Typography variant="h6" textAlign="center" color="white">0</Typography>
+                            <Typography variant="h6" textAlign="center" color="white">5</Typography>
                         </Box>
                     </Paper>
                 </Box>

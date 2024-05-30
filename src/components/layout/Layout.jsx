@@ -25,7 +25,7 @@ import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import Collapse from '@mui/material/Collapse';
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
-
+import Footer from "./Footer";
 const drawerWidth = 240;
 
 const openedMixin = (theme) => ({
@@ -136,8 +136,8 @@ export default function MiniDrawer() {
     return (
         <Box sx={{ display: 'flex' }}>
             <CssBaseline />
-            <AppBar position="fixed" open={open}>
-                <Toolbar>
+            <AppBar open={open}>
+                <Toolbar >
                     <IconButton
                         color="inherit"
                         aria-label="open drawer"
@@ -150,7 +150,7 @@ export default function MiniDrawer() {
                     >
                         <MenuIcon />
                     </IconButton>
-                    <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
+                    <Typography variant="h6" display="flex" alignItems="end" justifyContent="end" noWrap component="div" sx={{ flexGrow: 1 }}>
                         USER
                     </Typography>
                 </Toolbar>

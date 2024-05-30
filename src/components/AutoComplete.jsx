@@ -11,6 +11,7 @@ const Autocmp = ({ name, label, size, required, options, value, onChange }) => {
                 <TextField
                     {...params}
                     label={label}
+                    variant="standard"
                     required={required}
                     InputLabelProps={{ style: { color: 'black' } }}
                 />

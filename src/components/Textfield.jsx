@@ -18,6 +18,7 @@ const Texxt = ({ name, size, label, type, placeholder, required, multiline, rows
                 helperText={helperText}
                 onChange={onChange}
                 value={value}
+                variant='standard'
                 InputLabelProps={{
                     style: { color: 'black' }
                 }}

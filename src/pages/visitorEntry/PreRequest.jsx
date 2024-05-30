@@ -2,7 +2,6 @@ import { Grid, FormControl, Box, IconButton, Typography, Tooltip, SwipeableDrawe
 import { Search } from '@mui/icons-material';
 import React, { useState, useEffect } from 'react'
 import Texxt from '../../components/Textfield';
-import ReusableDatePicker from '../../components/DateRangePicker';
 import Autocmp from '../../components/AutoComplete';
 import ButtonComponent from '../../components/Button';
 import CustomDataTable from '../../components/ReactDataTable';
@@ -14,7 +13,7 @@ import { Close as CloseIcon } from '@mui/icons-material';
 import ReusableCheckbox from '../../components/CheckBox';
 import ReusableRadioButton from '../../components/RadioButton';
 import { toast, ToastContainer, POSITION } from 'react-toastify';
-
+import DatePickers from '../../components/DateRangePicker';
 const departmentOptions = [
     { label: 'HR', value: 'hr' },
     { label: 'Engineering', value: 'engineering' },
@@ -291,9 +290,8 @@ const PreRequest = () => {
                 </Grid>
                 <Grid item lg={6} md={6} xs={12} sm={12}>
                     <Box>
-                        <ReusableDatePicker
-                            label="Meeting Schedule"
-                        />
+                        <DatePickers
+                            placeholder="From Date" />
                     </Box>
                 </Grid>
                 <Grid item lg={6} md={6} xs={12} sm={12}>
@@ -345,9 +343,8 @@ const PreRequest = () => {
 
                         />
                         {isExtendedPassRequestChecked && (
-                            <ReusableDatePicker
-                                label="Valid Till"
-                            />
+                            <DatePickers
+                                placeholder="Till Date" />
                         )}
                     </Box>
                 </Grid>
@@ -413,8 +410,8 @@ const PreRequest = () => {
                             </IconButton>
                         </Box>
                         <Box display="flex" style={{ gap: "10px", marginTop: "15px" }}>
-                            <ReusableDatePicker label="From Date" />
-                            <ReusableDatePicker label="To Date" />
+                            <DatePickers placeholder="From Date" />
+                            <DatePickers placeholder="To Date" />
                         </Box>
                         {showMoreFilters && (
                             <>

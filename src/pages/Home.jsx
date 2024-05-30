@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Box, Grid } from '@mui/material';
 import { NavLink, Outlet, useLocation, Navigate, useNavigate } from 'react-router-dom';
 import ButtonComponent from '../components/Button';
-import ReusableDatePicker from '../components/DateRangePicker';
 import ReusableTabs from '../components/Tabs';
+import DatePickers from '../components/DateRangePicker';
 const Home = () => {
     const location = useLocation();
     const navigate = useNavigate();
@@ -47,69 +47,28 @@ const Home = () => {
                                 selectedTab={selectedTab}
                             />
                         </Box>
-                        {/* <Box display="flex" gap="10px">
-                            <NavLink
-                                to="/home/today"
-                                style={{
-                                    textDecoration: activeButton === 'today' ? 'underline' : 'none',
-                                    fontWeight: activeButton === 'today' ? 'bold' : 'normal',
-                                    color: activeButton === 'today' ? 'blue' : 'inherit',
-                                }}
-                                onClick={() => handleButtonClick('today')}
-                            >
-                                <ButtonComponent
-                                    style={{
-                                        backgroundColor: activeButton === 'today' ? 'rgb(60,86,91)' : 'inherit',
-                                        color: activeButton === 'today' ? 'white' : 'black'
-                                    }}
-                                    name="Today"
-                                />
-                            </NavLink>
-                            <NavLink
-                                to="/home/week"
-                                style={{
-                                    textDecoration: activeButton === 'week' ? 'underline' : 'none',
-                                    fontWeight: activeButton === 'week' ? 'bold' : 'normal',
-                                    color: activeButton === 'week' ? 'blue' : 'inherit',
-                                }}
-                                onClick={() => handleButtonClick('week')}
-                            >
-                                <ButtonComponent
-                                    style={{
-                                        backgroundColor: activeButton === 'week' ? 'rgb(60,86,91)' : 'inherit',
-                                        color: activeButton === 'week' ? 'white' : 'black'
-                                    }}
-                                    name="This Week"
-                                />
-                            </NavLink>
-                            <NavLink
-                                to="/home/month"
-                                style={{
-                                    textDecoration: activeButton === 'month' ? 'underline' : 'none',
-                                    fontWeight: activeButton === 'month' ? 'bold' : 'normal',
-                                    color: activeButton === 'month' ? 'blue' : 'inherit',
-                                }}
-                                onClick={() => handleButtonClick('month')}
-                            >
-                                <ButtonComponent
-                                    style={{
-                                        backgroundColor: activeButton === 'month' ? 'rgb(60,86,91)' : 'inherit',
-                                        color: activeButton === 'month' ? 'white' : 'black'
-                                    }}
-                                    name="This Month"
-                                />
-                            </NavLink>
-                        </Box> */}
+
                     </Grid>
                     <Grid item lg={6} md={6} sm={12} xs={12}>
                         <Box display="flex" gap="20px">
-                            <ReusableDatePicker label="From Date" size="small" />
-                            <ReusableDatePicker label="To Date" size="small" />
-                            {/* <ButtonComponent
-                                name="Show Visitors"
-                                size="small"
-                                style={{ backgroundColor: "rgb(60,86,91)", color: "white" }}
-                            /> */}
+                            {/* <ReusableDatePicker label="From Date" size="small" /> */}
+                            {/* <ReusableDatePicker label="To Date" size="small" /> */}
+                            <DatePickers
+                                // label="Select Date"
+                                // selectedDate={startDate}
+                                label="From Date"
+                                placeholder="From Date"
+                                // onChange={(date) => setStartDate(date)}
+                                dateFormat="yyyy/MM/dd"
+                            />
+                            <DatePickers
+                                label="To Date"
+                                placeholder="To Date"
+                                // selectedDate={startDate}
+                                // onChange={(date) => setStartDate(date)}
+                                dateFormat="yyyy/MM/dd"
+                            />
+
                         </Box>
                     </Grid>
                     <Grid item lg={6} md={6} sm={12} xs={12}>

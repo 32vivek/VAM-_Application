@@ -34,8 +34,8 @@ const CustomDataTable = ({ columns, filteredData, onSearch }) => {
         pagination: {
             style: {
                 fontSize: '12px',
-                backgroundColor: '#3C565B',
-                color: 'white',
+                // backgroundColor: '#3C565B',
+                color: 'black',
                 borderTopStyle: 'solid',
                 borderTopWidth: '1px',
                 borderTopColor: '#E0E0E0',

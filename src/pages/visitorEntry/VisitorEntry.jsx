@@ -15,6 +15,7 @@ import FloatingButton from '../../components/FloatingButton';
 import ReusableTabs from '../../components/Tabs';
 import { Outlet, useNavigate } from 'react-router-dom';
 import { Close as CloseIcon } from '@mui/icons-material';
+import DatePickers from '../../components/DateRangePicker';
 
 const data1 = [
     { label: 'IN', value: 200, color: '#0088FE' },
@@ -184,8 +185,14 @@ const VisitorActivity = () => {
                             <Texxt placeholder="Search" label="Search" size="small" fullWidth onChange={(e) => handleSearch(e.target.value)} />
                         </Box>
                         <Box display="flex" style={{ gap: "10px", marginTop: "15px" }}>
-                            <ReusableDatePicker label="From Date" />
-                            <ReusableDatePicker label="To Date" />
+                            {/* <ReusableDatePicker label="From Date" />
+                            <ReusableDatePicker label="To Date" /> */}
+                            <DatePickers
+                                placeholder="From Date"
+                            />
+                            <DatePickers
+                                placeholder="To Date"
+                            />
                         </Box>
                         {showMoreFilters && (
                             <>
