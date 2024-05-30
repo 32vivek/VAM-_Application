@@ -2,7 +2,7 @@ import React from 'react';
 import TextField from '@mui/material/TextField';
 import FormControl from '@mui/material/FormControl';
 
-const Texxt = ({ name, size, label, type, placeholder, required, multiline, rows, error, helperText, onChange, value }) => {
+const Texxt = ({ name, size, label, type, variant, placeholder, required, multiline, rows, error, helperText, onChange, value }) => {
     return (
         <FormControl fullWidth>
             <TextField
@@ -18,7 +18,7 @@ const Texxt = ({ name, size, label, type, placeholder, required, multiline, rows
                 helperText={helperText}
                 onChange={onChange}
                 value={value}
-                variant='standard'
+                variant={variant}
                 InputLabelProps={{
                     style: { color: 'black' }
                 }}

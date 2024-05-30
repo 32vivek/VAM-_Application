@@ -82,12 +82,12 @@ const PreRequest = () => {
             cell: (row) => <input type="checkbox" checked={row.selected} onChange={() => handleRowSelected(row)} />,
             sortable: false,
         },
-        { name: 'Name', selector: row => row.Name, sortable: true },
-        { name: 'Email', selector: row => row.Email, sortable: true },
-        { name: 'Number', selector: row => row.Number, sortable: true },
-        { name: 'Address', selector: row => row.Address, sortable: true },
-        { name: 'Department', selector: row => row.Department, sortable: true },
-        { name: 'Number', selector: row => row.Number, sortable: true },
+        { name: 'name', selector: row => row.name, sortable: true },
+        { name: 'email', selector: row => row.email, sortable: true },
+        { name: 'number', selector: row => row.number, sortable: true },
+        { name: 'address', selector: row => row.address, sortable: true },
+        { name: 'department', selector: row => row.department, sortable: true },
+        { name: 'number', selector: row => row.number, sortable: true },
     ];
 
     const handleMoreFiltersClick = () => {

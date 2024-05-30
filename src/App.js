@@ -18,6 +18,8 @@ import VisitorActivity from './pages/visitorEntry/VisitorEntry';
 import AddPreVisitors from './pages/visitorEntry/AddPreVisitors';
 import AddInstantVisitors from './pages/visitorEntry/AddinstantVisitors';
 import PreRequest from './pages/visitorEntry/PreRequest';
+import ViewDepartment from './pages/settings/department/ViewDepartment';
+import ViewContact from './pages/settings/department/Contact';
 function App() {
   return (
     <div className="App">
@@ -44,6 +46,9 @@ function App() {
                 <Route path="/visitor/visitoractivity/addprevisitors" element={<AddPreVisitors />} />
               </Route>
               <Route path='/visitor/prerequest' element={<PreRequest />} />
+              <Route path='/settings/department' element={<ViewDepartment />} />
+              <Route path='/settings/contact' element={<ViewContact />} />
+
             </Route>
             {/* </Route> */}
           </Routes>

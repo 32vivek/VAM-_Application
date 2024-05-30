@@ -95,7 +95,7 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
 
 export default function MiniDrawer() {
     const theme = useTheme();
-    const [open, setOpen] = React.useState(false);
+    const [open, setOpen] = React.useState(true);
     const [dashboardOpen, setDashboardOpen] = React.useState(false);
     const [visitorOpen, setVisitorOpen] = React.useState(false);
     const [startingUpOpen, setStartingUpOpen] = React.useState(false);

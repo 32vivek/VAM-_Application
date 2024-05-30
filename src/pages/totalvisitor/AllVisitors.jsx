@@ -64,11 +64,12 @@ const VisitorStatus = () => {
         <>
             {location.pathname === '/dashboard/visitorsstatus' && <Navigate to="/dashboard/visitorsstatus/status" replace />}
             <Grid container spacing={1} mt="15px">
-                <Grid item lg={5} md={5} sm={6} xs={6}>
+                <Grid item lg={4} md={4} sm={6} xs={6}>
                     <Autocmp
                         name="dateWise"
                         size="small"
                         label="Date Wise"
+                        variant="standard"
                         value={formData.dateWise}
                         options={dateOptions}
                         onChange={(e, value) => handleChange('dateWise', value)}
@@ -87,7 +88,7 @@ const VisitorStatus = () => {
                     </Box>
                 </Grid>
                 <Grid item lg={5} md={5} sm={6} xs={6}>
-                    <Box mt="20px">
+                    <Box mt="40px">
                         <ButtonComponent
                             name="Search"
                             variant="contained"

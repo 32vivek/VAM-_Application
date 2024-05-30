@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from "react";
 import DataTable from "react-data-table-component";
-import { Box, CircularProgress, createTheme, ThemeProvider } from "@mui/material";
+import { Box, IconButton, CircularProgress, createTheme, ThemeProvider } from "@mui/material";
+import { FileCopy, GetApp, Description } from '@mui/icons-material'; // Import icons for copy, download as XLSX, download as CSV
+import XLSX from 'xlsx';
+import { saveAs } from 'file-saver';
 
-const CustomDataTable = ({ columns, filteredData, onSearch }) => {
+const CustomDataTable = ({ columns, data, onSearch, copyEnabled, onCopy, downloadEnabled, onDownloadXLSX }) => {
     const [loading, setLoading] = useState(true);
 
     const tableCustomStyles = {
@@ -17,7 +20,7 @@ const CustomDataTable = ({ columns, filteredData, onSearch }) => {
         cells: {
             style: {
                 fontSize: "12px",
-                padding: "4px",
+                padding: "2px",
                 margin: "0px",
             },
         },
@@ -34,12 +37,10 @@ const CustomDataTable = ({ columns, filteredData, onSearch }) => {
         pagination: {
             style: {
                 fontSize: '12px',
-                // backgroundColor: '#3C565B',
                 color: 'black',
                 borderTopStyle: 'solid',
                 borderTopWidth: '1px',
                 borderTopColor: '#E0E0E0',
-
             },
             pageButtonsStyle: {
                 borderRadius: '50%',
@@ -66,8 +67,6 @@ const CustomDataTable = ({ columns, filteredData, onSearch }) => {
         return () => clearTimeout(timer);
     }, []);
 
-
-
     const theme = createTheme({
         palette: {
             primary: {
@@ -75,6 +74,18 @@ const CustomDataTable = ({ columns, filteredData, onSearch }) => {
             },
         },
     });
+
+    const handleCopy = () => {
+        if (onCopy) {
+            onCopy();
+        }
+    };
+
+    const handleDownloadXLSX = () => {
+        if (onDownloadXLSX) {
+            onDownloadXLSX();
+        }
+    };
 
     return (
         <ThemeProvider theme={theme}>
@@ -87,35 +98,45 @@ const CustomDataTable = ({ columns, filteredData, onSearch }) => {
                     <DataTable
                         customStyles={tableCustomStyles}
                         columns={columns}
-                        data={filteredData}
+                        data={data}
                         pagination
                         fixedHeader
                         fixedHeaderScrollHeight="300px"
                         responsive
-
                         selectableRowHighlight
                         highlightOnHover
                         striped
                         dense
                         subHeader
                         subHeaderComponent={
-                            <input
-                                type="text"
-                                placeholder="Search..."
-                                onChange={(e) => onSearch(e.target.value)}
-                                style={{
-                                    width: '15%',
-                                    height: '40px', // Increased height
-                                    padding: '10px',
-                                    fontSize: '14px',
-                                    borderRadius: '5px',
-                                    border: '1px solid #ddd',
-                                }}
-                            />
+                            <Box display="flex" alignItems="center">
+                                <input
+                                    type="text"
+                                    placeholder="Search..."
+                                    onChange={(e) => onSearch(e.target.value)}
+                                    style={{
+                                        width: '100%',
+                                        height: '40px',
+                                        padding: '10px',
+                                        fontSize: '14px',
+                                        borderRadius: '5px',
+                                        border: '1px solid #ddd',
+                                        marginLeft: '10px',
+                                    }}
+                                />
+                                {copyEnabled && (
+                                    <IconButton onClick={handleCopy}>
+                                        <FileCopy />
+                                    </IconButton>
+                                )}
+                                {downloadEnabled && (
+                                    <IconButton onClick={handleDownloadXLSX}>
+                                        <GetApp />
+                                    </IconButton>
+                                )}
+                            </Box>
                         }
-
                     />
-
                 )}
             </Box>
         </ThemeProvider>

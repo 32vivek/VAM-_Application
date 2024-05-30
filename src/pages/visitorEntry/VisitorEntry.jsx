@@ -49,12 +49,12 @@ const VisitorActivity = () => {
             cell: (row) => <input type="checkbox" checked={row.selected} onChange={() => handleRowSelected(row)} />,
             sortable: false,
         },
-        { name: 'Name', selector: row => row.Name, sortable: true },
-        { name: 'Email', selector: row => row.Email, sortable: true },
-        { name: 'Number', selector: row => row.Number, sortable: true },
-        { name: 'Address', selector: row => row.Address, sortable: true },
-        { name: 'Department', selector: row => row.Department, sortable: true },
-        { name: 'Number', selector: row => row.Number, sortable: true },
+        { name: 'name', selector: row => row.name, sortable: true },
+        { name: 'email', selector: row => row.email, sortable: true },
+        { name: 'number', selector: row => row.number, sortable: true },
+        { name: 'address', selector: row => row.address, sortable: true },
+        { name: 'department', selector: row => row.department, sortable: true },
+        { name: 'number', selector: row => row.number, sortable: true },
     ];
 
     const floatingActionButtonOptions = [
@@ -129,7 +129,7 @@ const VisitorActivity = () => {
                 <Box display="flex" justifyContent="space-between" style={{ marginLeft: "10px" }}>
                     <Typography variant="h5">ADD VISITORS</Typography>
                     <IconButton onClick={handleCloseDrawer}>
-                        <CloseIcon style={{ color: "red" }} />
+                        <CloseIcon style={{ color: "black" }} />
                     </IconButton>
                 </Box>
             </Grid>
@@ -181,8 +181,8 @@ const VisitorActivity = () => {
                 </Grid>
                 <Grid item lg={4} md={4} sm={12} xs={12}>
                     <Box boxShadow={3} padding={2} borderRadius={2}>
-                        <Box boxShadow={1} marginBottom={2}>
-                            <Texxt placeholder="Search" label="Search" size="small" fullWidth onChange={(e) => handleSearch(e.target.value)} />
+                        <Box marginBottom={2}>
+                            <Texxt placeholder="Search" variant="standard" label="Search" size="small" fullWidth onChange={(e) => handleSearch(e.target.value)} />
                         </Box>
                         <Box display="flex" style={{ gap: "10px", marginTop: "15px" }}>
                             {/* <ReusableDatePicker label="From Date" />
