@@ -105,6 +105,7 @@ const AddPreVisitors = () => {
                 position: "top-right",
                 style: {
                     backgroundColor: 'rgb(60,86,91)',
+                    color: "white",
                 },
             });
 
@@ -114,6 +115,7 @@ const AddPreVisitors = () => {
                 position: "top-right",
                 style: {
                     backgroundColor: 'rgb(60,86,91)',
+                    color: "white"
                 },
             });
 
@@ -125,7 +127,7 @@ const AddPreVisitors = () => {
 
     return (
         <>
-            <ToastContainer style={{ marginTop: '40px', color: "white" }} />
+            <ToastContainer style={{ marginTop: '60px', color: "white" }} />
             <Box component="form" sx={{}}>
                 <Grid container spacing={2} sx={{ p: 3 }}>
                     <Grid item lg={10} md={10} sm={12} xs={12}>

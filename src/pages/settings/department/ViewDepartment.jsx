@@ -163,9 +163,10 @@ const ViewDepartment = () => {
             toast.success("Form submitted successfully!", {
                 autoClose: 3000,
                 position: "top-right",
-                style: {
-                    backgroundColor: 'rgb(60,86,91)',
-                },
+                // style: {
+                //     backgroundColor: 'rgb(60,86,91)',
+                //     color: "white",
+                // },
             });
             // Reset form data state
             setDepartments([{ department: '', departmentCode: '' }]);
@@ -175,22 +176,23 @@ const ViewDepartment = () => {
             toast.error("Please fill in all required fields.", {
                 autoClose: 3000,
                 position: "top-right",
-                style: {
-                    backgroundColor: 'rgb(60,86,91)',
-                },
+                // style: {
+                //     backgroundColor: 'rgb(60,86,91)',
+                //     color: "white",
+                // },
             });
         }
     };
 
     const addInstantVisitors = (
         <>
-            <ToastContainer style={{ marginTop: '40px' }} toastStyle={{ color: 'white' }} />
+            <ToastContainer style={{ marginTop: '60px' }} />
 
             <Box component="form" sx={{ mt: "70px", mb: "20px", gap: "10px" }} >
                 <Grid container>
                     <Grid item lg={12} md={12} sm={12} xs={12}>
                         <Box display="flex" justifyContent="space-between" backgroundColor="rgb(60,86,91)" style={{ marginTop: "20px" }}>
-                            <Typography variant="h5" color="white" mt="5px" ml="10px">ADD Department</Typography>
+                            <Typography variant="h5" color="white" mt="5px" ml="10px">Add Department</Typography>
                             <IconButton onClick={handleCloseDrawer}>
                                 <CloseIcon style={{ color: "white" }} />
                             </IconButton>
@@ -251,6 +253,7 @@ const ViewDepartment = () => {
                 <Grid item lg={12} md={12} sm={12} xs={12}>
                     <Box display="flex" justifyContent="center" alignItems="center" style={{ gap: "10px" }}>
                         <ButtonComponent name="Save" variant="contained" size="small" onClick={handleSubmit} />
+                        <ButtonComponent name="Cancel" variant="contained" color="secondary" size="small" onClick={handleCloseDrawer} />
                         <ButtonComponent name="Reset" variant="contained" size="small" style={{ backgroundColor: "red", color: "white" }} onClick={() => {
                             setDepartments([{ department: '', departmentCode: '' }]);
                             setErrors([{ department: '', departmentCode: '' }]);

@@ -20,6 +20,13 @@ import AddInstantVisitors from './pages/visitorEntry/AddinstantVisitors';
 import PreRequest from './pages/visitorEntry/PreRequest';
 import ViewDepartment from './pages/settings/department/ViewDepartment';
 import ViewContact from './pages/settings/department/Contact';
+import User from './pages/settings/department/User';
+import Purpose from './pages/startingup/Purpose';
+import Plant from './pages/startingup/Plant';
+import UnitSettings from './pages/startingup/UnitSettings';
+import SummaryReport from './pages/startingup/SummaryReport';
+import DriverLicence from './pages/startingup/DriverLicence';
+import VehicleLicence from './pages/startingup/VehicleLicence';
 function App() {
   return (
     <div className="App">
@@ -48,7 +55,13 @@ function App() {
               <Route path='/visitor/prerequest' element={<PreRequest />} />
               <Route path='/settings/department' element={<ViewDepartment />} />
               <Route path='/settings/contact' element={<ViewContact />} />
-
+              <Route path='/settings/user' element={<User />} />
+              <Route path='/startingup/purpose' element={<Purpose />} />
+              <Route path='/startingup/plant' element={<Plant />} />
+              <Route path='/startingup/unit' element={<UnitSettings />} />
+              <Route path='/startingup/summary' element={<SummaryReport />} />
+              <Route path='/startingup/dl' element={<DriverLicence />} />
+              <Route path='/startingup/vl' element={<VehicleLicence />} />
             </Route>
             {/* </Route> */}
           </Routes>

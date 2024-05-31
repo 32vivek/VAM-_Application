@@ -303,43 +303,43 @@ export default function MiniDrawer() {
                             <List component="div" disablePadding>
                                 <ListItemButton
                                     sx={{ pl: 4 }}
-                                    onClick={() => handleItemClick('/startingup/subitem1')}
-                                    selected={isActiveRoute('/startingup/subitem1')}
-                                >
-                                    <ListItemText primary="Purpose" />
-                                </ListItemButton>
-                                <ListItemButton
-                                    sx={{ pl: 4 }}
                                     onClick={() => handleItemClick('/startingup/purpose')}
                                     selected={isActiveRoute('/startingup/purpose')}
                                 >
-                                    <ListItemText primary="Plant" />
+                                    <ListItemText primary="Purpose" />
                                 </ListItemButton>
                                 <ListItemButton
                                     sx={{ pl: 4 }}
                                     onClick={() => handleItemClick('/startingup/plant')}
                                     selected={isActiveRoute('/startingup/plant')}
                                 >
-                                    <ListItemText primary="Unit Settings" />
+                                    <ListItemText primary="Plant" />
                                 </ListItemButton>
                                 <ListItemButton
                                     sx={{ pl: 4 }}
                                     onClick={() => handleItemClick('/startingup/unit')}
                                     selected={isActiveRoute('/startingup/unit')}
                                 >
-                                    <ListItemText primary="Summary Report" />
+                                    <ListItemText primary="Unit Settings" />
                                 </ListItemButton>
                                 <ListItemButton
                                     sx={{ pl: 4 }}
                                     onClick={() => handleItemClick('/startingup/summary')}
                                     selected={isActiveRoute('/startingup/summary')}
                                 >
+                                    <ListItemText primary="Summary Report" />
+                                </ListItemButton>
+                                <ListItemButton
+                                    sx={{ pl: 4 }}
+                                    onClick={() => handleItemClick('/startingup/dl')}
+                                    selected={isActiveRoute('/startingup/dl')}
+                                >
                                     <ListItemText primary="Driver Licence" />
                                 </ListItemButton>
                                 <ListItemButton
                                     sx={{ pl: 4 }}
-                                    onClick={() => handleItemClick('/startingup/d-licence')}
-                                    selected={isActiveRoute('/startingup/d-licence')}
+                                    onClick={() => handleItemClick('/startingup/vl')}
+                                    selected={isActiveRoute('/startingup/vl')}
                                 >
                                     <ListItemText primary="Vehicle Licence" />
                                 </ListItemButton>

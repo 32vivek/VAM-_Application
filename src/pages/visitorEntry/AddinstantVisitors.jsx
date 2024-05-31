@@ -108,7 +108,7 @@ const AddInstantVisitors = () => {
                 position: "top-right",
                 style: {
                     backgroundColor: 'rgb(60,86,91)',
-
+                    color: "white",
                 },
             });
 
@@ -118,7 +118,7 @@ const AddInstantVisitors = () => {
                 position: "top-right",
                 style: {
                     backgroundColor: 'rgb(60,86,91)',
-
+                    color: "white",
                 },
             });
 
@@ -131,7 +131,7 @@ const AddInstantVisitors = () => {
 
     return (
         <>
-            <ToastContainer style={{ marginTop: '40px' }} toastStyle={{ color: 'white' }} />
+            <ToastContainer style={{ marginTop: '60px' }} toastStyle={{ color: 'white' }} />
             <Box sx={{}}>
                 <Grid container spacing={2} sx={{ p: 3 }}>
                     <Grid item lg={10} md={10} sm={12} xs={12}>

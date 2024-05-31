@@ -2,8 +2,7 @@ import React, { useState, useEffect } from "react";
 import DataTable from "react-data-table-component";
 import { Box, IconButton, CircularProgress, createTheme, ThemeProvider } from "@mui/material";
 import { FileCopy, GetApp, Description } from '@mui/icons-material'; // Import icons for copy, download as XLSX, download as CSV
-import XLSX from 'xlsx';
-import { saveAs } from 'file-saver';
+
 
 const CustomDataTable = ({ columns, data, onSearch, copyEnabled, onCopy, downloadEnabled, onDownloadXLSX }) => {
     const [loading, setLoading] = useState(true);

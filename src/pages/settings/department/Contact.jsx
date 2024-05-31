@@ -33,27 +33,58 @@ const statusOptions = [
     { label: "In Active", value: "inactive" },
 ];
 
+const accessRights = [
+    {
+        label: "Create User", value: "yes"
+    },
+
+]
+
+const info = [
+    { label: "Mail", value: "mail" }, {
+        label: "SMS", value: "sms"
+    }
+]
+
+const userType = [
+    { label: "HR", value: "hr" },
+    { label: "Admin", value: 'admin' }
+]
+
+const userTypes = [
+    { label: "HR", value: "hr" },
+    { label: "Admin", value: 'admin' }
+]
+
+
+
 const ViewContact = () => {
+
+
     const [open, setOpen] = useState(false);
     const [visitorsData, setVisitorsData] = useState([]);
     const [filteredData, setFilteredData] = useState([]);
     const [status, setStatus] = useState("active");
     const [selectedRows, setSelectedRows] = useState([]);
     const [createUserChecked, setCreateUserChecked] = useState(false);
+    const [information, setInformation] = useState(false);
 
-    // Form fields state
+
+
     const [formData, setFormData] = useState({
-        employeeId: '',
+        department: null,
         contactName: '',
         communicationName: '',
         mobileNumber: '',
         emailId: '',
-        userType: '',
+        userType: null,
         loginId: '',
         password: '',
         confirmPassword: '',
-        accessRights: '',
+        accessRights: null,
     });
+
+    const [errors, setErrors] = useState({});
 
     const toggleDrawer = (isOpen) => {
         setOpen(isOpen);
@@ -67,8 +98,27 @@ const ViewContact = () => {
         console.log('Refresh clicked');
     };
 
-    const handleStatusChange = (event, newValue) => {
-        setStatus(newValue ? newValue.value : '');
+    const handleChange = (e, name, value) => {
+        if (e && e.target && e.target.name) {
+            const { name, value } = e.target;
+            setFormData((prevFormData) => ({
+                ...prevFormData,
+                [name]: value,
+            }));
+        } else {
+            setFormData({
+                ...formData,
+                [name]: value
+            });
+        }
+    };
+
+
+    const handleInputChange = (name, value) => {
+        setFormData({
+            ...formData,
+            [name]: value
+        });
     };
 
     const columns = [
@@ -109,6 +159,10 @@ const ViewContact = () => {
         { label: 'Delete', icon: <DeleteIcon /> },
     ];
 
+    const handleStatusChange = (event, newValue) => {
+        setStatus(newValue ? newValue.value : '');
+    };
+
     const handleRowSelected = (row) => {
         const updatedData = filteredData.map((item) =>
             item === row ? { ...item, selected: !item.selected } : item
@@ -127,35 +181,108 @@ const ViewContact = () => {
         setFilteredData(filtered);
     };
 
-    const handleFormChange = (e) => {
-        const { name, value } = e.target;
-        setFormData(prevState => ({
-            ...prevState,
-            [name]: value,
-        }));
+    const handleCheckboxChange = (e) => {
+        const { name, checked } = e.target;
+        setCreateUserChecked(checked);
     };
-    const handleCheckboxChange = (checkedValues) => {
-        console.log("Checked values:", checkedValues);
-        // Update state or perform any other actions based on the checked values
+    const handleCheckboxChangeInfo = (e) => {
+        const { name, checked } = e.target;
+        setInformation(checked);
     };
+
+    const validateForm = () => {
+        const newErrors = {};
+
+        if (!formData.employeeId) {
+            newErrors.employeeId = 'Employee ID is required';
+        }
+        if (!formData.department) {
+            newErrors.department = 'Department is required';
+        }
+        if (!formData.contactName) {
+            newErrors.contactName = 'Contact Name is required';
+        }
+        if (!formData.communicationName) {
+            newErrors.communicationName = 'Communication Name is required';
+        }
+        if (!formData.mobileNumber) {
+            newErrors.mobileNumber = 'Mobile Number is required';
+        } else if (!/^\d{10}$/.test(formData.mobileNumber)) {
+            newErrors.mobileNumber = 'Mobile Number should be 10 digits long';
+        }
+        if (!formData.emailId) {
+            newErrors.emailId = 'Email is required';
+        } else if (!/^\S+@\S+\.\S+$/.test(formData.emailId)) {
+            newErrors.emailId = 'Invalid email address';
+        }
+        if (createUserChecked) {
+            if (!formData.userType) {
+                newErrors.userType = 'User Type is required';
+            }
+            if (!formData.loginId) {
+                newErrors.loginId = 'Login ID is required';
+            }
+            if (!formData.password) {
+                newErrors.password = 'Password is required';
+            }
+            if (formData.password !== formData.confirmPassword) {
+                newErrors.confirmPassword = 'Passwords do not match';
+            }
+            if (!formData.accessRights) {
+                newErrors.accessRights = 'Access Rights is required';
+            }
+        }
+
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
 
     const handleFormSubmit = (e) => {
         e.preventDefault();
-        console.log('Form Data:', formData);
 
-        // For demonstration, always showing success. Implement actual form validation and error handling as needed.
-        toast.success("Form submitted successfully!", {
-            autoClose: 3000,
-            position: "top-right",
-            style: {
-                backgroundColor: 'rgb(60,86,91)',
-            },
-        });
+        if (validateForm()) {
+            console.log('Form Data:', formData);
+
+            // Clear form fields
+            setFormData({
+                department: null,
+                contactName: '',
+                communicationName: '',
+                mobileNumber: '',
+                emailId: '',
+                userType: null,
+                loginId: '',
+                password: '',
+                confirmPassword: '',
+                accessRights: null,
+            });
+
+            // For demonstration, always showing success. Implement actual form validation and error handling as needed.
+            toast.success("Form submitted successfully!", {
+                autoClose: 3000,
+                position: "top-right",
+                style: {
+                    backgroundColor: 'rgb(60,86,91)',
+                    color: "white",
+                },
+            });
+        } else {
+            toast.error("Please correct the highlighted errors.", {
+                autoClose: 3000,
+                position: "top-right",
+                style: {
+                    backgroundColor: 'rgb(60,86,91)',
+                    color: "white",
+                },
+            });
+        }
     };
+
 
     const addInstantVisitors = (
         <>
-            <ToastContainer style={{ marginTop: '40px' }} toastStyle={{ color: 'white' }} />
+            <ToastContainer style={{ marginTop: '60px' }} />
 
             <Box component="form" sx={{ mt: "70px", mb: "20px", gap: "10px" }} >
                 <Grid container>
@@ -163,175 +290,238 @@ const ViewContact = () => {
                         <Box display="flex" justifyContent="space-between" backgroundColor="rgb(60,86,91)" style={{ marginTop: "20px" }}>
                             <Typography variant="h5" color="white" mt="5px" ml="10px">Create User</Typography>
                             <IconButton onClick={handleCloseDrawer}>
-                                <CloseIcon style={{ color: "white" }} />
+                                <CloseIcon style={{ color: 'white' }} />
                             </IconButton>
                         </Box>
                     </Grid>
                 </Grid>
-                <Grid container spacing={2} sx={{ p: 3 }}>
-                    <Grid item lg={6} md={6} sm={12} xs={12}>
-                        <Box display="flex" justifyContent="center" alignItems="center" style={{ gap: "10px" }}>
+
+                <Box p={2} sx={{ backgroundColor: '#f2f2f2', width: "100%", height: "490px" }}>
+                    <Grid container spacing={2}>
+                        <Grid item lg={6} md={6} sm={6} xs={6}>
                             <Texxt
-                                label="Employee ID"
-                                required
+                                type="text"
+                                placeholder="Employee Id"
                                 size="small"
-                                type="number"
-                                placeholder="Enter ID"
+                                label="Employee Id"
                                 name="employeeId"
+                                required
                                 value={formData.employeeId}
-                                onChange={handleFormChange}
+                                onChange={handleChange}
+                                error={errors.employeeId}
+                                helperText={errors.employeeId}
                             />
-                        </Box>
-                    </Grid>
-                    <Grid item lg={6} md={6} sm={12} xs={12}>
-                        <Autocmp
-                            label="Employee ID"
-                            name="employeeId"
-                            required
-                            size="small"
-                            options={statusOptions}
-                            onChange={handleStatusChange}
-                        />
-                    </Grid>
-                    <Grid item lg={6} md={6} sm={12} xs={12}>
-                        <Texxt
-                            label="Contact Name"
-                            required
-                            size="small"
-                            placeholder="Enter Data"
-                            name="contactName"
-                            value={formData.contactName}
-                            onChange={handleFormChange}
-                        />
-                    </Grid>
-                    <Grid item lg={6} md={6} sm={12} xs={12}>
-                        <Texxt
-                            label="Communication Name"
-                            required
-                            size="small"
-                            placeholder="Enter Data"
-                            name="communicationName"
-                            value={formData.communicationName}
-                            onChange={handleFormChange}
-                        />
-                    </Grid>
-                    <Grid item lg={6} md={6} sm={12} xs={12}>
-                        <Texxt
-                            label="Mobile Number"
-                            required
-                            size="small"
-                            type="number"
-                            placeholder="Enter Mobile Number"
-                            name="mobileNumber"
-                            value={formData.mobileNumber}
-                            onChange={handleFormChange}
-                        />
-                    </Grid>
-                    <Grid item lg={6} md={6} sm={12} xs={12}>
-                        <Texxt
-                            label="Email ID"
-                            required
-                            size="small"
-                            placeholder="Enter Email ID"
-                            name="emailId"
-                            value={formData.emailId}
-                            onChange={handleFormChange}
-                        />
-                    </Grid>
-                    <Grid item lg={6} md={6} sm={12} xs={12}>
-                        <ReusableCheckbox
-                            options={[
-                                { label: "Create User", value: "mail" },
-                            ]}
-                            checked={createUserChecked}
-                            onChange={() => setCreateUserChecked(!createUserChecked)}
-                        />
-                    </Grid>
+                        </Grid>
 
-                    {createUserChecked && (
-                        <>
-                            <Grid item lg={6} md={6} sm={12} xs={12}>
-                                <Autocmp
-                                    label="User Type"
-                                    required
-                                    size="small"
-                                    options={statusOptions}
-                                    onChange={handleStatusChange}
-                                    name="userType"
-                                    value={formData.userType}
-                                // onChange={handleFormChange}
-                                />
-                            </Grid>
-                            <Grid item lg={6} md={6} sm={12} xs={12}>
-                                <Texxt
-                                    label="Login Id"
-                                    required
-                                    size="small"
-                                    placeholder="Enter Data"
-                                    name="loginId"
-                                    value={formData.loginId}
-                                    onChange={handleFormChange}
-                                />
-                            </Grid>
-                            <Grid item lg={6} md={6} sm={12} xs={12}>
-                                <Texxt
-                                    label="Password"
-                                    required
-                                    size="small"
-                                    type="password"
-                                    placeholder="Enter Password"
-                                    name="password"
-                                    value={formData.password}
-                                    onChange={handleFormChange}
-                                />
-                            </Grid>
-                            <Grid item lg={6} md={6} sm={12} xs={12}>
-                                <Texxt
-                                    label="Confirm Password"
-                                    required
-                                    size="small"
-                                    type="password"
-                                    placeholder="Confirm Password"
-                                    name="confirmPassword"
-                                    value={formData.confirmPassword}
-                                    onChange={handleFormChange}
-                                />
-                            </Grid>
-                            <Grid item lg={6} md={6} sm={12} xs={12}>
-                                <Autocmp
-                                    label="Access Rights"
-                                    required
-                                    size="small"
-                                    options={statusOptions}
-                                    onChange={handleStatusChange}
-                                    name="accessRights"
-                                    value={formData.accessRights}
-                                // onChange={handleFormChange}
-                                />
-                            </Grid>
-                            <Grid item lg={6} md={6} xs={12} sm={12}>
-                                <Box>
-                                    <ReusableCheckbox
-                                        label="Notify Employee"
-                                        options={[
-                                            { label: "Mail", value: "mail" },
-                                            { label: "SMS", value: "sms" }
-                                        ]}
-                                        onChange={handleCheckboxChange}
+                        <Grid item lg={6} md={6} sm={6} xs={6}>
+                            <Autocmp
+                                disablePortal
+                                id="department"
+                                size="small" required
+                                options={userTypes}
+                                name="department"
+                                label="Department"
+                                value={formData.department}
+                                onChange={(e, value) => handleChange(e, "department", value)}
+                                renderInput={(params) => (
+                                    <Texxt {...params}
+                                        name="department"
+                                        error={errors.department}
+                                        helperText={errors.department}
+                                        placeholder="Department"
+                                        size="small" />
+                                )}
+                            />
+                        </Grid>
+
+                        <Grid item lg={6} md={6} sm={6} xs={6}>
+                            <Texxt
+                                type="text"
+                                placeholder="Contact Name"
+                                size="small"
+                                label="Contact Name"
+                                name="contactName" required
+                                value={formData.contactName}
+                                onChange={handleChange}
+                                error={errors.contactName}
+                                helperText={errors.contactName}
+                            />
+                        </Grid>
+
+                        <Grid item lg={6} md={6} sm={6} xs={6}>
+                            <Texxt
+                                type="text"
+                                placeholder="Communication Name"
+                                size="small"
+                                label="Communication Name" required
+                                name="communicationName"
+                                value={formData.communicationName}
+                                onChange={handleChange}
+                                error={errors.communicationName}
+                                helperText={errors.communicationName}
+                            />
+                        </Grid>
+
+                        <Grid item lg={6} md={6} sm={6} xs={6}>
+                            <Texxt
+                                type="text"
+                                placeholder="Mobile Number"
+                                size="small"
+                                name="mobileNumber"
+                                label="Mobile Number" required
+                                value={formData.mobileNumber}
+                                onChange={handleChange}
+                                error={errors.mobileNumber}
+                                helperText={errors.mobileNumber}
+                            />
+                        </Grid>
+
+                        <Grid item lg={6} md={6} sm={6} xs={6}>
+                            <Texxt
+                                type="text"
+                                placeholder="Email Id"
+                                size="small"
+                                name="emailId"
+                                label="Email Id"
+                                value={formData.emailId}
+                                onChange={handleChange}
+                            />
+                        </Grid>
+
+                        <Grid item lg={6} md={6} sm={6} xs={6}>
+                            <ReusableCheckbox
+                                name="createUser"
+                                value={createUserChecked}
+                                onChange={handleCheckboxChange}
+                                // label="Create User"
+                                options={accessRights}
+                            />
+                        </Grid>
+
+                        {createUserChecked && (
+                            <>
+                                <Grid item lg={6} md={6} sm={6} xs={6}>
+                                    <Autocmp
+                                        disablePortal
+                                        id="userType"
+                                        size="small"
+                                        options={userType}
+                                        name="userType" required
+                                        label="User Type"
+                                        value={formData.userType}
+                                        onChange={(e, value) => handleChange(e, "userType", value)}
+                                        renderInput={(params) => (
+                                            <Texxt {...params}
+                                                name="userType"
+                                                error={errors.userType}
+                                                helperText={errors.userType}
+                                                placeholder="User Type"
+                                                size="small" />
+                                        )}
                                     />
-                                </Box>
-                            </Grid>
+                                </Grid>
 
-                        </>
-                    )}
+                                <Grid item lg={6} md={6} sm={6} xs={6}>
+                                    <Texxt
+                                        type="text"
+                                        placeholder="Login Id"
+                                        size="small"
+                                        name="loginId"
+                                        label="Login Id" required
+                                        value={formData.loginId}
+                                        onChange={handleChange}
+                                        error={errors.loginId}
+                                        helperText={errors.loginId}
+                                    />
+                                </Grid>
 
-                    <Grid item lg={12} md={12} sm={12} xs={12}>
-                        <Box display="flex" justifyContent="center" alignItems="center" style={{ gap: "10px" }}>
-                            <ButtonComponent name="Save" variant="contained" size="small" type="submit" onClick={handleFormSubmit} />
-                            <ButtonComponent name="Reset" variant="contained" size="small" style={{ backgroundColor: "red", color: "white" }} />
-                        </Box>
+                                <Grid item lg={6} md={6} sm={6} xs={6}>
+                                    <Texxt
+                                        type="password"
+                                        placeholder="Password"
+                                        size="small"
+                                        name="password"
+                                        label="Password" required
+                                        value={formData.password}
+                                        onChange={handleChange}
+                                        error={errors.password}
+                                        helperText={errors.password}
+                                    />
+                                </Grid>
+
+                                <Grid item lg={6} md={6} sm={6} xs={6}>
+                                    <Texxt
+                                        type="password"
+                                        placeholder="Confirm Password"
+                                        size="small" required
+                                        label="Confirm Password"
+                                        name="confirmPassword"
+                                        value={formData.confirmPassword}
+                                        onChange={handleChange}
+                                        error={errors.confirmPassword}
+                                        helperText={errors.confirmPassword}
+                                    />
+                                </Grid>
+
+                                <Grid item lg={6} md={6} sm={6} xs={6}>
+                                    <Autocmp
+                                        disablePortal
+                                        id="accessRights"
+                                        size="small"
+                                        options={accessRights}
+                                        name="accessRights"
+                                        label="Access Rights" required
+                                        value={formData.accessRights}
+                                        onChange={(e, value) => handleChange(e, "accessRights", value)}
+                                        renderInput={(params) => (
+                                            <Texxt {...params}
+                                                name="accessRights"
+                                                error={errors.accessRights}
+                                                helperText={errors.accessRights}
+                                                placeholder="Access Rights"
+                                                size="small" />
+                                        )}
+                                    />
+                                </Grid>
+
+                                <Grid item lg={6} md={6} sm={6} xs={6}>
+                                    <ReusableCheckbox
+                                        name="sendInformation"
+                                        value={information}
+                                        onChange={handleCheckboxChangeInfo}
+                                        label="Send Info"
+                                        options={info}
+                                    />
+                                </Grid>
+                            </>
+                        )}
+
+                        <Grid item lg={12} md={12} sm={12} xs={12}>
+                            <Box display="flex" justifyContent="center" m={2} style={{ gap: "10px" }}>
+                                <ButtonComponent
+                                    onClick={handleFormSubmit}
+                                    variant="contained"
+                                    color="primary"
+                                    text="Submit"
+                                    name="Submit"
+                                />
+                                <ButtonComponent
+                                    onClick={handleCloseDrawer}
+                                    variant="contained"
+                                    color="secondary"
+                                    name="Cancel"
+                                />
+                                <ButtonComponent
+                                    variant="contained"
+                                    color="primary"
+                                    text="Reset"
+                                    name="Reset"
+                                    style={{ color: "white", backgroundColor: "red" }}
+                                />
+                            </Box>
+                        </Grid>
                     </Grid>
-                </Grid>
+                </Box>
             </Box>
         </>
     );
@@ -410,6 +600,7 @@ const ViewContact = () => {
                                 size="small"
                                 variant="outlined"
                                 options={dateOptions}
+                            // onChange={(e, value) => handleChange(null, 'department', value)}
                             />
                         </Box>
                     </Grid>
