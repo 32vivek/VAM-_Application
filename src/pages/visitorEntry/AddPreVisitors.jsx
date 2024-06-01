@@ -129,7 +129,7 @@ const AddPreVisitors = () => {
         <>
             <ToastContainer style={{ marginTop: '60px', color: "white" }} />
             <Box component="form" sx={{}}>
-                <Grid container spacing={2} sx={{ p: 3 }}>
+                <Grid container spacing={1} sx={{ p: 1 }}>
                     <Grid item lg={10} md={10} sm={12} xs={12}>
                         <Box display="flex" style={{ gap: "10px" }}>
                             <Texxt

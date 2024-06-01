@@ -73,6 +73,7 @@ const VisitorStatus = () => {
                         value={formData.dateWise}
                         options={dateOptions}
                         onChange={(e, value) => handleChange('dateWise', value)}
+
                     />
                     <Box display="flex" gap="5px" mt="8px">
                         <DatePickers
@@ -88,11 +89,13 @@ const VisitorStatus = () => {
                     </Box>
                 </Grid>
                 <Grid item lg={5} md={5} sm={6} xs={6}>
-                    <Box mt="40px">
+                    <Box mt="60px">
                         <ButtonComponent
                             name="Search"
                             variant="contained"
-                            style={{ backgroundColor: "rgb(60,86,91)", color: "white", marginLeft: "10px" }}
+                            size="small"
+                            style={{ backgroundColor: "rgb(60,86,91)", color: "white", marginLeft: "10px", fontSize: "10px" }}
+                        // style={{ fontSize: '14px', padding: '8px 16px' }}
                         />
                     </Box>
                 </Grid>

@@ -15,41 +15,14 @@ import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
 import { Search, Add, Close as CloseIcon, Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
 
-const departmentOptions = [
+const data = [
     { label: 'HR', value: 'hr' },
     { label: 'Engineering', value: 'engineering' },
     { label: 'Marketing', value: 'marketing' },
 ];
 
-const purposeOptions = [
-    { label: 'Meeting', value: 'meeting' },
-    { label: 'Interview', value: 'interview' },
-    { label: 'Delivery', value: 'delivery' },
-];
 
-const organizationOptions = [
-    { label: 'Meeting', value: 'meeting' },
-    { label: 'Interview', value: 'interview' },
-    { label: 'Delivery', value: 'delivery' },
-];
 
-const visitorName = [
-    { label: 'Meeting', value: 'meeting' },
-    { label: 'Interview', value: 'interview' },
-    { label: 'Delivery', value: 'delivery' },
-];
-
-const visitorMobile = [
-    { label: 'Meeting', value: 'meeting' },
-    { label: 'Interview', value: 'interview' },
-    { label: 'Delivery', value: 'delivery' },
-];
-
-const employeeNameOptions = [
-    { label: 'John Doe', value: 'john_doe' },
-    { label: 'Jane Smith', value: 'jane_smith' },
-    { label: 'Alice Johnson', value: 'alice_johnson' },
-];
 
 const Purpose = () => {
     const [open, setOpen] = useState(false);
@@ -343,6 +316,10 @@ const Purpose = () => {
     const handleAddVisitorClick = () => {
         setOpen(true);
     };
+    const handleAutocompleteChange = (value) => {
+        // console.log("Selected value:", value);
+        // Handle the selected value here
+    };
 
     return (
         <>
@@ -365,7 +342,7 @@ const Purpose = () => {
                     </Box>
                 </Grid>
                 <Box boxShadow={3} padding={2} borderRadius={2} marginLeft="20px" width="100%">
-                    <Grid item lg={6} md={6} sm={12} xs={12}>
+                    <Grid item lg={4} md={4} sm={12} xs={12}>
                         <Box >
                             <Box marginBottom={2} display="flex" style={{ gap: "10px" }}>
                                 <Texxt placeholder="Search" label="Search" size="small" fullWidth />
@@ -377,20 +354,27 @@ const Purpose = () => {
                                 <>
                                     <Box display="flex" style={{ gap: "10px", marginTop: "15px" }}>
                                         <FormControl fullWidth>
-                                            <Autocmp size="small" label="Active" />
+                                            <Autocmp size="small" label="Active" options={data}
+                                                onChange={(event, value) => handleAutocompleteChange(value)}
+                                            />
                                         </FormControl>
                                         <FormControl fullWidth>
-                                            <Autocmp size="small" label="Purpose" />
+                                            <Autocmp size="small" label="Purpose" options={data}
+                                                onChange={(event, value) => handleAutocompleteChange(value)}
+                                            />
                                         </FormControl>
                                         <FormControl fullWidth>
-                                            <Autocmp size="small" label="Purpose For" />
+                                            <Autocmp size="small" label="Purpose For" options={data}
+                                                onChange={(event, value) => handleAutocompleteChange(value)}
+                                            />
                                         </FormControl>
                                     </Box>
                                 </>
                             )}
                             <Box style={{ gap: "10px", marginTop: "15px", display: "flex", justifyContent: "space-between" }}>
-                                <ButtonComponent style={{ backgroundColor: "rgb(60,86,91)", color: "white" }} name="Submit" />
+                                <ButtonComponent style={{ backgroundColor: "rgb(60,86,91)", color: "white" }} name="Submit" size="small" />
                                 <ButtonComponent
+                                    size="small"
                                     style={{ backgroundColor: "rgb(60,86,91)", color: "white" }}
                                     name={showMoreFilters ? "Hide Filters" : "More Filters"}
                                     onClick={handleMoreFiltersClick}

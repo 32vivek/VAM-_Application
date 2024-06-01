@@ -64,7 +64,7 @@ export default function SignInSide() {
         }
 
 
-        if (email === 'vivek@gmail.com' && password === '12345') {
+        if (email === 'dreamsol@gmail.com' && password === '12345') {
 
             toast.success("Login successful");
             navigate("/home");

@@ -4,7 +4,7 @@ import { Checkbox, FormControlLabel, FormGroup, FormControl, FormLabel } from '@
 const ReusableCheckbox = ({ label, options, onChange }) => {
     return (
         <FormControl component="fieldset">
-            <FormLabel component="legend" style={{ color: 'black' }}>{label}</FormLabel>
+            <FormLabel component="legend" style={{ color: 'black', fontSize: "12px" }}>{label}</FormLabel>
             <FormGroup row>
                 {options.map((option, index) => (
                     <FormControlLabel
@@ -15,6 +15,7 @@ const ReusableCheckbox = ({ label, options, onChange }) => {
                             />
                         }
                         label={option.label}
+                        style={{ fontSize: "12px" }}
                     />
                 ))}
             </FormGroup>

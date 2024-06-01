@@ -10,7 +10,7 @@ const ReusableRadioButton = ({ label, options, defaultValue, onChange }) => {
 
     return (
         <FormControl component="fieldset">
-            <FormLabel component="legend" style={{ color: "black" }}>{label}</FormLabel>
+            <FormLabel component="legend" style={{ color: "black", fontSize: "12px" }}>{label}</FormLabel>
             <RadioGroup aria-label={label} name={label} defaultValue={defaultValue} onChange={handleChange}>
                 <Grid container spacing={2}>
                     {options.map((option, index) => (
@@ -19,6 +19,7 @@ const ReusableRadioButton = ({ label, options, defaultValue, onChange }) => {
                                 value={option.value}
                                 control={<Radio />}
                                 label={option.label}
+                                style={{ fontSize: "12px" }}
                             />
                         </Grid>
                     ))}

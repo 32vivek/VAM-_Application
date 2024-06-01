@@ -558,7 +558,10 @@ const ViewContact = () => {
     const handleFormClick = () => {
         setOpen(true);
     };
-
+    const handleAutocompleteChange = (value) => {
+        // console.log("Selected value:", value);
+        // Handle the selected value here
+    };
     return (
         <>
             <SwipeableDrawer
@@ -600,6 +603,7 @@ const ViewContact = () => {
                                 size="small"
                                 variant="outlined"
                                 options={dateOptions}
+                                onChange={(event, value) => handleAutocompleteChange(value)}
                             // onChange={(e, value) => handleChange(null, 'department', value)}
                             />
                         </Box>

@@ -49,6 +49,12 @@ const employeeNameOptions = [
     { label: 'Alice Johnson', value: 'alice_johnson' },
 ];
 
+const data = [
+    { label: 'John Doe', value: 'john_doe' },
+    { label: 'Jane Smith', value: 'jane_smith' },
+    { label: 'Alice Johnson', value: 'alice_johnson' },
+];
+
 const PreRequest = () => {
     const [open, setOpen] = useState(false);
 
@@ -166,6 +172,7 @@ const PreRequest = () => {
                 position: "top-right",
                 style: {
                     backgroundColor: 'rgb(60,86,91)',
+                    color: "white",
                 },
             });
         } else {
@@ -175,6 +182,7 @@ const PreRequest = () => {
                 position: "top-right",
                 style: {
                     backgroundColor: 'rgb(60,86,91)',
+                    color: "white",
                 },
             });
         }
@@ -184,7 +192,7 @@ const PreRequest = () => {
             <Box display="flex" justifyContent="space-between" backgroundColor="rgb(60,86,91)"  >
                 <Typography color="white" style={{ marginLeft: "10px", marginTop: "10px" }}>Visitor Pre Request</Typography>
                 <IconButton onClick={handleCloseDrawer}>
-                    <CloseIcon style={{ color: "red", marginRight: "10px" }} />
+                    <CloseIcon style={{ color: "white", marginRight: "10px" }} />
                 </IconButton>
             </Box>
             <Grid container spacing={2} sx={{ p: 3 }}>
@@ -195,6 +203,7 @@ const PreRequest = () => {
                             label="Visitor Organization"
                             size="small"
                             required
+                            variant="standard"
                             value={formData.visitorOrganization}
                             onChange={(e, value) => handleChange('visitorOrganization', value)}
                             options={organizationOptions}
@@ -210,6 +219,7 @@ const PreRequest = () => {
                             label="Visitor Name"
                             size="small"
                             required
+                            variant="standard"
                             value={formData.visitorName}
                             onChange={(e, value) => handleChange('visitorName', value)}
                             options={visitorName}
@@ -226,6 +236,7 @@ const PreRequest = () => {
                             label="Visitor Mobile No"
                             size="small"
                             required
+                            variant="standard"
                             value={formData.visitorMobile}
                             onChange={(e, value) => handleChange('visitorMobile', value)}
                             options={visitorMobile}
@@ -240,6 +251,7 @@ const PreRequest = () => {
                             name="visitorEmail"
                             size="small"
                             type="text"
+                            variant="standard"
                             label="Visitor Email"
                             placeholder="Enter Visitor Email Id"
                             value={formData.visitorEmail}
@@ -253,6 +265,7 @@ const PreRequest = () => {
                             name="address"
                             size="small"
                             type="text"
+                            variant="standard"
                             label="Visitor Address"
                             placeholder="Enter Visitor Address"
                             value={formData.address}
@@ -266,6 +279,7 @@ const PreRequest = () => {
                             name="possessionAllowed"
                             size="small"
                             type="text"
+                            variant="standard"
                             label="Possession Allowed"
                             placeholder="Enter Data"
                             value={formData.possessionAllowed}
@@ -279,6 +293,7 @@ const PreRequest = () => {
                             name="purpose"
                             label="Purpose of Meeting"
                             size="small"
+                            variant="standard"
                             options={purposeOptions}
                             value={formData.purpose}
                             onChange={(e, value) => handleChange('purpose', value)}
@@ -301,6 +316,7 @@ const PreRequest = () => {
                             size="small"
                             type="text"
                             label="Laptop"
+                            variant="standard"
                             placeholder="Enter Data"
                             value={formData.laptop}
                             onChange={(e) => handleChange(e.target.name, e.target.value)}
@@ -313,6 +329,7 @@ const PreRequest = () => {
                             name="confrenceRoom"
                             size="small"
                             type="text"
+                            variant="standard"
                             label="Confrence Room"
                             placeholder="Enter Data"
                             value={formData.confrenceRoom}
@@ -351,7 +368,7 @@ const PreRequest = () => {
             </Grid>
             <Grid container>
                 <Grid item lg={6} md={6} xs={12}>
-                    <Box sx={{ display: "flex", ml: "25px", flexDirection: "row", gap: "20px" }}>
+                    <Box sx={{ display: "flex", ml: "25px", mb: "20px", flexDirection: "row", gap: "20px" }}>
                         <Box>
                             <ButtonComponent
                                 name="Submit"
@@ -378,10 +395,14 @@ const PreRequest = () => {
     const handleAddVisitorClick = () => {
         setOpen(true);
     };
+    const handleAutocompleteChange = (value) => {
+        console.log("Selected value:", value);
+        // Handle the selected value here
+    };
 
     return (
         <>
-            <ToastContainer style={{ marginTop: '40px', color: "white" }} />
+            <ToastContainer style={{ marginTop: '60px' }} />
             <SwipeableDrawer
                 anchor="right"
                 open={open}
@@ -402,9 +423,10 @@ const PreRequest = () => {
                 </Grid>
 
                 <Grid item lg={5} md={5} sm={12} xs={12}>
-                    <Box boxShadow={3} padding={2} borderRadius={2}>
+                    {/* <Box boxShadow={3} padding={2} borderRadius={2}> */}
+                    <Box>
                         <Box marginBottom={2} display="flex" style={{ gap: "10px" }}>
-                            <Texxt placeholder="Search" label="Search" size="small" fullWidth />
+                            <Texxt placeholder="Search" label="Search" variant="standard" size="small" fullWidth />
                             <IconButton color="primary">
                                 <Search />
                             </IconButton>
@@ -417,49 +439,54 @@ const PreRequest = () => {
                             <>
                                 <Box display="flex" style={{ gap: "10px", marginTop: "15px" }}>
                                     <FormControl fullWidth>
-                                        <Autocmp size="small" label="Pending" />
+                                        <Autocmp size="small" label="Pending" options={data}
+                                            onChange={(event, value) => handleAutocompleteChange(value)}
+                                        />
                                     </FormControl>
                                     <FormControl fullWidth>
-                                        <Autocmp size="small" label="Purpose" />
+                                        <Autocmp size="small" label="Purpose" options={data}
+                                            onChange={(event, value) => handleAutocompleteChange(value)}
+                                        />
                                     </FormControl>
                                 </Box>
 
                             </>
                         )}
                         <Box style={{ gap: "10px", marginTop: "15px", display: "flex", justifyContent: "space-between" }}>
-                            <ButtonComponent style={{ backgroundColor: "rgb(60,86,91)", color: "white" }} name="Submit" />
+                            <ButtonComponent style={{ backgroundColor: "rgb(60,86,91)", color: "white" }} size="small" name="Submit" />
                             <ButtonComponent
                                 style={{ backgroundColor: "rgb(60,86,91)", color: "white" }}
                                 name={showMoreFilters ? "Hide Filters" : "More Filters"}
                                 onClick={handleMoreFiltersClick}
+                                size="small"
                             />
                         </Box>
                     </Box>
                 </Grid>
                 <Grid item lg={7} md={7} sm={12} xs={12}>
-                    <Box boxShadow={3} padding={2} borderRadius={2}>
+                    <Box borderRadius={2}>
                         <Box display="flex" flexDirection="row" gap="20px">
                             <Box width="50%" boxShadow={1} padding={1} borderRadius={2} justifyContent="center" alignItems="center" backgroundColor="#413839" color="white">
-                                <Typography variant="body1" display="flex" justifyContent="center" alignItems="center">Pending</Typography>
-                                <Box display="flex" justifyContent="center" alignItems="center"><Typography variant="body1">0</Typography></Box>
+                                <Typography variant="body1" display="flex" justifyContent="center" alignItems="center" fontSize="12px">Pending</Typography>
+                                <Box display="flex" justifyContent="center" alignItems="center"><Typography variant="body1" fontSize="12px">0</Typography></Box>
                             </Box>
                             <Box width="50%" boxShadow={1} padding={1} borderRadius={2} justifyContent="space-between" alignItems="center" backgroundColor="#007C80" color="white">
-                                <Typography variant="body1" display="flex" justifyContent="center" alignItems="center">Done</Typography>
-                                <Box display="flex" justifyContent="center" alignItems="center"><Typography variant="body1">0</Typography></Box>
+                                <Typography variant="body1" display="flex" justifyContent="center" alignItems="center" fontSize="12px">Done</Typography>
+                                <Box display="flex" justifyContent="center" alignItems="center"><Typography variant="body1" fontSize="12px">0</Typography></Box>
                             </Box>
                             <Box width="50%" boxShadow={1} padding={1} borderRadius={2} justifyContent="space-between" alignItems="center" backgroundColor="rgb(37,65,23)" color="white">
-                                <Typography variant="body1" display="flex" justifyContent="center" alignItems="center">Rescheduled</Typography>
-                                <Box display="flex" justifyContent="center" alignItems="center"><Typography variant="body1">0</Typography></Box>
+                                <Typography variant="body1" display="flex" justifyContent="center" alignItems="center" fontSize="12px">Rescheduled</Typography>
+                                <Box display="flex" justifyContent="center" alignItems="center"><Typography variant="body1" fontSize="12px">0</Typography></Box>
                             </Box>
                         </Box>
                         <Box display="flex" flexDirection="row" gap="20px" mt="20px">
-                            <Box width="50%" boxShadow={1} padding={1} borderRadius={2} justifyContent="space-between" alignItems="center" backgroundColor="#FF4500" color="white">
-                                <Typography variant="body1" display="flex" justifyContent="center" alignItems="center">Cancelled</Typography>
-                                <Box display="flex" justifyContent="center" alignItems="center"><Typography variant="body1">0</Typography></Box>
+                            <Box width="50%" borderRadius={2} justifyContent="space-between" alignItems="center" backgroundColor="#FF4500" color="white">
+                                <Typography variant="body1" display="flex" justifyContent="center" alignItems="center" fontSize="12px">Cancelled</Typography>
+                                <Box display="flex" justifyContent="center" alignItems="center"><Typography variant="body1" fontSize="12px">0</Typography></Box>
                             </Box>
                             <Box width="50%" boxShadow={1} padding={1} borderRadius={2} justifyContent="space-between" alignItems="center" backgroundColor="#AA6C39" color="white">
-                                <Typography variant="body1" display="flex" justifyContent="center" alignItems="center">Missed</Typography>
-                                <Box display="flex" justifyContent="center" alignItems="center"><Typography variant="body1">0</Typography></Box>
+                                <Typography variant="body1" display="flex" justifyContent="center" alignItems="center" fontSize="12px">Missed</Typography>
+                                <Box display="flex" justifyContent="center" alignItems="center"><Typography variant="body1" fontSize="12px">0</Typography></Box>
                             </Box>
                             {/* <Box width="50%" boxShadow={1} padding={1} borderRadius={2} justifyContent="space-between" alignItems="center" backgroundColor="#800000" color="white">
                                 <Typography variant="body1" display="flex" justifyContent="center" alignItems="center">Rejected</Typography>

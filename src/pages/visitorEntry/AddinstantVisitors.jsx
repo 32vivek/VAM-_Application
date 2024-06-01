@@ -133,7 +133,7 @@ const AddInstantVisitors = () => {
         <>
             <ToastContainer style={{ marginTop: '60px' }} toastStyle={{ color: 'white' }} />
             <Box sx={{}}>
-                <Grid container spacing={2} sx={{ p: 3 }}>
+                <Grid container spacing={1} sx={{ p: 1 }}>
                     <Grid item lg={10} md={10} sm={12} xs={12}>
                         <Box display="flex" style={{ gap: "10px" }}>
                             <Texxt
@@ -309,7 +309,7 @@ const AddInstantVisitors = () => {
                         </Box>
                     </Grid>
                     <Grid item lg={6} md={6} xs={12} sm={12}>
-                        <Box>
+                        <Box display="flex" justifyContent="center" alignItems="center">
                             <ReusableCheckbox
                                 label="Notify Employee"
                                 options={[

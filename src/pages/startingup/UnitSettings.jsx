@@ -372,7 +372,7 @@ const UnitSettings = () => {
                     </Box>
                 </Grid>
                 <Box boxShadow={3} padding={2} borderRadius={2} marginLeft="20px" width="100%">
-                    <Grid item lg={6} md={6} sm={12} xs={12}>
+                    <Grid item lg={4} md={4} sm={12} xs={12}>
                         <Box >
                             <Box marginBottom={2} display="flex" style={{ gap: "10px" }}>
                                 <Texxt placeholder="Search" variant="standard" label="Search" size="small" fullWidth />

@@ -4,6 +4,7 @@ import { NavLink, Outlet, useLocation, Navigate, useNavigate } from 'react-route
 import ButtonComponent from '../components/Button';
 import ReusableTabs from '../components/Tabs';
 import DatePickers from '../components/DateRangePicker';
+import './page.css';
 const Home = () => {
     const location = useLocation();
     const navigate = useNavigate();
@@ -50,7 +51,7 @@ const Home = () => {
 
                     </Grid>
                     <Grid item lg={6} md={6} sm={12} xs={12}>
-                        <Box display="flex" gap="20px">
+                        <Box display="flex" gap="10px">
                             {/* <ReusableDatePicker label="From Date" size="small" /> */}
                             {/* <ReusableDatePicker label="To Date" size="small" /> */}
                             <DatePickers
@@ -68,19 +69,23 @@ const Home = () => {
                                 // onChange={(date) => setStartDate(date)}
                                 dateFormat="yyyy/MM/dd"
                             />
+                            <ButtonComponent
+                                name="Show Visitors"
+                                size="small"
+                                style={{ backgroundColor: "rgb(60,86,91)", color: "white", fontSize: "10px" }}
+                            />
 
                         </Box>
                     </Grid>
-                    <Grid item lg={6} md={6} sm={12} xs={12}>
+                    {/* <Grid item lg={6} md={6} sm={12} xs={12}>
                         <Box>
                             <ButtonComponent
                                 name="Show Visitors"
-                                size="medium"
+                                size="small"
                                 style={{ backgroundColor: "rgb(60,86,91)", color: "white" }}
                             />
                         </Box>
-
-                    </Grid>
+                    </Grid> */}
                 </Grid>
                 <Box marginTop="30px">
                     <Outlet />

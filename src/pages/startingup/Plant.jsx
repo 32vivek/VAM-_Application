@@ -14,7 +14,11 @@ import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
 import { Search, Add, Close as CloseIcon, Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
 
-
+const data = [
+    { label: 'HR', value: 'hr' },
+    { label: 'Engineering', value: 'engineering' },
+    { label: 'Marketing', value: 'marketing' },
+];
 
 const Plant = () => {
     const [open, setOpen] = useState(false);
@@ -195,6 +199,11 @@ const Plant = () => {
         });
     };
 
+    const handleAutocompleteChange = (value) => {
+        // console.log("Selected value:", value);
+        // Handle the selected value here
+    };
+
     const addInstantVisitors = (
         <>
             <Box display="flex" justifyContent="space-between" backgroundColor="rgb(60,86,91)" >
@@ -301,7 +310,7 @@ const Plant = () => {
                     </Box>
                 </Grid>
                 <Box boxShadow={3} padding={2} borderRadius={2} marginLeft="20px" width="100%">
-                    <Grid item lg={6} md={6} sm={12} xs={12}>
+                    <Grid item lg={4} md={4} sm={12} xs={12}>
                         <Box >
                             <Box marginBottom={2} display="flex" style={{ gap: "10px" }}>
                                 <Texxt placeholder="Search" variant="standard" label="Search" size="small" fullWidth />
@@ -313,17 +322,21 @@ const Plant = () => {
                                 <>
                                     <Box display="flex" style={{ gap: "10px", marginTop: "15px" }}>
                                         <FormControl fullWidth>
-                                            <Autocmp size="small" label="Active" variant="standard" />
+                                            <Autocmp size="small" label="Active" variant="standard" options={data}
+                                                onChange={(event, value) => handleAutocompleteChange(value)}
+                                            />
                                         </FormControl>
                                         <FormControl fullWidth>
-                                            <Autocmp size="small" label="Plant" variant="standard" />
+                                            <Autocmp size="small" label="Plant" variant="standard" options={data}
+                                                onChange={(event, value) => handleAutocompleteChange(value)}
+                                            />
                                         </FormControl>
                                     </Box>
                                 </>
                             )}
                             <Box style={{ gap: "10px", marginTop: "15px", display: "flex", justifyContent: "space-between" }}>
-                                <ButtonComponent style={{ backgroundColor: "rgb(60,86,91)", color: "white" }} name="Submit" />
-                                <ButtonComponent
+                                <ButtonComponent size="small" style={{ backgroundColor: "rgb(60,86,91)", color: "white" }} name="Submit" />
+                                <ButtonComponent size="small"
                                     style={{ backgroundColor: "rgb(60,86,91)", color: "white" }}
                                     name={showMoreFilters ? "Hide Filters" : "More Filters"}
                                     onClick={handleMoreFiltersClick}

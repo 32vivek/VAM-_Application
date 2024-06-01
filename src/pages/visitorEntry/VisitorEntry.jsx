@@ -22,6 +22,11 @@ const data1 = [
     { label: 'Total', value: 300, color: '#00C49F' },
 ];
 
+const data = [
+    { label: 'IN', value: 200, color: '#0088FE' },
+    { label: 'Total', value: 300, color: '#00C49F' },
+];
+
 const VisitorActivity = () => {
 
     const [open, setOpen] = useState(false);
@@ -118,6 +123,12 @@ const VisitorActivity = () => {
         navigate(tabs[newValue].route);
     };
 
+    const handleAutocompleteChange = (value) => {
+        console.log("Selected value:", value);
+        // Handle the selected value here
+    };
+
+
     const addInstantVisitors = (
         <Box component="form" sx={{ mt: "70px", mb: "20px" }}>
             {/* <Box display="flex" justifyContent="flex-end">
@@ -172,6 +183,7 @@ const VisitorActivity = () => {
 
             </SwipeableDrawer>
 
+
             <Grid container spacing={2}>
                 <Grid item lg={12} md={12} sm={12} xs={12}>
                     <Box display="flex">
@@ -179,11 +191,13 @@ const VisitorActivity = () => {
                     </Box>
                     <hr width="100%" />
                 </Grid>
+
                 <Grid item lg={4} md={4} sm={12} xs={12}>
-                    <Box boxShadow={3} padding={2} borderRadius={2}>
+                    <Box  >
                         <Box marginBottom={2}>
                             <Texxt placeholder="Search" variant="standard" label="Search" size="small" fullWidth onChange={(e) => handleSearch(e.target.value)} />
                         </Box>
+
                         <Box display="flex" style={{ gap: "10px", marginTop: "15px" }}>
                             {/* <ReusableDatePicker label="From Date" />
                             <ReusableDatePicker label="To Date" /> */}
@@ -198,68 +212,76 @@ const VisitorActivity = () => {
                             <>
                                 <Box display="flex" style={{ gap: "10px", marginTop: "15px" }}>
                                     <FormControl fullWidth>
-                                        <Autocmp size="small" label="In" />
+                                        <Autocmp size="small" label="In" variant="standard" options={data}
+                                            onChange={(event, value) => handleAutocompleteChange(value)}
+                                        />
                                     </FormControl>
                                     <FormControl fullWidth>
-                                        <Autocmp size="small" label="Purpose" />
+                                        <Autocmp size="small" label="Purpose" variant="standard" options={data}
+                                            onChange={(event, value) => handleAutocompleteChange(value)}
+                                        />
                                     </FormControl>
                                 </Box>
                                 <Box display="flex" style={{ gap: "10px", marginTop: "15px" }}>
                                     <FormControl fullWidth>
-                                        <Autocmp size="small" label="Request Status" />
+                                        <Autocmp size="small" label="Request Status" variant="standard" options={data}
+                                            onChange={(event, value) => handleAutocompleteChange(value)}
+                                        />
                                     </FormControl>
                                 </Box>
                             </>
                         )}
                         <Box style={{ gap: "10px", marginTop: "15px", display: "flex", justifyContent: "space-between" }}>
-                            <ButtonComponent style={{ backgroundColor: "rgb(60,86,91)", color: "white" }} name="Submit" />
+                            <ButtonComponent style={{ backgroundColor: "rgb(60,86,91)", color: "white" }} name="Submit" size="small" />
                             <ButtonComponent
                                 style={{ backgroundColor: "rgb(60,86,91)", color: "white" }}
                                 name={showMoreFilters ? "Hide Filters" : "More Filters"}
                                 onClick={handleMoreFiltersClick}
+                                size="small"
                             />
                         </Box>
                     </Box>
                 </Grid>
                 <Grid item lg={4} md={4} sm={12} xs={12}>
-                    <Box display="flex" justifyContent="center" alignItems="center" boxShadow={3} padding={0} borderRadius={2}>
+                    <Box display="flex" justifyContent="center" alignItems="center"  >
                         <ReusablePieChart data={data1} outerRadius={80} width={200} height={200} legendHidden={false} />
                     </Box>
                 </Grid>
                 <Grid item lg={4} md={4} sm={12} xs={12}>
-                    <Box boxShadow={3} padding={2} borderRadius={2}>
+                    <Box  >
                         <Box display="flex" flexDirection="row" gap="20px">
                             <Box width="50%" boxShadow={1} padding={1} borderRadius={2} justifyContent="center" alignItems="center" backgroundColor="#413839" color="white">
-                                <Typography variant="body1" display="flex" justifyContent="center" alignItems="center">Visitors in</Typography>
-                                <Box display="flex" justifyContent="center" alignItems="center"><Typography variant="body1">0</Typography></Box>
+                                <Typography variant="body1" display="flex" justifyContent="center" alignItems="center" fontSize="12px" >Visitors in</Typography>
+                                <Box display="flex" justifyContent="center" alignItems="center"><Typography variant="body1" fontSize="12px">0</Typography></Box>
                             </Box>
                             <Box width="50%" boxShadow={1} padding={1} borderRadius={2} justifyContent="space-between" alignItems="center" backgroundColor="#AA6C39" color="white">
-                                <Typography variant="body1" display="flex" justifyContent="center" alignItems="center">Visitor out</Typography>
-                                <Box display="flex" justifyContent="center" alignItems="center"><Typography variant="body1">0</Typography></Box>
+                                <Typography variant="body1" display="flex" justifyContent="center" alignItems="center" fontSize="12px">Visitor out</Typography>
+                                <Box display="flex" justifyContent="center" alignItems="center"><Typography variant="body1" fontSize="12px">0</Typography></Box>
                             </Box>
                             <Box width="50%" boxShadow={1} padding={1} borderRadius={2} justifyContent="space-between" alignItems="center" backgroundColor="rgb(37,65,23)" color="white">
-                                <Typography variant="body1" display="flex" justifyContent="center" alignItems="center">Total visitors</Typography>
-                                <Box display="flex" justifyContent="center" alignItems="center"><Typography variant="body1">0</Typography></Box>
+                                <Typography variant="body1" display="flex" justifyContent="center" alignItems="center" fontSize="12px">Total visitors</Typography>
+                                <Box display="flex" justifyContent="center" alignItems="center"><Typography variant="body1" fontSize="12px">0</Typography></Box>
                             </Box>
                         </Box>
                         <Box display="flex" flexDirection="row" gap="20px" mt="20px">
                             <Box width="50%" boxShadow={1} padding={1} borderRadius={2} justifyContent="space-between" alignItems="center" backgroundColor="rgb(71,56,16)" color="white">
-                                <Typography variant="body1" display="flex" justifyContent="center" alignItems="center">Pending</Typography>
-                                <Box display="flex" justifyContent="center" alignItems="center"><Typography variant="body1">0</Typography></Box>
+                                <Typography variant="body1" display="flex" justifyContent="center" alignItems="center" fontSize="12px">Pending</Typography>
+                                <Box display="flex" justifyContent="center" alignItems="center"><Typography variant="body1" fontSize="12px">0</Typography></Box>
                             </Box>
                             <Box width="50%" boxShadow={1} padding={1} borderRadius={2} justifyContent="space-between" alignItems="center" backgroundColor="rgb(3,62,62)" color="white">
-                                <Typography variant="body1" display="flex" justifyContent="center" alignItems="center">Approved</Typography>
-                                <Box display="flex" justifyContent="center" alignItems="center"><Typography variant="body1">0</Typography></Box>
+                                <Typography variant="body1" display="flex" justifyContent="center" alignItems="center" fontSize="12px">Approved</Typography>
+                                <Box display="flex" justifyContent="center" alignItems="center"><Typography variant="body1" fontSize="12px">0</Typography></Box>
                             </Box>
                             <Box width="50%" boxShadow={1} padding={1} borderRadius={2} justifyContent="space-between" alignItems="center" backgroundColor="#FF4500" color="white">
-                                <Typography variant="body1" display="flex" justifyContent="center" alignItems="center">Rejected</Typography>
-                                <Box display="flex" justifyContent="center" alignItems="center"><Typography variant="body1">0</Typography></Box>
+                                <Typography variant="body1" display="flex" justifyContent="center" alignItems="center" fontSize="12px">Rejected</Typography>
+                                <Box display="flex" justifyContent="center" alignItems="center"><Typography variant="body1" fontSize="12px">0</Typography></Box>
                             </Box>
                         </Box>
                     </Box>
                 </Grid>
+
                 <Grid item lg={12} md={12} sm={12} xs={12}>
-                    <Box width="100%" boxShadow={3} borderRadius={2} bgcolor='rgb(60,86,91)'>
+                    <Box width="100%" bgcolor='rgb(60,86,91)'>
                         <Box display="flex" justifyContent="space-between" alignItems="center">
                             <Typography ml="10px" variant="h10" color="white">Filtered By : </Typography>
                             <Typography variant="h10" color="white">Count = {filteredData.length} </Typography>
@@ -286,6 +308,7 @@ const VisitorActivity = () => {
                 </Grid>
                 <FloatingButton options={floatingActionButtonOptions} bottomOffset="100px" onAddVisitorClick={handleFormClick} />
             </Grid>
+
         </>
     );
 };

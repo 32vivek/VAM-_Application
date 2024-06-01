@@ -27,6 +27,8 @@ import UnitSettings from './pages/startingup/UnitSettings';
 import SummaryReport from './pages/startingup/SummaryReport';
 import DriverLicence from './pages/startingup/DriverLicence';
 import VehicleLicence from './pages/startingup/VehicleLicence';
+import UserProfile from './pages/userdetails/UserProfile';
+import UserFeedback from './pages/userdetails/UserFeedback';
 function App() {
   return (
     <div className="App">
@@ -62,6 +64,8 @@ function App() {
               <Route path='/startingup/summary' element={<SummaryReport />} />
               <Route path='/startingup/dl' element={<DriverLicence />} />
               <Route path='/startingup/vl' element={<VehicleLicence />} />
+              <Route path='/userprofile' element={<UserProfile />} />
+              <Route path='/userfeedback' element={<UserFeedback />} />
             </Route>
             {/* </Route> */}
           </Routes>

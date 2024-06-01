@@ -295,6 +295,10 @@ const ViewDepartment = () => {
     const handleFormClick = () => {
         setOpen(true);
     };
+    const handleAutocompleteChange = (value) => {
+        // console.log("Selected value:", value);
+        // Handle the selected value here
+    };
 
     return (
         <>
@@ -337,6 +341,7 @@ const ViewDepartment = () => {
                                 size="small"
                                 variant="outlined"
                                 options={dateOptions}
+                                onChange={(event, value) => handleAutocompleteChange(value)}
                             />
                         </Box>
                     </Grid>
@@ -349,6 +354,7 @@ const ViewDepartment = () => {
                                 variant="outlined"
                                 options={statusOptions}
                                 onChange={handleStatusChange}
+                            // onChange={(event, value) => handleAutocompleteChange(value)}
                             />
                         </Box>
                     </Grid>

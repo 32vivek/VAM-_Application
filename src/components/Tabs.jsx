@@ -16,10 +16,12 @@ const ReusableTabs = ({ tabs, selectedTab, onChange }) => {
                         key={index}
                         label={tab.label}
                         value={index}
+
                         sx={{
                             color: 'white',
+                            fontSize: "10px",
                             '&.Mui-selected': {
-                                color: 'white', // Keep the color white for selected tab
+                                color: 'white',
                             },
                         }}
                     />

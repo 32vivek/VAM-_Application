@@ -24,8 +24,16 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import Collapse from '@mui/material/Collapse';
+import Avatar from '@mui/material/Avatar';
+import Menu from '@mui/material/Menu';
+import Tooltip from '@mui/material/Tooltip';
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
+import MenuItem from '@mui/material/MenuItem';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import FeedbackIcon from '@mui/icons-material/Feedback';
+import LogoutIcon from '@mui/icons-material/Logout';
 import Footer from "./Footer";
+
 const drawerWidth = 240;
 
 const openedMixin = (theme) => ({
@@ -100,6 +108,7 @@ export default function MiniDrawer() {
     const [visitorOpen, setVisitorOpen] = React.useState(false);
     const [startingUpOpen, setStartingUpOpen] = React.useState(false);
     const [settingsOpen, setSettingsOpen] = React.useState(false);
+    const [anchorElUser, setAnchorElUser] = React.useState(null);
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -131,13 +140,30 @@ export default function MiniDrawer() {
         setSettingsOpen(!settingsOpen);
     };
 
+    const handleOpenUserMenu = (event) => {
+        setAnchorElUser(event.currentTarget);
+    };
+
+    const handleCloseUserMenu = (route) => {
+        setAnchorElUser(null);
+        if (route) {
+            navigate(route);
+        }
+    };
+
     const isActiveRoute = (route) => location.pathname.startsWith(route);
+
+    const settings = [
+        { text: 'Profile', route: '/userprofile', icon: <AccountCircleIcon /> },
+        { text: 'My Feedback', route: '/userfeedback', icon: <FeedbackIcon /> },
+        { text: 'Logout', route: '/', icon: <LogoutIcon /> }
+    ];
 
     return (
         <Box sx={{ display: 'flex' }}>
             <CssBaseline />
             <AppBar open={open}>
-                <Toolbar >
+                <Toolbar>
                     <IconButton
                         color="inherit"
                         aria-label="open drawer"
@@ -151,8 +177,45 @@ export default function MiniDrawer() {
                         <MenuIcon />
                     </IconButton>
                     <Typography variant="h6" display="flex" alignItems="end" justifyContent="end" noWrap component="div" sx={{ flexGrow: 1 }}>
-                        USER
+                        {/* User */}
                     </Typography>
+                    <Box sx={{ flexGrow: 0 }} >
+                        <Tooltip title="Open settings">
+                            <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+                                <Avatar alt="User Avatar" src="/static/images/avatar/2.jpg" />
+                            </IconButton>
+                        </Tooltip>
+                        <Menu
+                            // style={{ mt: '65px' }}
+                            id="menu-appbar"
+                            anchorEl={anchorElUser}
+                            anchorOrigin={{
+                                vertical: 'top',
+                                horizontal: 'right',
+                            }}
+                            keepMounted
+                            transformOrigin={{
+                                vertical: 'top',
+                                horizontal: 'right',
+                            }}
+                            open={Boolean(anchorElUser)}
+                            onClose={() => handleCloseUserMenu(null)}
+                            sx={{
+                                '& .MuiPaper-root': {
+                                    width: '250px',
+                                    marginTop: "55px",
+
+                                }
+                            }}
+                        >
+                            {settings.map((setting) => (
+                                <MenuItem key={setting.text} onClick={() => handleCloseUserMenu(setting.route)}>
+                                    <ListItemIcon color="black">{setting.icon}</ListItemIcon>
+                                    <Typography textAlign="center" color="black">{setting.text}</Typography>
+                                </MenuItem>
+                            ))}
+                        </Menu>
+                    </Box>
                 </Toolbar>
             </AppBar>
             <Drawer variant="permanent" open={open}>

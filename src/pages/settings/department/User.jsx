@@ -461,7 +461,7 @@ const User = () => {
         const worksheet = XLSX.utils.json_to_sheet(filteredData);
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, worksheet, "Sheet1");
-        const wbout = XLSX.write(wb, { type: 'array', bookType: "xlsx" }); // Changed to 'array'
+        const wbout = XLSX.write(wb, { type: 'array', bookType: "xlsx" });
         const blob = new Blob([wbout], { type: "application/octet-stream" });
         const fileName = 'table_data.xlsx';
         saveAs(blob, fileName);
@@ -476,6 +476,10 @@ const User = () => {
 
     const handleFormClick = () => {
         setOpen(true);
+    };
+    const handleAutocompleteChange = (value) => {
+        // console.log("Selected value:", value);
+        // Handle the selected value here
     };
 
     return (
@@ -519,6 +523,7 @@ const User = () => {
                                 size="small"
                                 variant="outlined"
                                 options={dateOptions}
+                                onChange={(event, value) => handleAutocompleteChange(value)}
                             />
                         </Box>
                     </Grid>

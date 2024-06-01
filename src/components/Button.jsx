@@ -11,7 +11,7 @@ const ButtonComponent = ({ name, size, color, onClick, style, variant, fullWidth
                 color={color}
                 onClick={onClick}
                 style={style}
-                sx={{ borderRadius: "12px" }}
+                sx={{ borderRadius: "12px", fontSize: "10px" }}
                 fullWidth={fullWidth}
             >
                 {name}

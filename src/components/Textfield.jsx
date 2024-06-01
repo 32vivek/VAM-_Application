@@ -17,10 +17,11 @@ const Texxt = ({ name, size, label, type, variant, placeholder, required, multil
                 error={!!error}
                 helperText={helperText}
                 onChange={onChange}
+                margin="dense"
                 value={value}
                 variant={variant}
                 InputLabelProps={{
-                    style: { color: 'black' }
+                    style: { color: 'black', fontSize: "12px" }
                 }}
             />
         </FormControl>
