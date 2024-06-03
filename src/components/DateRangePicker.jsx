@@ -6,6 +6,7 @@ import { Form, InputGroup } from 'react-bootstrap';
 import './components.css';
 
 const DatePickers = ({ label, required, selectedDate, placeholder, onChange, ...props }) => {
+
     return (
         <Form.Group>
             <InputGroup className="date-picker-standard">
@@ -14,12 +15,13 @@ const DatePickers = ({ label, required, selectedDate, placeholder, onChange, ...
                     onChange={onChange}
                     required={required}
                     placeholderText={placeholder}
-                    customInput={<Form.Control required={required} />}
+                    customInput={<Form.Control style={{ fontSize: "12px", fontWeight: "bold" }} required={required} />}
                     {...props}
                 />
             </InputGroup>
         </Form.Group>
     );
+
 };
 
 export default DatePickers;

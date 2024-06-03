@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
-import { Box, Grid, IconButton } from '@mui/material';
+import { Box, Grid, IconButton, Typography } from '@mui/material';
 import { Search } from '@mui/icons-material';
 import Texxt from '../../components/Textfield';
-import ReusableCheckbox from '../../components/CheckBox';
 import ReusableRadioButton from '../../components/RadioButton';
 import Autocmp from '../../components/AutoComplete';
 import ButtonComponent from '../../components/Button';
 // import { ToastContainer } from 'react-toastify';
 import { toast, ToastContainer, POSITION } from 'react-toastify';
+import CustomCheckbox from './../../components/CheckBox';
 
 
 const departmentOptions = [
@@ -44,7 +44,8 @@ const AddInstantVisitors = () => {
         vehicleNumber: '',
         laptop: '',
         approvalRequired: 'yes',
-        notifyEmployee: []
+        mail: true,
+        sms: true
     });
 
 
@@ -309,14 +310,18 @@ const AddInstantVisitors = () => {
                         </Box>
                     </Grid>
                     <Grid item lg={6} md={6} xs={12} sm={12}>
-                        <Box display="flex" justifyContent="center" alignItems="center">
-                            <ReusableCheckbox
-                                label="Notify Employee"
-                                options={[
-                                    { label: "Mail", value: "mail" },
-                                    { label: "SMS", value: "sms" }
-                                ]}
-                                onChange={(value) => handleChange('notifyEmployee', value)}
+                        <Box>
+                            <Typography>Notify Employee</Typography>
+                        </Box>
+                        <Box >
+
+                            <CustomCheckbox
+                                label="Mail"
+                                checked={formData.mail} onChange={(e) => handleChange('mail', e.target.checked)}
+                            />
+                            <CustomCheckbox
+                                label="SMS"
+                                checked={formData.sms} onChange={(e) => handleChange('sms', e.target.checked)}
                             />
                         </Box>
                     </Grid>

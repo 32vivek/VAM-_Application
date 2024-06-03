@@ -14,6 +14,7 @@ import ReusableCheckbox from '../../components/CheckBox';
 import ReusableRadioButton from '../../components/RadioButton';
 import { toast, ToastContainer, POSITION } from 'react-toastify';
 import DatePickers from '../../components/DateRangePicker';
+import CustomCheckbox from '../../components/CheckBox';
 const departmentOptions = [
     { label: 'HR', value: 'hr' },
     { label: 'Engineering', value: 'engineering' },
@@ -74,7 +75,9 @@ const PreRequest = () => {
         possessionAllowed: '',
         confrenceRoom: '',
         laptop: '',
-        notifyEmployee: []
+        mail: true,
+        sms: true,
+        pass: false,
     });
 
     const floatingActionButtonOptions = [
@@ -142,15 +145,23 @@ const PreRequest = () => {
     };
 
     const handleChange = (name, value) => {
-        setFormData({
-            ...formData,
-            [name]: value
-        });
-        setErrors({
-            ...errors,
-            [name]: ''
-        });
+        if (name === 'pass') {
+            setFormData({
+                ...formData,
+                [name]: value,
+            });
+        } else {
+            setFormData({
+                ...formData,
+                [name]: value
+            });
+            setErrors({
+                ...errors,
+                [name]: ''
+            });
+        }
     };
+
 
     const validateForm = () => {
         let formErrors = {};
@@ -338,26 +349,25 @@ const PreRequest = () => {
                     </Box>
                 </Grid>
                 <Grid item lg={6} md={6} xs={12} sm={12}>
-                    <Box>
-                        <ReusableCheckbox
-                            label="Notify Employee"
-                            options={[
-                                { label: "Mail", value: "mail" },
-                                { label: "SMS", value: "sms" }
-                            ]}
-                            onChange={(value) => console.log("Selected options:", value)}
+                    {/* <Typography>Notify Employee</Typography> */}
+                    <Box display="flex">
+                        <Typography>Notify Employee</Typography>
+                        <CustomCheckbox
+                            label="Mail"
+                            checked={formData.mail} onChange={(e) => handleChange('mail', e.target.checked)}
+                        />
+                        <CustomCheckbox
+                            label="SMS"
+                            checked={formData.sms} onChange={(e) => handleChange('sms', e.target.checked)}
                         />
                     </Box>
                 </Grid>
                 <Grid item lg={6} md={6} xs={12} sm={12}>
                     <Box>
-                        <ReusableCheckbox
+                        <CustomCheckbox
                             label="Extended Pass Request"
-                            options={[
-                                { label: "Yes", value: "yes" }
-                            ]}
+                            checked={formData.pass}
                             onChange={handleExtendedPassRequestChange}
-
                         />
                         {isExtendedPassRequestChecked && (
                             <DatePickers

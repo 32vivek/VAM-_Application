@@ -27,8 +27,11 @@ import UnitSettings from './pages/startingup/UnitSettings';
 import SummaryReport from './pages/startingup/SummaryReport';
 import DriverLicence from './pages/startingup/DriverLicence';
 import VehicleLicence from './pages/startingup/VehicleLicence';
-import UserProfile from './pages/userdetails/UserProfile';
 import UserFeedback from './pages/userdetails/UserFeedback';
+import UserProfile from './pages/userdetails/userporfile/UserProfile';
+import BasicDetails from './pages/userdetails/userporfile/BasicDetails';
+import ResetPassword from './pages/userdetails/userporfile/ResetPassword';
+import EditUser from './pages/userdetails/userporfile/EditUser';
 function App() {
   return (
     <div className="App">
@@ -64,8 +67,13 @@ function App() {
               <Route path='/startingup/summary' element={<SummaryReport />} />
               <Route path='/startingup/dl' element={<DriverLicence />} />
               <Route path='/startingup/vl' element={<VehicleLicence />} />
-              <Route path='/userprofile' element={<UserProfile />} />
-              <Route path='/userfeedback' element={<UserFeedback />} />
+              {/* <Route path='/userprofile' element={<UserProfile />} /> */}
+              <Route path='/userprofile' element={<UserProfile />}>
+                <Route path='/userprofile' element={<BasicDetails />} />
+                <Route path='/userprofile/resetpassword' element={<ResetPassword />} />
+                <Route path='/userprofile/edituser' element={<EditUser />} />
+
+              </Route>
             </Route>
             {/* </Route> */}
           </Routes>

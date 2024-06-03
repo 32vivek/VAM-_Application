@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Box, Grid, Typography, IconButton } from '@mui/material';
 import { Search } from '@mui/icons-material';
 import Texxt from '../../components/Textfield';
-import ReusableCheckbox from '../../components/CheckBox';
+import CustomCheckbox from '../../components/CheckBox';
 import ReusableRadioButton from '../../components/RadioButton';
 import Autocmp from '../../components/AutoComplete';
 import ButtonComponent from '../../components/Button';
@@ -45,7 +45,8 @@ const AddPreVisitors = () => {
         visitorCardNo: '',
         vehicleNumber: '',
         laptop: '',
-        notifyEmployee: []
+        mail: false,
+        sms: false
     });
 
     const handleChange = (name, value) => {
@@ -304,14 +305,16 @@ const AddPreVisitors = () => {
                         </Box>
                     </Grid>
                     <Grid item lg={6} md={6} xs={12} sm={12}>
-                        <Box display="flex" justifyContent="center" alignItems="center">
-                            <ReusableCheckbox
-                                label="Notify Employee"
-                                options={[
-                                    { label: "Mail", value: "mail" },
-                                    { label: "SMS", value: "sms" }
-                                ]}
-                                onChange={(value) => console.log("Selected options:", value)}
+                        <Box >  <Typography>Notify Employee</Typography></Box>
+                        <Box >
+
+                            <CustomCheckbox
+                                label="Mail"
+                                checked={formData.mail} onChange={(e) => handleChange('mail', e.target.checked)}
+                            />
+                            <CustomCheckbox
+                                label="SMS"
+                                checked={formData.sms} onChange={(e) => handleChange('sms', e.target.checked)}
                             />
                         </Box>
                     </Grid>
