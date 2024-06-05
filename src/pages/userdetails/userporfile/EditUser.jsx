@@ -55,8 +55,8 @@ const EditUser = () => {
                 autoClose: 3000,
                 position: "top-right",
                 style: {
-                    backgroundColor: 'rgb(60,86,91)',
-                    color: "white",
+                    // backgroundColor: 'rgb(60,86,91)',
+                    color: "#0075a8",
                 },
             });
             setFormData({
@@ -72,8 +72,8 @@ const EditUser = () => {
                 autoClose: 3000,
                 position: "top-right",
                 style: {
-                    backgroundColor: 'rgb(60,86,91)',
-                    color: "white",
+                    // backgroundColor: 'rgb(60,86,91)',
+                    color: "#0075a8",
                 },
             });
 
@@ -102,7 +102,7 @@ const EditUser = () => {
 
     return (
         <>
-            <ToastContainer style={{ marginTop: '60px' }} toastStyle={{ color: 'white' }} />
+            <ToastContainer style={{ marginTop: '60px' }} />
             <Box boxShadow={3} p={2} borderRadius={3}>
                 <Grid container spacing={1}>
                     <Grid item lg={6} md={6} sm={12} xs={12}>

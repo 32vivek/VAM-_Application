@@ -220,19 +220,19 @@ const User = () => {
             toast.success("Form submitted successfully!", {
                 autoClose: 3000,
                 position: "top-right",
-                // style: {
-                //     backgroundColor: 'rgb(60,86,91)',
-                //     color: "white"
-                // },
+                style: {
+                    // backgroundColor: "rgb(60,86,91)",
+                    color: "#0075a8"
+                },
             });
         } else {
             toast.error("Please correct the highlighted errors.", {
                 autoClose: 3000,
                 position: "top-right",
-                // style: {
-                //     backgroundColor: 'rgb(60,86,91)',
-                //     color: "white"
-                // },
+                style: {
+                    // backgroundColor: "rgb(60,86,91)",
+                    color: "#0075a8"
+                },
             });
         }
     };
@@ -288,10 +288,10 @@ const User = () => {
             toast.success("Selected rows deleted successfully!", {
                 autoClose: 3000,
                 position: "top-right",
-                // style: {
-                //     backgroundColor: 'rgb(60,86,91)',
-                //     color: "white",
-                // },
+                style: {
+                    // backgroundColor: "rgb(60,86,91)",
+                    color: "#0075a8"
+                },
             });
         }
     };
@@ -496,9 +496,10 @@ const User = () => {
         toast.success("Table data copied successfully!", {
             autoClose: 3000,
             position: "top-right",
-            // style: {
-            //     backgroundColor: 'rgb(60,86,91)',
-            // },
+            style: {
+                // backgroundColor: "rgb(60,86,91)",
+                color: "#0075a8"
+            },
         });
     };
 
@@ -514,7 +515,8 @@ const User = () => {
             autoClose: 3000,
             position: "top-right",
             style: {
-                backgroundColor: 'rgb(60,86,91)',
+                // backgroundColor: "rgb(60,86,91)",
+                color: "#0075a8"
             },
         });
     };

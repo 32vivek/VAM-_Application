@@ -263,19 +263,19 @@ const ViewContact = () => {
             toast.success("Form submitted successfully!", {
                 autoClose: 3000,
                 position: "top-right",
-                // style: {
-                //     backgroundColor: 'rgb(60,86,91)',
-                //     color: "white",
-                // },
+                style: {
+                    // backgroundColor: "rgb(60,86,91)",
+                    color: "#0075a8"
+                },
             });
         } else {
             toast.error("Please correct the highlighted errors.", {
                 autoClose: 3000,
                 position: "top-right",
-                // style: {
-                //     backgroundColor: 'rgb(60,86,91)',
-                //     color: "white",
-                // },
+                style: {
+                    // backgroundColor: "rgb(60,86,91)",
+                    color: "#0075a8"
+                },
             });
         }
     };
@@ -288,10 +288,10 @@ const ViewContact = () => {
             toast.success("Selected rows deleted successfully!", {
                 autoClose: 3000,
                 position: "top-right",
-                // style: {
-                //     backgroundColor: 'rgb(60,86,91)',
-                //     color: "white",
-                // },
+                style: {
+                    // backgroundColor: "rgb(60,86,91)",
+                    color: "#0075a8"
+                },
             });
         }
     };
@@ -324,7 +324,7 @@ const ViewContact = () => {
 
     const addInstantVisitors = (
         <>
-            <ToastContainer style={{ marginTop: '45px' }} />
+            {/* <ToastContainer style={{ marginTop: '45px' }} /> */}
 
             <Box component="form" sx={{ mt: "63px", mb: "20px", gap: "10px" }} >
                 <Grid container>
@@ -580,7 +580,8 @@ const ViewContact = () => {
             autoClose: 3000,
             position: "top-right",
             style: {
-                backgroundColor: 'rgb(60,86,91)',
+                // backgroundColor: "rgb(60,86,91)",
+                color: "#0075a8"
             },
         });
     };
@@ -597,7 +598,8 @@ const ViewContact = () => {
             autoClose: 3000,
             position: "top-right",
             style: {
-                backgroundColor: 'rgb(60,86,91)',
+                // backgroundColor: "rgb(60,86,91)",
+                color: "#0075a8"
             },
         });
     };

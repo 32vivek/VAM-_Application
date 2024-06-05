@@ -105,10 +105,10 @@ const AddPreVisitors = () => {
             toast.success("Form submitted successfully!", {
                 autoClose: 3000,
                 position: "top-right",
-                // style: {
-                //     backgroundColor: 'rgb(60,86,91)',
-                //     color: "white",
-                // },
+                style: {
+                    // backgroundColor: "rgb(60,86,91)",
+                    color: "#0075a8"
+                },
             });
             setFormData({
                 number: '',
@@ -130,10 +130,10 @@ const AddPreVisitors = () => {
             toast.error("Validation Error! Please check the form for errors.", {
                 autoClose: 3000,
                 position: "top-right",
-                // style: {
-                //     backgroundColor: 'rgb(60,86,91)',
-                //     color: "white"
-                // },
+                style: {
+                    // backgroundColor: "rgb(60,86,91)",
+                    color: "#0075a8"
+                },
             });
 
         }

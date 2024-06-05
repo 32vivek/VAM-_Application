@@ -115,8 +115,8 @@ const AddInstantVisitors = () => {
                 autoClose: 3000,
                 position: "top-right",
                 style: {
-                    backgroundColor: '#0075a8',
-                    color: "white",
+                    // backgroundColor: "rgb(60,86,91)",
+                    color: "#0075a8"
                 },
             });
             setFormData({
@@ -140,8 +140,8 @@ const AddInstantVisitors = () => {
                 autoClose: 3000,
                 position: "top-right",
                 style: {
-                    backgroundColor: '#0075a8',
-                    color: "white",
+                    // backgroundColor: "rgb(60,86,91)",
+                    color: "#0075a8"
                 },
             });
         }

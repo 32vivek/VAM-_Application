@@ -152,6 +152,10 @@ const Plant = () => {
             toast.success("Form submitted successfully!", {
                 autoClose: 3000,
                 position: "top-right",
+                style: {
+                    // backgroundColor: 'rgb(60,86,91)',
+                    color: "#0075a8"
+                },
 
             });
 
@@ -159,10 +163,10 @@ const Plant = () => {
             toast.error("Please fill all required filled ...", {
                 autoClose: 3000,
                 position: "top-right",
-                // style: {
-                //     backgroundColor: 'rgb(60,86,91)',
-                //     color: 'white'
-                // },
+                style: {
+                    // backgroundColor: 'rgb(60,86,91)',
+                    color: "#0075a8"
+                },
             });
         }
     };
@@ -219,10 +223,10 @@ const Plant = () => {
             toast.success("Selected rows deleted successfully!", {
                 autoClose: 3000,
                 position: "top-right",
-                //    style: {
-                //         backgroundColor: 'rgb(60,86,91)',
-                //         color: "white",
-                //     }, 
+                style: {
+                    // backgroundColor: 'rgb(60,86,91)',
+                    color: "#0075a8"
+                },
             });
         }
     };

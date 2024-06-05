@@ -83,10 +83,10 @@ const ResetPassword = () => {
             toast.success("Password has been changed successfully!", {
                 autoClose: 3000,
                 position: "top-right",
-                // style: {
-                //     backgroundColor: 'rgb(60,86,91)',
-                //     color: "white",
-                // },
+                style: {
+                    // backgroundColor: 'rgb(60,86,91)',
+                    color: "#0075a8"
+                },
             });
             setFormData({
                 oldPassword: "",
@@ -99,17 +99,17 @@ const ResetPassword = () => {
             toast.error("Validation Error! Please check the form for errors.", {
                 autoClose: 3000,
                 position: "top-right",
-                // style: {
-                //     backgroundColor: 'rgb(60,86,91)',
-                //     color: "white",
-                // },
+                style: {
+                    // backgroundColor: 'rgb(60,86,91)',
+                    color: "#0075a8"
+                },
             });
         }
     };
 
     return (
         <>
-            <ToastContainer style={{ marginTop: '45px' }} toastStyle={{ color: 'white' }} />
+            <ToastContainer style={{ marginTop: '45px' }} />
             <Box boxShadow={3} p={2} borderRadius={3} width="100%">
                 <Grid container spacing={1}>
                     <Grid item lg={8} md={8} sm={12} xs={12}>

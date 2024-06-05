@@ -187,19 +187,19 @@ const DriverLicence = () => {
             toast.success("Form submitted successfully!", {
                 autoClose: 3000,
                 position: "top-right",
-                // style: {
-                //     backgroundColor: "rgb(60,86,91)",
-                //     color: "white",
-                // },
+                style: {
+                    // backgroundColor: "rgb(60,86,91)",
+                    color: "#0075a8"
+                },
             });
         } else {
             toast.error("Please fill all the required fields.", {
                 autoClose: 3000,
                 position: "top-right",
-                // style: {
-                //     backgroundColor: "rgb(60,86,91)",
-                //     color: "white",
-                // },
+                style: {
+                    // backgroundColor: "rgb(60,86,91)",
+                    color: "#0075a8"
+                },
             });
         }
     };
@@ -213,7 +213,8 @@ const DriverLicence = () => {
             autoClose: 3000,
             position: "top-right",
             style: {
-                backgroundColor: "rgb(60,86,91)",
+                // backgroundColor: "rgb(60,86,91)",
+                color: "#0075a8"
             },
         });
     };
@@ -229,8 +230,9 @@ const DriverLicence = () => {
         toast.success("Table data downloaded as XLSX successfully!", {
             autoClose: 3000,
             position: "top-right",
-            style: {
-                backgroundColor: "rgb(60,86,91)",
+            sstyle: {
+                // backgroundColor: "rgb(60,86,91)",
+                color: "#0075a8"
             },
         });
     };
@@ -271,10 +273,10 @@ const DriverLicence = () => {
             toast.success("Selected rows deleted successfully!", {
                 autoClose: 3000,
                 position: "top-right",
-                // style: {
-                //     backgroundColor: 'rgb(60,86,91)',
-                //     color: "white",
-                // },
+                style: {
+                    // backgroundColor: "rgb(60,86,91)",
+                    color: "#0075a8"
+                },
             });
         }
     };

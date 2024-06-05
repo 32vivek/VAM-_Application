@@ -171,20 +171,20 @@ const Purpose = () => {
             toast.success("Form submitted successfully!", {
                 autoClose: 3000,
                 position: "top-right",
-                // style: {
-                //     backgroundColor: 'rgb(60,86,91)',
-                //     color: "white",
-                // },
+                style: {
+                    // backgroundColor: 'rgb(60,86,91)',
+                    color: "#0075a8"
+                },
             });
         } else {
             console.log("Validation Failed");
             toast.error("Validation Error! Please check the form for errors.", {
                 autoClose: 3000,
                 position: "top-right",
-                // style: {
-                //     backgroundColor: 'rgb(60,86,91)',
-                //     color: "white",
-                // },
+                style: {
+                    // backgroundColor: 'rgb(60,86,91)',
+                    color: "#0075a8"
+                },
             });
         }
     };
@@ -196,7 +196,8 @@ const Purpose = () => {
             autoClose: 3000,
             position: "top-right",
             style: {
-                backgroundColor: 'rgb(60,86,91)',
+                // backgroundColor: 'rgb(60,86,91)',
+                color: "#0075a8"
             },
         });
     };
@@ -213,7 +214,8 @@ const Purpose = () => {
             autoClose: 3000,
             position: "top-right",
             style: {
-                backgroundColor: 'rgb(60,86,91)',
+                // backgroundColor: 'rgb(60,86,91)',
+                color: "#0075a8"
             },
         });
     };
@@ -226,10 +228,10 @@ const Purpose = () => {
             toast.success("Selected rows deleted successfully!", {
                 autoClose: 3000,
                 position: "top-right",
-                // style: {
-                //     backgroundColor: 'rgb(60,86,91)',
-                //     color: "white",
-                // },
+                style: {
+                    // backgroundColor: 'rgb(60,86,91)',
+                    color: "#0075a8"
+                },
             });
         }
     };
@@ -397,7 +399,7 @@ const Purpose = () => {
 
     return (
         <>
-            <ToastContainer style={{ marginTop: '45px', color: "white" }} />
+            <ToastContainer style={{ marginTop: '45px' }} />
             <SwipeableDrawer
                 anchor="right"
                 open={open}
@@ -486,6 +488,7 @@ const Purpose = () => {
                             onSelectedRowsChange={(selected) => setSelectedRows(selected.selectedRows)}
                             selectableRows
                             pagination
+                            selectableRowsHighlight
                         />
                     </Box>
                 </Grid>

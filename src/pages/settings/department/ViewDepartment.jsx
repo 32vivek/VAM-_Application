@@ -164,10 +164,10 @@ const ViewDepartment = () => {
             toast.success("Form submitted successfully!", {
                 autoClose: 3000,
                 position: "top-right",
-                // style: {
-                //     backgroundColor: 'rgb(60,86,91)',
-                //     color: "white",
-                // },
+                style: {
+                    // backgroundColor: "rgb(60,86,91)",
+                    color: "#0075a8"
+                },
             });
             // Reset form data state
             setDepartments([{ department: '', departmentCode: '' }]);
@@ -177,10 +177,10 @@ const ViewDepartment = () => {
             toast.error("Please fill in all required fields.", {
                 autoClose: 3000,
                 position: "top-right",
-                // style: {
-                //     backgroundColor: 'rgb(60,86,91)',
-                //     color: "white",
-                // },
+                style: {
+                    // backgroundColor: "rgb(60,86,91)",
+                    color: "#0075a8"
+                },
             });
         }
     };
@@ -196,8 +196,8 @@ const ViewDepartment = () => {
                 autoClose: 3000,
                 position: "top-right",
                 style: {
-                    backgroundColor: 'rgb(60,86,91)',
-                    color: "white",
+                    // backgroundColor: "rgb(60,86,91)",
+                    color: "#0075a8"
                 },
             });
         }
@@ -316,7 +316,8 @@ const ViewDepartment = () => {
             autoClose: 3000,
             position: "top-right",
             style: {
-                backgroundColor: 'rgb(60,86,91)',
+                // backgroundColor: "rgb(60,86,91)",
+                color: "#0075a8"
             },
         });
     };
@@ -333,7 +334,8 @@ const ViewDepartment = () => {
             autoClose: 3000,
             position: "top-right",
             style: {
-                backgroundColor: 'rgb(60,86,91)',
+                // backgroundColor: "rgb(60,86,91)",
+                color: "#0075a8"
             },
         });
     };
