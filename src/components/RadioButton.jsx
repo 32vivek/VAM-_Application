@@ -1,5 +1,5 @@
 import React from "react";
-import { Grid, Radio, RadioGroup, FormControlLabel, FormControl, FormLabel } from "@mui/material";
+import { Radio, RadioGroup, FormControlLabel, FormControl, FormLabel, Box } from "@mui/material";
 
 const ReusableRadioButton = ({ label, options, defaultValue, onChange }) => {
     const handleChange = (event) => {
@@ -11,19 +11,16 @@ const ReusableRadioButton = ({ label, options, defaultValue, onChange }) => {
     return (
         <FormControl component="fieldset">
             <FormLabel component="legend" style={{ color: "black", fontSize: "12px" }}>{label}</FormLabel>
-            <RadioGroup aria-label={label} name={label} defaultValue={defaultValue} onChange={handleChange}>
-                <Grid container spacing={2}>
-                    {options.map((option, index) => (
-                        <Grid item key={index}>
-                            <FormControlLabel
-                                value={option.value}
-                                control={<Radio />}
-                                label={option.label}
-                                style={{ fontSize: "12px" }}
-                            />
-                        </Grid>
-                    ))}
-                </Grid>
+            <RadioGroup aria-label={label} name={label} defaultValue={defaultValue} onChange={handleChange} row>
+                {options.map((option, index) => (
+                    <FormControlLabel
+                        key={index}
+                        value={option.value}
+                        control={<Radio />}
+                        label={<Box style={{ fontSize: "12px" }}>{option.label}</Box>}
+                        style={{ marginRight: '16px' }}
+                    />
+                ))}
             </RadioGroup>
         </FormControl>
     );

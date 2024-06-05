@@ -15,6 +15,8 @@ import ReusableRadioButton from '../../components/RadioButton';
 import { toast, ToastContainer, POSITION } from 'react-toastify';
 import DatePickers from '../../components/DateRangePicker';
 import CustomCheckbox from '../../components/CheckBox';
+import colors from '../colors';
+
 const departmentOptions = [
     { label: 'HR', value: 'hr' },
     { label: 'Engineering', value: 'engineering' },
@@ -80,9 +82,14 @@ const PreRequest = () => {
         pass: false,
     });
 
+    const [formValues, setFormValues] = useState({
+        fromDate: null,
+        toDate: null
+    });
+
     const floatingActionButtonOptions = [
         { label: 'Add', icon: <Add /> },
-        { label: 'Calender View', icon: <ExitToApp /> },
+        // { label: 'Calender View', icon: <ExitToApp /> },
     ];
     const columns = [
         {
@@ -162,6 +169,13 @@ const PreRequest = () => {
         }
     };
 
+    const handleInputChange = (event) => {
+        const { name, value } = event.target;
+        setFormValues((prevValues) => ({ ...prevValues, [name]: value }));
+    };
+
+
+
 
     const validateForm = () => {
         let formErrors = {};
@@ -181,26 +195,59 @@ const PreRequest = () => {
             toast.success("Form submitted successfully!", {
                 autoClose: 3000,
                 position: "top-right",
-                style: {
-                    backgroundColor: 'rgb(60,86,91)',
-                    color: "white",
-                },
+                // style: {
+                //     backgroundColor: 'rgb(60,86,91)',
+                //     color: "white",
+                // },
             });
         } else {
             console.log("Validation Failed");
             toast.error("Validation Error! Please check the form for errors.", {
                 autoClose: 3000,
                 position: "top-right",
-                style: {
-                    backgroundColor: 'rgb(60,86,91)',
-                    color: "white",
-                },
+                // style: {
+                //     backgroundColor: 'rgb(60,86,91)',
+                //     color: "white",
+                // },
             });
         }
     };
+
+    const handleReset = () => {
+        setFormData({
+            visitorName: null,
+            visitorMobile: null,
+            visitorEmail: '',
+            visitorOrganization: null,
+            purpose: null,
+            address: "",
+            possessionAllowed: '',
+            confrenceRoom: '',
+            laptop: '',
+            mail: true,
+            sms: true,
+            pass: false,
+        });
+        // setFormErrors({});
+    };
+    const styles = {
+        navbar: {
+            backgroundColor: colors.navbar,
+            color: '#fff',
+            padding: '10px',
+        },
+        resetButton: {
+            backgroundColor: colors.resetButtonBackground,
+            color: colors.resetButtonColor,
+            // padding: '8px 16px',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer',
+        },
+    };
     const addInstantVisitors = (
         <>
-            <Box display="flex" justifyContent="space-between" backgroundColor="rgb(60,86,91)"  >
+            <Box display="flex" justifyContent="space-between" backgroundColor={colors.navbar}  >
                 <Typography color="white" style={{ marginLeft: "10px", marginTop: "10px" }}>Visitor Pre Request</Typography>
                 <IconButton onClick={handleCloseDrawer}>
                     <CloseIcon style={{ color: "white", marginRight: "10px" }} />
@@ -214,9 +261,9 @@ const PreRequest = () => {
                             label="Visitor Organization"
                             size="small"
                             required
-                            variant="standard"
+                            // variant="standard"
                             value={formData.visitorOrganization}
-                            onChange={(e, value) => handleChange('visitorOrganization', value)}
+                            onChange={(value) => handleChange('visitorOrganization', value)}
                             options={organizationOptions}
                             error={errors.visitorOrganization}
                             helperText={errors.visitorOrganization}
@@ -230,9 +277,9 @@ const PreRequest = () => {
                             label="Visitor Name"
                             size="small"
                             required
-                            variant="standard"
+                            // variant="standard"
                             value={formData.visitorName}
-                            onChange={(e, value) => handleChange('visitorName', value)}
+                            onChange={(value) => handleChange('visitorName', value)}
                             options={visitorName}
 
                             error={errors.visitorName}
@@ -247,9 +294,9 @@ const PreRequest = () => {
                             label="Visitor Mobile No"
                             size="small"
                             required
-                            variant="standard"
+                            // variant="standard"
                             value={formData.visitorMobile}
-                            onChange={(e, value) => handleChange('visitorMobile', value)}
+                            onChange={(value) => handleChange('visitorMobile', value)}
                             options={visitorMobile}
                             error={errors.visitorMobile}
                             helperText={errors.visitorMobile}
@@ -262,7 +309,7 @@ const PreRequest = () => {
                             name="visitorEmail"
                             size="small"
                             type="text"
-                            variant="standard"
+                            // variant="standard"
                             label="Visitor Email"
                             placeholder="Enter Visitor Email Id"
                             value={formData.visitorEmail}
@@ -276,7 +323,7 @@ const PreRequest = () => {
                             name="address"
                             size="small"
                             type="text"
-                            variant="standard"
+                            // variant="standard"
                             label="Visitor Address"
                             placeholder="Enter Visitor Address"
                             value={formData.address}
@@ -290,7 +337,7 @@ const PreRequest = () => {
                             name="possessionAllowed"
                             size="small"
                             type="text"
-                            variant="standard"
+                            // variant="standard"
                             label="Possession Allowed"
                             placeholder="Enter Data"
                             value={formData.possessionAllowed}
@@ -304,10 +351,10 @@ const PreRequest = () => {
                             name="purpose"
                             label="Purpose of Meeting"
                             size="small"
-                            variant="standard"
+                            // variant="standard"
                             options={purposeOptions}
                             value={formData.purpose}
-                            onChange={(e, value) => handleChange('purpose', value)}
+                            onChange={(value) => handleChange('purpose', value)}
                             required
                             error={errors.purpose}
                             helperText={errors.purpose}
@@ -317,7 +364,12 @@ const PreRequest = () => {
                 <Grid item lg={6} md={6} xs={12} sm={12}>
                     <Box>
                         <DatePickers
-                            placeholder="From Date" />
+                            label="To Date"
+                            // name="fromDate"
+                            placeholder="To Date"
+                            value={formData.toDate}
+                            handleInputChange={handleInputChange}
+                        />
                     </Box>
                 </Grid>
                 <Grid item lg={6} md={6} xs={12} sm={12}>
@@ -327,7 +379,7 @@ const PreRequest = () => {
                             size="small"
                             type="text"
                             label="Laptop"
-                            variant="standard"
+                            // variant="standard"
                             placeholder="Enter Data"
                             value={formData.laptop}
                             onChange={(e) => handleChange(e.target.name, e.target.value)}
@@ -340,7 +392,7 @@ const PreRequest = () => {
                             name="confrenceRoom"
                             size="small"
                             type="text"
-                            variant="standard"
+                            // variant="standard"
                             label="Confrence Room"
                             placeholder="Enter Data"
                             value={formData.confrenceRoom}
@@ -371,7 +423,12 @@ const PreRequest = () => {
                         />
                         {isExtendedPassRequestChecked && (
                             <DatePickers
-                                placeholder="Till Date" />
+                                label="To Date"
+                                // name="fromDate"
+                                placeholder="To Date"
+                                value={formData.toDate}
+                                handleInputChange={handleInputChange}
+                            />
                         )}
                     </Box>
                 </Grid>
@@ -382,16 +439,28 @@ const PreRequest = () => {
                         <Box>
                             <ButtonComponent
                                 name="Submit"
-                                size="medium"
+                                size="small"
                                 type="submit"
+                                variant="contained"
                                 onClick={handleSubmit}
-                                style={{ backgroundColor: "rgb(60,86,91)", fontSize: "12px", color: "white" }}
+                                backgroundColor={colors.navbar}
+                            // style={{ backgroundColor: "rgb(60,86,91)", fontSize: "12px", color: "white" }}
+                            />
+                        </Box>
+                        <Box>
+                            <ButtonComponent
+                                name="Reset"
+                                size="small"
+                                variant="contained"
+                                onClick={handleReset}
+                                style={styles.resetButton}
+                            // style={{ backgroundColor: "rgb(60,86,91)", fontSize: "12px", color: "white" }}
                             />
                         </Box>
                         <Box>
                             <ButtonComponent
                                 name="Cancel"
-                                size="medium"
+                                size="small"
                                 onClick={handleCloseDrawer}
                                 style={{ backgroundColor: "red", fontSize: "12px", color: "white" }}
                             />
@@ -410,40 +479,52 @@ const PreRequest = () => {
         // Handle the selected value here
     };
 
+
     return (
         <>
-            <ToastContainer style={{ marginTop: '60px' }} />
+            <ToastContainer style={{ marginTop: '45px' }} />
             <SwipeableDrawer
                 anchor="right"
                 open={open}
                 onClose={() => toggleDrawer(false)}
                 onOpen={() => toggleDrawer(true)}
             >
-                <Box sx={{ width: '600px', marginTop: "100px" }}>
+                <Box sx={{ width: '600px', marginTop: "63px" }}>
                     {addInstantVisitors}
                 </Box>
 
             </SwipeableDrawer>
-            <Grid container spacing={3}>
-                <Grid item lg={12} md={12} sm={12} xs={12}>
-                    <Box>
-                        <Typography variant="h5">Visitor Pre Request</Typography>
-                        <hr style={{ width: "100%" }} />
-                    </Box>
-                </Grid>
+            <Box backgroundColor={colors.navbar}>
+                <Typography style={{ marginTop: "-15px", color: "white", marginLeft: "10px" }}>Visitors Pre Request</Typography>
+                {/* <hr style={{ marginTop: "-0px", height: "4px", borderWidth: "0", color: "rgb(60,86,91)", backgroundColor: "rgb(60,86,91)" }} /> */}
+            </Box>
+            <Grid container spacing={3} >
 
-                <Grid item lg={5} md={5} sm={12} xs={12}>
+
+                <Grid item lg={5} md={5} sm={12} xs={12} style={{ marginTop: "4px" }}>
                     {/* <Box boxShadow={3} padding={2} borderRadius={2}> */}
                     <Box>
                         <Box marginBottom={2} display="flex" style={{ gap: "10px" }}>
-                            <Texxt placeholder="Search" label="Search" variant="standard" size="small" fullWidth />
-                            <IconButton color="primary">
+                            <Texxt placeholder="Enter Data" label="Search Visitors Activity" size="small" />
+                            {/* <IconButton color="primary">
                                 <Search />
-                            </IconButton>
+                            </IconButton> */}
                         </Box>
                         <Box display="flex" style={{ gap: "10px", marginTop: "15px" }}>
-                            <DatePickers placeholder="From Date" />
-                            <DatePickers placeholder="To Date" />
+                            <DatePickers
+                                label="From Date"
+                                // name="fromDate"
+                                placeholder="From Date"
+                                value={formData.fromDate}
+                                handleInputChange={handleInputChange}
+                            />
+                            <DatePickers
+                                label="To Date"
+                                // name="fromDate"
+                                placeholder="To Date"
+                                value={formData.toDate}
+                                handleInputChange={handleInputChange}
+                            />
                         </Box>
                         {showMoreFilters && (
                             <>
@@ -463,18 +544,18 @@ const PreRequest = () => {
                             </>
                         )}
                         <Box style={{ gap: "10px", marginTop: "15px", display: "flex", justifyContent: "space-between" }}>
-                            <ButtonComponent style={{ backgroundColor: "rgb(60,86,91)", color: "white" }} size="small" name="Submit" />
-                            <ButtonComponent
-                                style={{ backgroundColor: "rgb(60,86,91)", color: "white" }}
+                            <ButtonComponent backgroundColor={colors.navbar} variant="contained" style={{ textTransform: "none", borderRadius: "8px", fontSize: "12px" }} size="small" name="Submit" />
+                            <ButtonComponent backgroundColor={colors.navbar} variant="contained"
+                                style={{ textTransform: "none", borderRadius: "8px", fontSize: "10px" }}
                                 name={showMoreFilters ? "Hide Filters" : "More Filters"}
                                 onClick={handleMoreFiltersClick}
-                                size="small"
+                                size="medium"
                             />
                         </Box>
                     </Box>
                 </Grid>
                 <Grid item lg={7} md={7} sm={12} xs={12}>
-                    <Box borderRadius={2}>
+                    <Box borderRadius={2} mt="10px">
                         <Box display="flex" flexDirection="row" gap="20px">
                             <Box width="50%" boxShadow={1} padding={1} borderRadius={2} justifyContent="center" alignItems="center" backgroundColor="#413839" color="white">
                                 <Typography variant="body1" display="flex" justifyContent="center" alignItems="center" fontSize="12px">Pending</Typography>
@@ -506,10 +587,10 @@ const PreRequest = () => {
                     </Box>
                 </Grid>
                 <Grid item lg={12} md={12} sm={12} xs={12}>
-                    <Box width="auto" boxShadow={3} borderRadius={2} bgcolor='rgb(60,86,91)'>
+                    <Box boxShadow={3} borderRadius={2} backgroundColor={colors.navbar} height="35px" borderWidth="0">
                         <Box display="flex" justifyContent="space-between" alignItems="center">
-                            <Typography ml="10px" variant="h10" color="white">Filtered By : </Typography>
-                            <Typography mr="10px" variant="h10" color="white">Count = 0 </Typography>
+                            <Typography ml="10px" mt="8px" variant="h10" fontSize="10px" color="white">Filtered By : </Typography>
+                            {/* <Typography mr="10px" variant="h10" color="white">Count = 0 </Typography> */}
                         </Box>
                     </Box>
                 </Grid>
@@ -519,7 +600,7 @@ const PreRequest = () => {
                         />
                     </Box>
                 </Grid>
-                <FloatingButton options={floatingActionButtonOptions} bottomOffset="100px" onAddVisitorClick={handleAddVisitorClick} />
+                <FloatingButton options={floatingActionButtonOptions} bottomOffset="100px" onButtonClick={handleAddVisitorClick} />
             </Grid>
         </>
     )

@@ -22,6 +22,7 @@ import { saveAs } from 'file-saver';
 import ReusableCheckbox from '../../../components/CheckBox';
 import { Lock } from "@mui/icons-material"; // Import the Lock icon for Reset Password
 import VisibilityIcon from '@mui/icons-material/Visibility';
+import colors from './../../colors';
 
 
 const dateOptions = [
@@ -88,6 +89,22 @@ const User = () => {
         accessRights: null,
     });
 
+    const styles = {
+        navbar: {
+            backgroundColor: colors.navbar,
+            color: '#fff',
+            padding: '10px',
+        },
+        resetButton: {
+            backgroundColor: colors.resetButtonBackground,
+            color: colors.resetButtonColor,
+            // padding: '8px 16px',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer',
+        },
+    };
+
 
     const [errors, setErrors] = useState({});
 
@@ -106,6 +123,16 @@ const User = () => {
     const handleStatusChange = (event, newValue) => {
         setStatus(newValue ? newValue.value : '');
     };
+
+    const floatingActionButtonOptions = selectedRows.length === 0 ? [
+        { label: 'Add', icon: <Add /> },
+    ] : selectedRows.length === 1 ? [
+        { label: 'Edit', icon: <EditIcon /> },
+        { label: 'Delete', icon: <DeleteIcon /> },
+    ] : [
+        { label: 'Delete', icon: <DeleteIcon /> },
+    ];
+
 
     const columns = [
         {
@@ -193,19 +220,19 @@ const User = () => {
             toast.success("Form submitted successfully!", {
                 autoClose: 3000,
                 position: "top-right",
-                style: {
-                    backgroundColor: 'rgb(60,86,91)',
-                    color: "white"
-                },
+                // style: {
+                //     backgroundColor: 'rgb(60,86,91)',
+                //     color: "white"
+                // },
             });
         } else {
             toast.error("Please correct the highlighted errors.", {
                 autoClose: 3000,
                 position: "top-right",
-                style: {
-                    backgroundColor: 'rgb(60,86,91)',
-                    color: "white"
-                },
+                // style: {
+                //     backgroundColor: 'rgb(60,86,91)',
+                //     color: "white"
+                // },
             });
         }
     };
@@ -214,16 +241,7 @@ const User = () => {
         fetchData();
     }, []);
 
-    const floatingActionButtonOptions = selectedRows.length === 0 ? [
-        { label: 'Visitor Entry', icon: <Add /> },
-        { label: 'View', icon: <VisibilityIcon /> },
-    ] : selectedRows.length === 1 ? [
-        { label: 'Edit', icon: <EditIcon /> },
-        { label: 'Delete', icon: <DeleteIcon /> },
-        { label: 'Reset Password', icon: <Lock /> }, // Add the Reset Password option
-    ] : [
-        { label: 'Delete', icon: <DeleteIcon /> },
-    ];
+
     const renderIconButton = (label, icon) => (
         <Tooltip title={label}>
             <IconButton  >{icon}</IconButton>
@@ -262,16 +280,42 @@ const User = () => {
         }
     };
 
+    const handleDelete = () => {
+        if (selectedRows.length > 0) {
+            const remainingData = filteredData.filter(item => !selectedRows.includes(item));
+            setFilteredData(remainingData);
+            setSelectedRows([]);
+            toast.success("Selected rows deleted successfully!", {
+                autoClose: 3000,
+                position: "top-right",
+                // style: {
+                //     backgroundColor: 'rgb(60,86,91)',
+                //     color: "white",
+                // },
+            });
+        }
+    };
+
+    const handleFloatingButtonClick = (label) => {
+        if (label === 'Add') {
+            handleAddVisitorClick();
+        } else if (label === 'Delete') {
+            handleDelete();
+        } else if (label === 'Edit') {
+            // Handle edit action here
+        }
+    };
+
 
     const addInstantVisitors = (
         <>
-            <ToastContainer style={{ marginTop: '60px' }} />
+            {/* <ToastContainer style={{ marginTop: '60px' }} /> */}
             <Box sx={{ backgroundColor: '#f2f2f2', width: "100%", height: "550px" }}>
-                <Box component="form" sx={{ mt: "70px", mb: "20px", gap: "10px" }} >
+                <Box component="form" sx={{ mt: "63px", gap: "10px" }} >
                     <Grid container spacing={2} style={{ p: "10px" }}>
                         <Grid item lg={12} md={12} sm={12} xs={12}>
-                            <Box display="flex" justifyContent="space-between" backgroundColor="rgb(60,86,91)" style={{ marginTop: "20px" }}>
-                                <Typography variant="h5" color="white" mt="5px" ml="10px">ADD User</Typography>
+                            <Box display="flex" justifyContent="space-between" backgroundColor={colors.navbar}>
+                                <Typography variant="h6" color="white" mt="5px" ml="10px">ADD User</Typography>
                                 <IconButton onClick={handleCloseDrawer}>
                                     <CloseIcon style={{ color: "white" }} />
                                 </IconButton>
@@ -416,7 +460,8 @@ const User = () => {
                         </Grid>
 
                         <Grid item lg={6} md={6} sm={6} xs={6}>
-                            <Box display="flex" justifyContent="center" alignItems="center">
+                            <Box display="flex" justifyContent="center" alignItems="center" style={{ gap: "10px" }}>
+                                <Typography marginTop="10px" >Send Info</Typography>
                                 <ReusableCheckbox
                                     name="sendInformation"
                                     value={information}
@@ -434,9 +479,9 @@ const User = () => {
                     <Grid item lg={12} md={12} sm={12} xs={12}>
                         <Box display="flex" justifyContent="center" alignItems="center" style={{ gap: "10px" }}>
 
-                            <ButtonComponent name="Submit" variant="contained" size="small" onClick={handleFormSubmit} />
-                            <ButtonComponent name="Cancel" variant="contained" color="secondary" size="small" onClick={handleCloseDrawer} />
-                            <ButtonComponent name="Reset" variant="contained" size="small" style={{ backgroundColor: "red", color: "white" }}
+                            <ButtonComponent name="Submit" variant="contained" backgroundColor={colors.navbar} size="small" onClick={handleFormSubmit} />
+                            <ButtonComponent name="Cancel" variant="contained" style={{ backgroundColor: "red", color: "white" }} size="small" onClick={handleCloseDrawer} />
+                            <ButtonComponent name="Reset" variant="contained" size="small" style={styles.resetButton}
                             />
                         </Box>
                     </Grid>
@@ -451,9 +496,9 @@ const User = () => {
         toast.success("Table data copied successfully!", {
             autoClose: 3000,
             position: "top-right",
-            style: {
-                backgroundColor: 'rgb(60,86,91)',
-            },
+            // style: {
+            //     backgroundColor: 'rgb(60,86,91)',
+            // },
         });
     };
 
@@ -474,7 +519,7 @@ const User = () => {
         });
     };
 
-    const handleFormClick = () => {
+    const handleAddVisitorClick = () => {
         setOpen(true);
     };
     const handleAutocompleteChange = (value) => {
@@ -484,6 +529,7 @@ const User = () => {
 
     return (
         <>
+            <ToastContainer style={{ marginTop: '45px' }} />
             <SwipeableDrawer
                 anchor="right"
                 open={open}
@@ -496,14 +542,14 @@ const User = () => {
             </SwipeableDrawer>
 
 
-            <Box display="flex" alignItems="center" justifyContent="space-between" mb={2}>
-                <Typography variant="h5">Manage User</Typography>
-                <IconButton onClick={handleRefresh}>
-                    <RefreshIcon />
-                </IconButton>
-            </Box>
-            <hr style={{ width: "100%" }} />
-            <Box boxShadow={3} p={3} m={2} borderRadius={2}>
+            <Grid item lg={12} md={12} sm={12} xs={12}>
+                <Box backgroundColor={colors.navbar}>
+                    <Typography style={{ marginTop: "-15px", color: "white", marginLeft: "10px" }}>Manage Users</Typography>
+                    {/* <hr style={{ marginTop: "-0px", height: "4px", borderWidth: "0", color: "rgb(60,86,91)", backgroundColor: "rgb(60,86,91)" }} /> */}
+                </Box>
+            </Grid>
+            {/* <hr style={{ width: "100%" }} /> */}
+            <Box boxShadow={3} p={3} borderRadius={2} marginTop="8px">
                 <Grid container spacing={3}>
                     <Grid item lg={2} md={2} sm={12} xs={12}>
                         <Box>
@@ -553,15 +599,12 @@ const User = () => {
                     </Grid>
                 </Grid>
             </Box>
-            <Grid container spacing={2}>
+            <Grid container spacing={2} style={{ marginTop: "5px" }}>
                 <Grid item lg={12} md={12} sm={12} xs={12}>
-                    <Box width="100%" height="40px" boxShadow={3} borderRadius={2} bgcolor='rgb(60,86,91)'>
-                        <Box display="flex" mt="8px" justifyContent="space-between" alignItems="center" px={2}>
-
-                            <Typography variant="subtitle1" mt="8px" color="white">Filtered By: {statusOptions.find(option => option.value === status)?.label}</Typography>
-
-
-                            <Typography color="white">count : {filteredData.length}</Typography>
+                    <Box boxShadow={3} borderRadius={2} bgcolor={colors.navbar} height="35px" borderWidth="0">
+                        <Box display="flex" justifyContent="space-between" alignItems="center">
+                            <Typography ml="10px" mt="8px" variant="h10" fontSize="10px" color="white">Filtered By : </Typography>
+                            {/* <Typography mr="10px" variant="h10" color="white">Count = 0 </Typography> */}
                         </Box>
                     </Box>
                 </Grid>
@@ -573,6 +616,8 @@ const User = () => {
                             onSearch={handleSearch}
                             copyEnabled={true}
                             onCopy={handleCopy}
+                            onSelectedRowsChange={(selected) => setSelectedRows(selected.selectedRows)}
+
                             downloadEnabled={true}
                             onDownloadXLSX={handleDownloadXLSX}
                         />
@@ -582,7 +627,7 @@ const User = () => {
                 <FloatingButton
                     options={floatingActionButtonOptions}
                     bottomOffset="100px"
-                    onAddVisitorClick={handleFormClick}
+                    onButtonClick={handleFloatingButtonClick}
                 />
             </Grid>
         </>

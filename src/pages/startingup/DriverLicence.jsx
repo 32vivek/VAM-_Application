@@ -26,6 +26,7 @@ import {
 } from "@mui/icons-material";
 import DatePickers from "../../components/DateRangePicker";
 import InputFileUpload from "../../components/FileUpload";
+import colors from "../colors";
 
 const statuss = [
     {
@@ -55,38 +56,36 @@ const DriverLicence = () => {
         licence: "",
         brief: "",
         expDate: null,
+        fromDate: null,
+        toDate: null
     });
+    const [searchNumber, setSearchNumber] = useState('');
 
-    const floatingActionButtonOptions =
-        selectedRows.length === 0
-            ? [{ label: "Add", icon: <Add /> }]
-            : selectedRows.length === 1
-                ? [
-                    { label: "Edit", icon: <EditIcon /> },
-                    { label: "Delete", icon: <DeleteIcon /> },
-                ]
-                : [{ label: "Delete", icon: <DeleteIcon /> }];
+
+    const floatingActionButtonOptions = selectedRows.length === 0 ? [
+        { label: 'Add', icon: <Add /> },
+    ] : selectedRows.length === 1 ? [
+        { label: 'Edit', icon: <EditIcon /> },
+        { label: 'Delete', icon: <DeleteIcon /> },
+    ] : [
+        { label: 'Delete', icon: <DeleteIcon /> },
+    ];
 
     const columns = [
         {
-            name: "Select",
-            selector: "select",
-            cell: (row) => (
-                <input
-                    type="checkbox"
-                    checked={row.selected}
-                    onChange={() => handleRowSelected(row)}
-                />
-            ),
+            name: 'Select',
+            selector: 'select',
+            cell: (row) => <input type="checkbox" checked={row.selected} onChange={() => handleRowSelected(row)} />,
             sortable: false,
         },
-        { name: "name", selector: (row) => row.name, sortable: true },
-        { name: "email", selector: (row) => row.email, sortable: true },
-        { name: "number", selector: (row) => row.number, sortable: true },
-        { name: "address", selector: (row) => row.address, sortable: true },
-        { name: "department", selector: (row) => row.department, sortable: true },
-        { name: "number", selector: (row) => row.number, sortable: true },
+        { name: 'name', selector: row => row.name, sortable: true },
+        { name: 'email', selector: row => row.email, sortable: true },
+        { name: 'number', selector: row => row.number, sortable: true },
+        { name: 'address', selector: row => row.address, sortable: true },
+        { name: 'department', selector: row => row.department, sortable: true },
+        { name: 'number', selector: row => row.number, sortable: true },
     ];
+
 
     const handleMoreFiltersClick = () => {
         setShowMoreFilters(!showMoreFilters);
@@ -188,19 +187,19 @@ const DriverLicence = () => {
             toast.success("Form submitted successfully!", {
                 autoClose: 3000,
                 position: "top-right",
-                style: {
-                    backgroundColor: "rgb(60,86,91)",
-                    color: "white",
-                },
+                // style: {
+                //     backgroundColor: "rgb(60,86,91)",
+                //     color: "white",
+                // },
             });
         } else {
             toast.error("Please fill all the required fields.", {
                 autoClose: 3000,
                 position: "top-right",
-                style: {
-                    backgroundColor: "rgb(60,86,91)",
-                    color: "white",
-                },
+                // style: {
+                //     backgroundColor: "rgb(60,86,91)",
+                //     color: "white",
+                // },
             });
         }
     };
@@ -264,13 +263,58 @@ const DriverLicence = () => {
         });
         setAttachedFile(null);
     }
+    const handleDelete = () => {
+        if (selectedRows.length > 0) {
+            const remainingData = filteredData.filter(item => !selectedRows.includes(item));
+            setFilteredData(remainingData);
+            setSelectedRows([]);
+            toast.success("Selected rows deleted successfully!", {
+                autoClose: 3000,
+                position: "top-right",
+                // style: {
+                //     backgroundColor: 'rgb(60,86,91)',
+                //     color: "white",
+                // },
+            });
+        }
+    };
+
+    const handleFloatingButtonClick = (label) => {
+        if (label === 'Add') {
+            handleAddVisitorClick();
+        } else if (label === 'Delete') {
+            handleDelete();
+        } else if (label === 'Edit') {
+            // Handle edit action here
+        }
+    };
+
+    const handleInputChange = (event) => {
+        const { name, value } = event.target;
+        setFormData((prevValues) => ({ ...prevValues, [name]: value }));
+    };
+    const styles = {
+        navbar: {
+            backgroundColor: colors.navbar,
+            color: '#fff',
+            padding: '10px',
+        },
+        resetButton: {
+            backgroundColor: colors.resetButtonBackground,
+            color: colors.resetButtonColor,
+            // padding: '8px 16px',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer',
+        },
+    };
 
     const addInstantVisitors = (
         <>
             <Box
                 display="flex"
                 justifyContent="space-between"
-                backgroundColor="rgb(60,86,91)"
+                backgroundColor={colors.navbar}
             >
                 <Typography
                     color="white"
@@ -292,7 +336,7 @@ const DriverLicence = () => {
                             size="small"
                             required
                             name="driverName"
-                            variant="standard"
+                            // variant="contained"
                             value={formData.driverName}
                             onChange={handleChange}
                             error={errors.driverName}
@@ -308,7 +352,7 @@ const DriverLicence = () => {
                             size="small"
                             required
                             name="driverMobile"
-                            variant="standard"
+                            // variant="standard"
                             value={formData.driverMobile}
                             onChange={handleChange}
                             error={errors.driverMobile}
@@ -324,7 +368,7 @@ const DriverLicence = () => {
                             size="small"
                             required
                             name="licence"
-                            variant="standard"
+                            // variant="standard"
                             onChange={handleChange}
                             value={formData.licence}
                             error={errors.licence}
@@ -335,11 +379,11 @@ const DriverLicence = () => {
                 <Grid item lg={6} md={6} sm={12} xs={12}>
                     <Box style={{ marginTop: "15px" }}>
                         <DatePickers
-                            label="Exp Date"
-                            placeholder="Enter Exp Date"
-                            selectedDate={formData.expDate}
-                            onChange={(date) => handleChange(null, 'expDate', date)}
+                            placeholder="From Date"
+                            value={formData.fromDate}
+                            handleInputChange={handleInputChange}
                         />
+
                     </Box>
                 </Grid>
                 <Grid item lg={6} md={6} sm={12} xs={12}>
@@ -348,7 +392,7 @@ const DriverLicence = () => {
                             label="Brief"
                             size="small"
                             name="brief"
-                            variant="standard"
+                            // variant="standard"
                             required
                             placeholder="Enter Data"
                             onChange={handleChange}
@@ -362,7 +406,7 @@ const DriverLicence = () => {
                     <Box display="flex" justifyContent="center" alignItems="center" style={{ gap: "10px", marginTop: "20px" }}>
                         {attachedFile ? (
                             <>
-                                <Typography>{attachedFile.name}</Typography>
+                                <Typography >{attachedFile.name}</Typography>
                                 <IconButton onClick={removeFile}>
                                     <CloseIcon style={{ color: "red" }} />
                                 </IconButton>
@@ -370,7 +414,9 @@ const DriverLicence = () => {
                         ) : (
                             <>
                                 <Typography>No file attached</Typography>
-                                <InputFileUpload onFileSelect={handleFileSelect} />
+                                <InputFileUpload onFileSelect={handleFileSelect}
+
+                                />
                             </>
                         )}
                     </Box>
@@ -378,10 +424,12 @@ const DriverLicence = () => {
             </Grid>
 
             <Grid container spacing={3}>
-                <Grid item lg={6} md={6} xs={12}>
+                <Grid item lg={12} md={12} xs={12}>
                     <Box
                         sx={{
                             display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
                             ml: "25px",
                             flexDirection: "row",
                             gap: "20px",
@@ -394,7 +442,7 @@ const DriverLicence = () => {
                                 type="submit"
                                 onClick={handleFormSubmit}
                                 variant="contained"
-                                style={{ backgroundColor: "rgb(60,86,91)", color: "white" }}
+                                backgroundColor={colors.navbar}
                             />
                         </Box>
                         <Box>
@@ -405,6 +453,7 @@ const DriverLicence = () => {
                                 color="success"
                                 variant="contained"
                                 onClick={handleReset}
+                                style={styles.resetButton}
                             />
                         </Box>
                         <Box>
@@ -425,24 +474,35 @@ const DriverLicence = () => {
         setOpen(true);
     };
 
+    const handleSearchNumberChange = (event) => {
+        const searchText = event.target.value;
+        setSearchNumber(searchText);
+        const filtered = visitorsData.filter(item =>
+            item.number && item.number.toString().includes(searchText)
+        );
+        setFilteredData(filtered);
+    };
+
+
+
     return (
         <>
-            <ToastContainer style={{ marginTop: "60px" }} />
+            <ToastContainer style={{ marginTop: "45px" }} />
             <SwipeableDrawer
                 anchor="right"
                 open={open}
                 onClose={() => toggleDrawer(false)}
                 onOpen={() => toggleDrawer(true)}
             >
-                <Box sx={{ width: "600px", marginTop: "100px" }}>
+                <Box sx={{ width: "600px", marginTop: "63px" }}>
                     {addInstantVisitors}
                 </Box>
             </SwipeableDrawer>
             <Grid container spacing={3}>
                 <Grid item lg={12} md={12} sm={12} xs={12}>
-                    <Box>
-                        <Typography variant="h5">Driver Licence View</Typography>
-                        <hr style={{ width: "100%" }} />
+                    <Box backgroundColor={colors.navbar}>
+                        <Typography style={{ marginTop: "-15px", color: "white", marginLeft: "10px" }}>Driver Licence View</Typography>
+                        {/* <hr style={{ marginTop: "-0px", height: "4px", borderWidth: "0", color: "rgb(60,86,91)", backgroundColor: "rgb(60,86,91)" }} /> */}
                     </Box>
                 </Grid>
                 <Box
@@ -451,20 +511,23 @@ const DriverLicence = () => {
                     borderRadius={2}
                     marginLeft="20px"
                     width="100%"
+                    marginTop="9px"
                 >
                     <Grid item lg={4} md={4} sm={12} xs={12}>
                         <Box>
                             <Box marginBottom={2} display="flex" style={{ gap: "10px" }}>
                                 <Texxt
-                                    placeholder="Search"
-                                    variant="standard"
-                                    label="Search"
+                                    placeholder="Search Data"
+                                    // variant="standard"
+                                    label="Search for Driver Licence"
                                     size="small"
                                     fullWidth
+                                    value={searchNumber}
+                                    onChange={handleSearchNumberChange}
                                 />
-                                <IconButton color="primary">
+                                {/* <IconButton color="primary">
                                     <Search />
-                                </IconButton>
+                                </IconButton> */}
                             </Box>
                             {showMoreFilters && (
                                 <>
@@ -496,12 +559,16 @@ const DriverLicence = () => {
                             >
                                 <ButtonComponent
                                     size="small"
-                                    style={{ backgroundColor: "rgb(60,86,91)", color: "white" }}
+                                    variant="contained"
+                                    backgroundColor={colors.navbar}
+                                    style={{ marginLeft: "10px", fontSize: "10px" }}
                                     name="Submit"
                                 />
                                 <ButtonComponent
                                     size="small"
-                                    style={{ backgroundColor: "rgb(60,86,91)", color: "white" }}
+                                    variant="contained"
+                                    backgroundColor={colors.navbar}
+                                    style={{ marginLeft: "10px", fontSize: "10px" }}
                                     name={showMoreFilters ? "Hide Filters" : "More Filters"}
                                     onClick={handleMoreFiltersClick}
                                 />
@@ -510,23 +577,10 @@ const DriverLicence = () => {
                     </Grid>
                 </Box>
                 <Grid item lg={12} md={12} sm={12} xs={12}>
-                    <Box
-                        width="auto"
-                        boxShadow={3}
-                        borderRadius={2}
-                        bgcolor="rgb(60,86,91)"
-                    >
-                        <Box
-                            display="flex"
-                            justifyContent="space-between"
-                            alignItems="center"
-                        >
-                            <Typography variant="h6" color="white" marginLeft="10px">
-                                Filtered By: {selectedStatus.length > 0 ? selectedStatus.map(status => status.label).join(", ") : "None"}
-                            </Typography>
-                            <Typography mr="10px" variant="h10" color="white">
-                                Count = 0{" "}
-                            </Typography>
+                    <Box boxShadow={3} borderRadius={2} backgroundColor={colors.navbar} height="35px" borderWidth="0">
+                        <Box display="flex" justifyContent="space-between" alignItems="center">
+                            <Typography ml="10px" mt="8px" variant="h10" fontSize="10px" color="white">Filtered By : </Typography>
+                            {/* <Typography mr="10px" variant="h10" color="white">Count = 0 </Typography> */}
                         </Box>
                     </Box>
                 </Grid>
@@ -542,7 +596,8 @@ const DriverLicence = () => {
                             columns={columns}
                             data={filteredData}
                             onSearch={handleSearch}
-                            copyEnabled={true}
+                            copyEnabled={true} onSelectedRowsChange={(selected) => setSelectedRows(selected.selectedRows)}
+                            // columns={columns}
                             onCopy={handleCopy}
                             downloadEnabled={true}
                             onDownloadXLSX={handleDownloadXLSX}
@@ -552,7 +607,7 @@ const DriverLicence = () => {
                 <FloatingButton
                     options={floatingActionButtonOptions}
                     bottomOffset="100px"
-                    onAddVisitorClick={handleAddVisitorClick}
+                    onButtonClick={handleFloatingButtonClick}
                 />
             </Grid>
         </>

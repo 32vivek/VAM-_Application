@@ -36,48 +36,48 @@ function App() {
   return (
     <div className="App">
       <BrowserRouter>
-        <TokenRefresh>
-          <Routes>
-            {/* <Route element={<PrivateRoutes />}> */}
-            <Route path='/' element={<SignInSide />} />
-            <Route path='/signup' element={<SingUpInSide />} />
-            <Route path='/' element={<PersistentDrawerLeft />}>
-              <Route path="/home" element={<Home />} >
-                <Route path='/home/today' element={<Todays_Visitor />} />
-                <Route path="/home/week" element={<ThisWeekVisitor />} />
-                <Route path="/home/month" element={<ThisMonthVisitor />} />
-              </Route>
-              <Route path='/userform' element={<UserForm />} />
-              <Route path='/dashboard/visitorsstatus' element={<VisitorStatus />}>
-                <Route path='/dashboard/visitorsstatus/status' element={<VisitedStatus />} />
-                <Route path='/dashboard/visitorsstatus/purpose' element={<VisitedPurpose />} />
-                <Route path='/dashboard/visitorsstatus/department' element={<VisitedDepartment />} />
-              </Route>
-              <Route path="/visitor/visitoractivity" element={<VisitorActivity />} >
-                <Route path="/visitor/visitoractivity" element={<AddInstantVisitors />} />
-                <Route path="/visitor/visitoractivity/addprevisitors" element={<AddPreVisitors />} />
-              </Route>
-              <Route path='/visitor/prerequest' element={<PreRequest />} />
-              <Route path='/settings/department' element={<ViewDepartment />} />
-              <Route path='/settings/contact' element={<ViewContact />} />
-              <Route path='/settings/user' element={<User />} />
-              <Route path='/startingup/purpose' element={<Purpose />} />
-              <Route path='/startingup/plant' element={<Plant />} />
-              <Route path='/startingup/unit' element={<UnitSettings />} />
-              <Route path='/startingup/summary' element={<SummaryReport />} />
-              <Route path='/startingup/dl' element={<DriverLicence />} />
-              <Route path='/startingup/vl' element={<VehicleLicence />} />
-              {/* <Route path='/userprofile' element={<UserProfile />} /> */}
-              <Route path='/userprofile' element={<UserProfile />}>
-                <Route path='/userprofile' element={<BasicDetails />} />
-                <Route path='/userprofile/resetpassword' element={<ResetPassword />} />
-                <Route path='/userprofile/edituser' element={<EditUser />} />
-
-              </Route>
+        {/* <TokenRefresh> */}
+        <Routes>
+          {/* <Route element={<PrivateRoutes />}> */}
+          <Route path='/' element={<SignInSide />} />
+          <Route path='/signup' element={<SingUpInSide />} />
+          <Route path='/' element={<PersistentDrawerLeft />}>
+            <Route path="/home" element={<Home />} >
+              <Route path='/home/today' element={<Todays_Visitor />} />
+              <Route path="/home/week" element={<ThisWeekVisitor />} />
+              <Route path="/home/month" element={<ThisMonthVisitor />} />
             </Route>
+            <Route path='/userform' element={<UserForm />} />
+            <Route path='/dashboard/visitorsstatus' element={<VisitorStatus />}>
+              <Route path='/dashboard/visitorsstatus/status' element={<VisitedStatus />} />
+              <Route path='/dashboard/visitorsstatus/purpose' element={<VisitedPurpose />} />
+              <Route path='/dashboard/visitorsstatus/department' element={<VisitedDepartment />} />
+            </Route>
+            <Route path="/visitor/visitoractivity" element={<VisitorActivity />} >
+              <Route path="/visitor/visitoractivity" element={<AddInstantVisitors />} />
+              <Route path="/visitor/visitoractivity/addprevisitors" element={<AddPreVisitors />} />
+            </Route>
+            <Route path='/visitor/prerequest' element={<PreRequest />} />
+            <Route path='/settings/department' element={<ViewDepartment />} />
+            <Route path='/settings/contact' element={<ViewContact />} />
+            <Route path='/settings/user' element={<User />} />
+            <Route path='/startingup/purpose' element={<Purpose />} />
+            <Route path='/startingup/plant' element={<Plant />} />
+            <Route path='/startingup/unit' element={<UnitSettings />} />
+            <Route path='/startingup/summary' element={<SummaryReport />} />
+            <Route path='/startingup/dl' element={<DriverLicence />} />
+            <Route path='/startingup/vl' element={<VehicleLicence />} />
+            {/* <Route path='/userprofile' element={<UserProfile />} /> */}
+            <Route path='/userprofile' element={<UserProfile />}>
+              <Route path='/userprofile' element={<BasicDetails />} />
+              <Route path='/userprofile/resetpassword' element={<ResetPassword />} />
+              <Route path='/userprofile/edituser' element={<EditUser />} />
+            </Route>
+            <Route path='/userfeedback' element={<UserFeedback />} />
             {/* </Route> */}
-          </Routes>
-        </TokenRefresh>
+          </Route>
+        </Routes>
+        {/* </TokenRefresh> */}
       </BrowserRouter>
     </div>
   );

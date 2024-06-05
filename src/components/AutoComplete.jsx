@@ -16,12 +16,17 @@ const Autocmp = ({ name, label, size, style, required, options, multiple, varian
                     style={style}
                     margin="dense"
                     required={required}
-                    InputLabelProps={{ style: { color: 'black', fontSize: "12px" } }}
+                    InputLabelProps={{ style: { color: 'black', fontSize: '12px' } }}
+                    sx={{
+                        '& .MuiInputLabel-asterisk': {
+                            color: 'red', // Set the color of the asterisk to red
+                        },
+                    }}
                 />
             )}
             size={size}
             value={value}
-            onChange={(event, newValue) => onChange(event, name, newValue)}
+            onChange={(event, newValue) => onChange(newValue)}
         />
     );
 };

@@ -14,6 +14,8 @@ import Texxt from '../../components/Textfield';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
 import { Search, Add, Close as CloseIcon, Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
+import colors from './../colors';
+
 
 const data = [
     { label: 'HR', value: 'hr' },
@@ -33,7 +35,7 @@ const Purpose = () => {
     const [errors, setErrors] = useState({});
     const [selectedRows, setSelectedRows] = useState([]);
     const [showAdditionalFields, setShowAdditionalFields] = useState(false);
-
+    const [searchNumber, setSearchNumber] = useState('');
     const [formData, setFormData] = useState({
         visitorName: null,
         visitorMobile: null,
@@ -46,6 +48,22 @@ const Purpose = () => {
         laptop: '',
         notifyEmployee: []
     });
+
+    const styles = {
+        navbar: {
+            backgroundColor: colors.navbar,
+            color: '#fff',
+            padding: '10px',
+        },
+        resetButton: {
+            backgroundColor: colors.resetButtonBackground,
+            color: colors.resetButtonColor,
+            // padding: '8px 16px',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer',
+        },
+    };
 
     const [time, setTime] = useState(null);
 
@@ -153,20 +171,20 @@ const Purpose = () => {
             toast.success("Form submitted successfully!", {
                 autoClose: 3000,
                 position: "top-right",
-                style: {
-                    backgroundColor: 'rgb(60,86,91)',
-                    color: "white",
-                },
+                // style: {
+                //     backgroundColor: 'rgb(60,86,91)',
+                //     color: "white",
+                // },
             });
         } else {
             console.log("Validation Failed");
             toast.error("Validation Error! Please check the form for errors.", {
                 autoClose: 3000,
                 position: "top-right",
-                style: {
-                    backgroundColor: 'rgb(60,86,91)',
-                    color: "white",
-                },
+                // style: {
+                //     backgroundColor: 'rgb(60,86,91)',
+                //     color: "white",
+                // },
             });
         }
     };
@@ -200,9 +218,35 @@ const Purpose = () => {
         });
     };
 
+    const handleDelete = () => {
+        if (selectedRows.length > 0) {
+            const remainingData = filteredData.filter(item => !selectedRows.includes(item));
+            setFilteredData(remainingData);
+            setSelectedRows([]);
+            toast.success("Selected rows deleted successfully!", {
+                autoClose: 3000,
+                position: "top-right",
+                // style: {
+                //     backgroundColor: 'rgb(60,86,91)',
+                //     color: "white",
+                // },
+            });
+        }
+    };
+
+    const handleFloatingButtonClick = (label) => {
+        if (label === 'Add') {
+            handleAddVisitorClick();
+        } else if (label === 'Delete') {
+            handleDelete();
+        } else if (label === 'Edit') {
+            // Handle edit action here
+        }
+    };
+
     const addInstantVisitors = (
         <>
-            <Box display="flex" justifyContent="space-between" backgroundColor="rgb(60,86,91)" >
+            <Box display="flex" justifyContent="space-between" backgroundColor={colors.navbar} >
                 <Typography color="white" style={{ marginLeft: "10px", marginTop: "10px" }}>Add Purpose</Typography>
                 <IconButton onClick={handleCloseDrawer}>
                     <CloseIcon style={{ color: "white", marginRight: "10px" }} />
@@ -212,26 +256,36 @@ const Purpose = () => {
                 <Grid item lg={6} md={6} xs={12} sm={12}>
                     <Box>
                         <Autocmp
-                            label="Purpose For"
-                            required
+                            options={data}
+                            name="visitorOrganization"
+                            label="Visitor Organization"
+                            value={formData.visitorOrganization}
+                            onChange={(event, newValue) => handleChange('visitorOrganization', newValue)}
+                            error={!!errors.visitorOrganization}
+                            helperText={errors.visitorOrganization}
                             size="small"
+                        // options={data}
                         />
                     </Box>
                 </Grid>
                 <Grid item lg={6} md={6} xs={12} sm={12}>
                     <Box>
                         <Texxt
-                            label="Purpose"
+                            label="Visitor Mobile"
                             required
-                            placeholder="Enter Data"
+                            value={formData.visitorMobile}
+                            onChange={(event) => handleChange('visitorMobile', event.target.value)}
+                            error={!!errors.visitorMobile}
                             size="small"
+                            helperText={errors.visitorMobile}
                         />
                     </Box>
                 </Grid>
                 <Grid item lg={6} md={6} xs={12} sm={12}>
-                    <Box>
+                    <Box display="flex" style={{ gap: "15px" }}>
+                        <Typography marginTop="10px"> Alert Option</Typography>
                         <ReusableRadioButton
-                            label="Alert Option"
+                            // label="Alert Option"
                             options={[
                                 { label: "Yes", value: "yes" },
                                 { label: "No", value: "no" }
@@ -249,22 +303,32 @@ const Purpose = () => {
                         <Grid item lg={6} md={6} xs={12} sm={12}>
                             <Box>
                                 <Texxt
-                                    label="Alert After"
-                                    size="small"
+                                    label="Visitor Email"
                                     required
+                                    size="small"
+                                    value={formData.visitorEmail}
+                                    onChange={(event) => handleChange('visitorEmail', event.target.value)}
+                                    error={!!errors.visitorEmail}
+                                    helperText={errors.visitorEmail}
                                 />
                             </Box>
                         </Grid>
                         <Grid item lg={6} md={6} xs={12} sm={12}>
                             <Box>
                                 <Autocmp
-                                    label="Alert To"
-                                    required
+                                    options={data}
                                     size="small"
+                                    name="purpose"
+                                    label="Purpose of Meeting"
+                                    value={formData.purpose}
+                                    onChange={(event, newValue) => handleChange('purpose', newValue)}
+                                    error={!!errors.purpose}
+                                    helperText={errors.purpose}
+                                // options={data}
                                 />
                             </Box>
                         </Grid>
-                        <Grid item lg={6} md={6} xs={12} sm={12}>
+                        {/* <Grid item lg={6} md={6} xs={12} sm={12}>
                             <Box>
                                 <Autocmp
                                     label="Employee Name"
@@ -272,13 +336,13 @@ const Purpose = () => {
                                     size="small"
                                 />
                             </Box>
-                        </Grid>
+                        </Grid> */}
                     </>
                 )}
             </Grid>
             <Grid container>
-                <Grid item lg={6} md={6} xs={12}>
-                    <Box sx={{ display: "flex", ml: "25px", flexDirection: "row", gap: "20px" }}>
+                <Grid item lg={12} md={12} xs={12}>
+                    <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", ml: "25px", flexDirection: "row", gap: "20px" }}>
                         <Box>
                             <ButtonComponent
                                 name="Submit"
@@ -286,17 +350,18 @@ const Purpose = () => {
                                 type="submit"
                                 onClick={handleSubmit}
                                 variant="contained"
-                            // style={{ backgroundColor: "rgb(60,86,91)", fontSize: "12px", color: "white" }}
+                                backgroundColor={colors.navbar}
+                                style={{ fontSize: "12px", borderRadius: "10px" }}
                             />
                         </Box>
                         <Box>
                             <ButtonComponent
                                 name="Reset"
-                                size="medium"
+                                size="small"
                                 type="submit"
-                                color="success"
                                 variant="contained"
-                            // style={{ backgroundColor: "rgb(60,86,91)", color: "red" }}
+                                fontSize="12px"
+                                style={styles.resetButton}
                             />
                         </Box>
                         <Box>
@@ -304,7 +369,7 @@ const Purpose = () => {
                                 name="Cancel"
                                 size="medium"
                                 onClick={handleCloseDrawer}
-                                style={{ backgroundColor: "red", color: "white" }}
+                                style={{ backgroundColor: "red", fontSize: "12px", color: "white", borderRadius: "10px" }}
                             />
                         </Box>
                     </Box>
@@ -321,34 +386,50 @@ const Purpose = () => {
         // Handle the selected value here
     };
 
+    const handleSearchNumberChange = (event) => {
+        const searchText = event.target.value;
+        setSearchNumber(searchText);
+        const filtered = visitorsData.filter(item =>
+            item.number && item.number.toString().includes(searchText)
+        );
+        setFilteredData(filtered);
+    };
+
     return (
         <>
-            <ToastContainer style={{ marginTop: '60px', color: "white" }} />
+            <ToastContainer style={{ marginTop: '45px', color: "white" }} />
             <SwipeableDrawer
                 anchor="right"
                 open={open}
                 onClose={() => toggleDrawer(false)}
                 onOpen={() => toggleDrawer(true)}
             >
-                <Box sx={{ width: '600px', marginTop: "100px" }}>
+                <Box sx={{ width: '600px', marginTop: "63px" }}>
                     {addInstantVisitors}
                 </Box>
             </SwipeableDrawer>
+            {/* <Box >
+                <Typography variant="h6" style={{ marginTop: "-15px" }}>Purpose View</Typography>
+             </Box> */}
+
             <Grid container spacing={3}>
                 <Grid item lg={12} md={12} sm={12} xs={12}>
-                    <Box>
-                        <Typography variant="h5">Purpose View</Typography>
-                        <hr style={{ width: "100%" }} />
+                    <Box backgroundColor={colors.navbar}>
+                        <Typography style={{ marginTop: "-15px", color: "white", marginLeft: "10px" }}>Purpose View</Typography>
+                        {/* <hr style={{ marginTop: "-0px", height: "4px", borderWidth: "0", color: "rgb(60,86,91)", backgroundColor: "rgb(60,86,91)" }} /> */}
                     </Box>
                 </Grid>
-                <Box boxShadow={3} padding={2} borderRadius={2} marginLeft="20px" width="100%">
-                    <Grid item lg={4} md={4} sm={12} xs={12}>
+                <Box boxShadow={3} padding={2} borderRadius={2} marginLeft="20px" marginTop="9px" width="100%">
+                    <Grid item lg={4} md={4} sm={12} xs={12} >
                         <Box >
                             <Box marginBottom={2} display="flex" style={{ gap: "10px" }}>
-                                <Texxt placeholder="Search" label="Search" size="small" fullWidth />
-                                <IconButton color="primary">
-                                    <Search />
-                                </IconButton>
+                                <Texxt
+                                    label="Search By Number"
+                                    size="small"
+                                    placeholder="Enter Number"
+                                    value={searchNumber}
+                                    onChange={handleSearchNumberChange}
+                                />
                             </Box>
                             {showMoreFilters && (
                                 <>
@@ -372,40 +453,50 @@ const Purpose = () => {
                                 </>
                             )}
                             <Box style={{ gap: "10px", marginTop: "15px", display: "flex", justifyContent: "space-between" }}>
-                                <ButtonComponent style={{ backgroundColor: "rgb(60,86,91)", color: "white" }} name="Submit" size="small" />
+                                <ButtonComponent
+                                    variant="contained" style={{ fontSize: "10px" }} backgroundColor={colors.navbar}
+                                    name="Submit" size="small" />
                                 <ButtonComponent
                                     size="small"
-                                    style={{ backgroundColor: "rgb(60,86,91)", color: "white" }}
+                                    variant="contained"
+                                    style={{ marginLeft: "10px", fontSize: "10px" }}
+                                    backgroundColor={colors.navbar}
                                     name={showMoreFilters ? "Hide Filters" : "More Filters"}
                                     onClick={handleMoreFiltersClick}
+                                // style={{ marginLeft: "10px", fontSize: "10px" }}
                                 />
                             </Box>
                         </Box>
                     </Grid>
                 </Box>
                 <Grid item lg={12} md={12} sm={12} xs={12}>
-                    <Box width="auto" boxShadow={3} borderRadius={2} bgcolor='rgb(60,86,91)'>
+                    <Box boxShadow={3} borderRadius={2} backgroundColor={colors.navbar} height="35px" borderWidth="0">
                         <Box display="flex" justifyContent="space-between" alignItems="center">
-                            <Typography ml="10px" variant="h10" color="white">Filtered By : </Typography>
-                            <Typography mr="10px" variant="h10" color="white">Count = 0 </Typography>
+                            <Typography ml="10px" mt="8px" variant="h10" fontSize="10px" color="white">Filtered By : </Typography>
+                            {/* <Typography mr="10px" variant="h10" color="white">Count = 0 </Typography> */}
                         </Box>
                     </Box>
                 </Grid>
                 <Grid item lg={12} md={12} sm={12} xs={12}>
                     <Box width="100%" boxShadow={3} padding={2} borderRadius={2} bgcolor='white'>
                         <CustomDataTable
-                            columns={columns}
-                            data={filteredData}
                             onSearch={handleSearch}
-                            copyEnabled={true}
-                            onCopy={handleCopy}
-                            downloadEnabled={true}
-                            onDownloadXLSX={handleDownloadXLSX}
+                            data={filteredData}
+                            columns={columns}
+                            onSelectedRowsChange={(selected) => setSelectedRows(selected.selectedRows)}
+                            selectableRows
+                            pagination
                         />
                     </Box>
                 </Grid>
-                <FloatingButton options={floatingActionButtonOptions} bottomOffset="100px" onAddVisitorClick={handleAddVisitorClick} />
+                {/* <FloatingButton options={floatingActionButtonOptions}
+                    bottomOffset="100px"
+                    onButtonClick={handleFloatingButtonClick} /> */}
             </Grid>
+
+            <FloatingButton options={floatingActionButtonOptions}
+                bottomOffset="100px"
+                onButtonClick={handleFloatingButtonClick} />
         </>
     )
 }

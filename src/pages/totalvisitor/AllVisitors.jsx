@@ -6,7 +6,7 @@ import Autocmp from '../../components/AutoComplete';
 import ReusableTabs from '../../components/Tabs';
 import { Outlet } from 'react-router-dom';
 import DatePickers from '../../components/DateRangePicker';
-
+import colors from '../colors';
 
 const data = [
     { name: 'Date 1', IN: 249, OUT: 150 },
@@ -17,7 +17,7 @@ const VisitorStatus = () => {
     const [formData, setFormData] = useState({
         dateWise: null,
         fromDate: null,
-        toDate: null,
+        toDate: null
     });
 
     const location = useLocation();
@@ -59,6 +59,26 @@ const VisitorStatus = () => {
             [name]: value,
         });
     };
+    const styles = {
+        navbar: {
+            backgroundColor: colors.navbar,
+            color: '#fff',
+            padding: '10px',
+        },
+        resetButton: {
+            backgroundColor: colors.resetButtonBackground,
+            color: colors.resetButtonColor,
+            padding: '8px 16px',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer',
+        },
+    };
+
+    const handleInputChange = (event) => {
+        const { name, value } = event.target;
+        setFormData((prevValues) => ({ ...prevValues, [name]: value }));
+    };
 
     return (
         <>
@@ -69,7 +89,7 @@ const VisitorStatus = () => {
                         name="dateWise"
                         size="small"
                         label="Date Wise"
-                        variant="standard"
+                        // variant="standard"
                         value={formData.dateWise}
                         options={dateOptions}
                         onChange={(e, value) => handleChange('dateWise', value)}
@@ -77,30 +97,35 @@ const VisitorStatus = () => {
                     />
                     <Box display="flex" gap="5px" mt="8px">
                         <DatePickers
+                            label="From Date"
+                            name="fromDate"
                             placeholder="From Date"
                             value={formData.fromDate}
-                            onChange={(value) => handleDateChange('fromDate', value)}
+                            handleInputChange={handleInputChange}
                         />
                         <DatePickers
+                            label="To Date"
+                            name="fromDate"
                             placeholder="To Date"
                             value={formData.toDate}
-                            onChange={(value) => handleDateChange('toDate', value)}
+                            handleInputChange={handleInputChange}
                         />
                     </Box>
                 </Grid>
                 <Grid item lg={5} md={5} sm={6} xs={6}>
-                    <Box mt="60px">
+                    <Box mt="68px">
                         <ButtonComponent
                             name="Search"
                             variant="contained"
-                            size="small"
-                            style={{ backgroundColor: "rgb(60,86,91)", color: "white", marginLeft: "10px", fontSize: "10px" }}
+                            backgroundColor={colors.navbar}
+                            size="medium"
+                            style={{ marginLeft: "10px", fontSize: "10px" }}
                         // style={{ fontSize: '14px', padding: '8px 16px' }}
                         />
                     </Box>
                 </Grid>
                 <Grid item lg={12} md={12} sm={12} xs={12} sx={{ mt: "20px" }}>
-                    <Box backgroundColor="rgb(60,86,91)" display="flex" justifyContent="center" alignItems="center" gap="30px">
+                    <Box backgroundColor={colors.navbar} display="flex" justifyContent="center" alignItems="center" gap="30px">
                         <ReusableTabs
                             onChange={handleTabChange}
                             tabs={tabs}

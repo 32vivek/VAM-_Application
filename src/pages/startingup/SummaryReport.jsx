@@ -24,6 +24,7 @@ import {
     Edit as EditIcon,
     Delete as DeleteIcon,
 } from "@mui/icons-material";
+import colors from "../colors";
 
 const data = [
     { label: "HR", value: "hr" },
@@ -39,21 +40,31 @@ const SummaryReport = () => {
     const [errors, setErrors] = useState({});
     const [selectedRows, setSelectedRows] = useState([]);
     const [showAdditionalFields, setShowAdditionalFields] = useState(false);
-
+    const [searchNumber, setSearchNumber] = useState('');
     const [formData, setFormData] = useState({
         plantName: "",
         brief: "",
+        visitorName: null,
+        visitorMobile: null,
+        visitorEmail: '',
+        visitorOrganization: null,
+        purpose: null,
+        address: "",
+        visitor: null,
+        possessionAllowed: '',
+        confrenceRoom: '',
+        laptop: '',
+        notifyEmployee: []
     });
 
-    const floatingActionButtonOptions =
-        selectedRows.length === 0
-            ? [{ label: "Add", icon: <Add /> }]
-            : selectedRows.length === 1
-                ? [
-                    { label: "Edit", icon: <EditIcon /> },
-                    { label: "Delete", icon: <DeleteIcon /> },
-                ]
-                : [{ label: "Delete", icon: <DeleteIcon /> }];
+    const floatingActionButtonOptions = selectedRows.length === 0 ? [
+        { label: 'Add', icon: <Add /> },
+    ] : selectedRows.length === 1 ? [
+        { label: 'Edit', icon: <EditIcon /> },
+        { label: 'Delete', icon: <DeleteIcon /> },
+    ] : [
+        { label: 'Delete', icon: <DeleteIcon /> },
+    ];
 
     const columns = [
         {
@@ -141,12 +152,16 @@ const SummaryReport = () => {
                 [name]: value,
             }));
         } else {
-            setFormData({
-                ...formData,
-                [name]: value,
-            });
+            // Check if the value is null, if not, update the form data
+            if (value !== null) {
+                setFormData({
+                    ...formData,
+                    [name]: value,
+                });
+            }
         }
     };
+
 
     const handleFormSubmit = (e) => {
         e.preventDefault();
@@ -164,19 +179,19 @@ const SummaryReport = () => {
             toast.success("Form submitted successfully!", {
                 autoClose: 3000,
                 position: "top-right",
-                style: {
-                    backgroundColor: "rgb(60,86,91)",
-                    color: "white",
-                },
+                // style: {
+                //     backgroundColor: "rgb(60,86,91)",
+                //     color: "white",
+                // },
             });
         } else {
             toast.error("Please correct the highlighted errors.", {
                 autoClose: 3000,
                 position: "top-right",
-                style: {
-                    backgroundColor: "rgb(60,86,91)",
-                    color: "white",
-                },
+                // style: {
+                //     backgroundColor: "rgb(60,86,91)",
+                //     color: "white",
+                // },
             });
         }
     };
@@ -211,13 +226,54 @@ const SummaryReport = () => {
             },
         });
     };
+    const handleDelete = () => {
+        if (selectedRows.length > 0) {
+            const remainingData = filteredData.filter(item => !selectedRows.includes(item));
+            setFilteredData(remainingData);
+            setSelectedRows([]);
+            toast.success("Selected rows deleted successfully!", {
+                autoClose: 3000,
+                position: "top-right",
+                // style: {
+                //     backgroundColor: 'rgb(60,86,91)',
+                //     color: "white",
+                // },
+            });
+        }
+    };
+
+    const handleFloatingButtonClick = (label) => {
+        if (label === 'Add') {
+            handleAddVisitorClick();
+        } else if (label === 'Delete') {
+            handleDelete();
+        } else if (label === 'Edit') {
+            // Handle edit action here
+        }
+    };
+
+    const styles = {
+        navbar: {
+            backgroundColor: colors.navbar,
+            color: '#fff',
+            padding: '10px',
+        },
+        resetButton: {
+            backgroundColor: colors.resetButtonBackground,
+            color: colors.resetButtonColor,
+            // padding: '8px 16px',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer',
+        },
+    };
 
     const addInstantVisitors = (
         <>
             <Box
                 display="flex"
                 justifyContent="space-between"
-                backgroundColor="rgb(60,86,91)"
+                backgroundColor={colors.navbar}
             >
                 <Typography
                     color="white"
@@ -230,14 +286,20 @@ const SummaryReport = () => {
                 </IconButton>
             </Box>
 
-            <Grid container spacing={2} sx={{ p: 3 }}>
+            <Grid container spacing={1} sx={{ p: 2 }}>
                 <Grid item lg={6} md={6} sm={12} xs={12}>
                     <Box>
                         <Autocmp
                             label="Report For"
+                            options={data}
+                            name="visitorOrganization"
+
+                            value={formData.visitorOrganization}
+                            onChange={(event, newValue) => handleChange('visitorOrganization', newValue)}
+                            error={!!errors.visitorOrganization}
+                            helperText={errors.visitorOrganization}
                             size="small"
-                            variant="standard"
-                            required
+
                         />
                     </Box>
                 </Grid>
@@ -245,9 +307,13 @@ const SummaryReport = () => {
                     <Box>
                         <Autocmp
                             label="Visited Department"
+                            options={data}
+                            name="visitorName"
+                            value={formData.visitorName}
+                            onChange={(event, newValue) => handleChange('visitorName', newValue)}
+                            error={!!errors.visitorName}
+                            helperText={errors.visitorName}
                             size="small"
-                            variant="standard"
-                            required
                         />
                     </Box>
                 </Grid>
@@ -256,7 +322,7 @@ const SummaryReport = () => {
                         <Texxt
                             label="Report At"
                             size="small"
-                            variant="standard"
+                            variant="outlined"
                             placeholder="Enter Data"
                             required
                         />
@@ -266,9 +332,13 @@ const SummaryReport = () => {
                     <Box>
                         <Autocmp
                             label="To Department"
+                            // label="Visited Department"
+                            options={data}
+                            name="visitor"
+                            value={formData.visitor}
+                            onChange={(event, newValue) => handleChange('visitor', newValue)}
+
                             size="small"
-                            variant="standard"
-                            required
                         />
                     </Box>
                 </Grid>
@@ -276,20 +346,26 @@ const SummaryReport = () => {
                     <Box>
                         <Autocmp
                             label="Employee"
+                            options={data}
+                            name="purpose"
+                            value={formData.purpose}
+                            onChange={(event, newValue) => handleChange('purpose', newValue)}
+                            error={!!errors.purpose}
+                            helperText={errors.purpose}
                             size="small"
-                            variant="standard"
-                            required
                         />
                     </Box>
                 </Grid>
             </Grid>
 
             <Grid container spacing={3}>
-                <Grid item lg={6} md={6} xs={12}>
+                <Grid item lg={12} md={12} xs={12}>
                     <Box
                         sx={{
                             display: "flex",
-                            ml: "25px",
+                            justifyContent: "center",
+                            alignItems: "center",
+                            // ml: "25px",
                             flexDirection: "row",
                             gap: "20px",
                         }}
@@ -301,6 +377,7 @@ const SummaryReport = () => {
                                 type="submit"
                                 onClick={handleFormSubmit}
                                 variant="contained"
+                                backgroundColor={colors.navbar}
                             // style={{ backgroundColor: "rgb(60,86,91)", fontSize: "12px", color: "white" }}
                             />
                         </Box>
@@ -308,9 +385,11 @@ const SummaryReport = () => {
                             <ButtonComponent
                                 name="Reset"
                                 size="small"
+                                va
                                 type="submit"
                                 color="success"
                                 variant="contained"
+                                style={styles.resetButton}
                             // style={{ backgroundColor: "rgb(60,86,91)", color: "red" }}
                             />
                         </Box>
@@ -335,25 +414,34 @@ const SummaryReport = () => {
         // console.log("Selected value:", value);
         // Handle the selected value here
     };
+    const handleSearchNumberChange = (event) => {
+        const searchText = event.target.value;
+        setSearchNumber(searchText);
+        const filtered = visitorsData.filter(item =>
+            item.number && item.number.toString().includes(searchText)
+        );
+        setFilteredData(filtered);
+    };
+
 
     return (
         <>
-            <ToastContainer style={{ marginTop: "60px", color: "white" }} />
+            <ToastContainer style={{ marginTop: "45px", color: "white" }} />
             <SwipeableDrawer
                 anchor="right"
                 open={open}
                 onClose={() => toggleDrawer(false)}
                 onOpen={() => toggleDrawer(true)}
             >
-                <Box sx={{ width: "600px", marginTop: "100px" }}>
+                <Box sx={{ width: "600px", marginTop: "63px" }}>
                     {addInstantVisitors}
                 </Box>
             </SwipeableDrawer>
             <Grid container spacing={3}>
                 <Grid item lg={12} md={12} sm={12} xs={12}>
-                    <Box>
-                        <Typography variant="h5">Summary Report View</Typography>
-                        <hr style={{ width: "100%" }} />
+                    <Box backgroundColor={colors.navbar}>
+                        <Typography style={{ marginTop: "-15px", color: "white", marginLeft: "10px" }}>Summary Report View</Typography>
+                        {/* <hr style={{ marginTop: "-0px", height: "4px", borderWidth: "0", color: "rgb(60,86,91)", backgroundColor: "rgb(60,86,91)" }} /> */}
                     </Box>
                 </Grid>
                 <Box
@@ -362,20 +450,24 @@ const SummaryReport = () => {
                     borderRadius={2}
                     marginLeft="20px"
                     width="100%"
+                    marginTop="9px"
                 >
                     <Grid item lg={4} md={4} sm={12} xs={12}>
                         <Box>
                             <Box marginBottom={2} display="flex" style={{ gap: "10px" }}>
                                 <Texxt
-                                    placeholder="Search"
-                                    variant="standard"
-                                    label="Search"
+                                    placeholder="Enter Data"
+                                    // variant="standard"
+                                    label="Search for Summary Report"
                                     size="small"
                                     fullWidth
+                                    value={searchNumber}
+                                    onChange={handleSearchNumberChange}
+
                                 />
-                                <IconButton color="primary">
+                                {/* <IconButton color="primary">
                                     <Search />
-                                </IconButton>
+                                </IconButton> */}
                             </Box>
                             {showMoreFilters && (
                                 <>
@@ -387,7 +479,7 @@ const SummaryReport = () => {
                                             <Autocmp
                                                 size="small"
                                                 label="Active"
-                                                variant="standard"
+                                                // variant="standard"
                                                 options={data}
                                                 onChange={(event, value) => handleAutocompleteChange(value)}
                                             />
@@ -405,12 +497,16 @@ const SummaryReport = () => {
                             >
                                 <ButtonComponent
                                     size="small"
-                                    style={{ backgroundColor: "rgb(60,86,91)", color: "white" }}
+                                    variant="contained"
+                                    backgroundColor={colors.navbar}
+                                    style={{ marginLeft: "10px", fontSize: "10px" }}
                                     name="Submit"
                                 />
                                 <ButtonComponent
                                     size="small"
-                                    style={{ backgroundColor: "rgb(60,86,91)", color: "white" }}
+                                    variant="contained"
+                                    backgroundColor={colors.navbar}
+                                    style={{ marginLeft: "10px", fontSize: "10px" }}
                                     name={showMoreFilters ? "Hide Filters" : "More Filters"}
                                     onClick={handleMoreFiltersClick}
                                 />
@@ -419,23 +515,10 @@ const SummaryReport = () => {
                     </Grid>
                 </Box>
                 <Grid item lg={12} md={12} sm={12} xs={12}>
-                    <Box
-                        width="auto"
-                        boxShadow={3}
-                        borderRadius={2}
-                        bgcolor="rgb(60,86,91)"
-                    >
-                        <Box
-                            display="flex"
-                            justifyContent="space-between"
-                            alignItems="center"
-                        >
-                            <Typography ml="10px" variant="h10" color="white">
-                                Filtered By :{" "}
-                            </Typography>
-                            <Typography mr="10px" variant="h10" color="white">
-                                Count = 0{" "}
-                            </Typography>
+                    <Box boxShadow={3} borderRadius={2} backgroundColor={colors.navbar} height="35px" borderWidth="0">
+                        <Box display="flex" justifyContent="space-between" alignItems="center">
+                            <Typography ml="10px" mt="8px" variant="h10" fontSize="10px" color="white">Filtered By : </Typography>
+                            {/* <Typography mr="10px" variant="h10" color="white">Count = 0 </Typography> */}
                         </Box>
                     </Box>
                 </Grid>
@@ -451,7 +534,8 @@ const SummaryReport = () => {
                             columns={columns}
                             data={filteredData}
                             onSearch={handleSearch}
-                            copyEnabled={true}
+                            copyEnabled={true} onSelectedRowsChange={(selected) => setSelectedRows(selected.selectedRows)}
+
                             onCopy={handleCopy}
                             downloadEnabled={true}
                             onDownloadXLSX={handleDownloadXLSX}
@@ -461,7 +545,7 @@ const SummaryReport = () => {
                 <FloatingButton
                     options={floatingActionButtonOptions}
                     bottomOffset="100px"
-                    onAddVisitorClick={handleAddVisitorClick}
+                    onButtonClick={handleFloatingButtonClick}
                 />
             </Grid>
         </>

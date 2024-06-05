@@ -15,7 +15,8 @@ import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-// import TokenRefresh from '../refreshToken'; // Commented out as it's not used in the simulation
+import { auth_api } from '../../Api/Api';
+import Cookies from 'js-cookie';
 
 export default function SignInSide() {
     const [showPassword, setShowPassword] = useState(false);
@@ -36,10 +37,10 @@ export default function SignInSide() {
 
     const handleChange = (event) => {
         const { name, value } = event.target;
-        setFormData({
-            ...formData,
+        setFormData((prevFormData) => ({
+            ...prevFormData,
             [name]: value
-        });
+        }));
 
         let error = '';
         if (value.trim() === '') {
@@ -48,47 +49,42 @@ export default function SignInSide() {
             error = 'Invalid email address';
         }
 
-        setErrors({
-            ...errors,
+        setErrors((prevErrors) => ({
+            ...prevErrors,
             [name]: error
-        });
+        }));
     };
 
     const handleSubmit = async (event) => {
         event.preventDefault();
+
         const { email, password } = formData;
 
-        if (!email || !password || errors.email || errors.password) {
-            toast.error("Please fill all required fields");
+        if (!email || !password) {
+            toast.error("Please fill in all fields");
             return;
         }
 
-
-        if (email === 'dreamsol@gmail.com' && password === '12345') {
-
-            toast.success("Login successful");
-            navigate("/home");
-        } else {
-
-            toast.error("Invalid email or password");
+        if (errors.email || errors.password) {
+            toast.error("Please fix the errors in the form");
+            return;
         }
 
-        // Commented out the actual API call as it's not currently used
-        /*
         try {
-            const response = await fetch("", {
+            const response = await fetch(`${auth_api}`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ email, password }),
+                body: JSON.stringify({ username: email, password }),
             });
 
             if (response.ok) {
                 const data = await response.json();
-                document.cookie = token=${data.access_token}; path=/;
-                localStorage.setItem("refreshToken", data.refresh_token);
-                navigate("/home");
+                // Store tokens in cookies
+                Cookies.set('token', data.access_token);
+                Cookies.set('refreshToken', data.refresh_token);
+                navigate("/home/today");
             } else {
                 const errorData = await response.json();
                 toast.error(errorData.message);
@@ -97,11 +93,10 @@ export default function SignInSide() {
             console.error("Error:", error);
             toast.error("An unexpected error occurred");
         }
-        */
     };
 
     const handleClickShowPassword = () => {
-        setShowPassword(!showPassword);
+        setShowPassword((prevShowPassword) => !prevShowPassword);
     };
 
     const handleMouseDownPassword = (event) => {
@@ -119,7 +114,6 @@ export default function SignInSide() {
                     sm={4}
                     md={7}
                     sx={{
-
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
@@ -135,17 +129,17 @@ export default function SignInSide() {
                             </Typography>
                         </Box>
                         <Box mt="30px" style={{ display: "flex", justifyContent: "center", alignItems: "center" }} >
-                            <Typography  >
+                            <Typography>
                                 For any help or assistance please reach out to
-                                <Link href="https://dreamsol.biz/contact/" target="_blank" style={{ cursor: "pointer", fontWeight: "bold" }} > DreamSol</Link>
+                                <Link href="https://dreamsol.biz/contact/" target="_blank" style={{ cursor: "pointer", fontWeight: "bold" }}> DreamSol</Link>
                             </Typography>
                         </Box>
                     </Box>
                 </Grid>
-                <Grid item xs={12} sm={8} md={5} component={Paper} square sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: "center", }}>
+                <Grid item xs={12} sm={8} md={5} component={Paper} square sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: "center" }}>
                     <Card sx={{ my: 8, mx: 4, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: "center", boxShadow: 3 }}>
-                        <CardContent sx={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}  >
-                            <Box mb="30px" display="flex" justifyContent="center" alignItems="center" flexDirection="column" >
+                        <CardContent sx={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                            <Box mb="30px" display="flex" justifyContent="center" alignItems="center" flexDirection="column">
                                 <Typography variant='h5' mt="20px" fontWeight="bold" color="rgb(9,90,163)">
                                     SIGN IN
                                 </Typography>
@@ -212,7 +206,7 @@ export default function SignInSide() {
                         </CardContent>
                     </Card>
                 </Grid>
-            </Grid >
+            </Grid>
         </>
     );
 }

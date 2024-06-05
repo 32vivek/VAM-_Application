@@ -5,10 +5,9 @@ import Texxt from '../../components/Textfield';
 import ReusableRadioButton from '../../components/RadioButton';
 import Autocmp from '../../components/AutoComplete';
 import ButtonComponent from '../../components/Button';
-// import { ToastContainer } from 'react-toastify';
-import { toast, ToastContainer, POSITION } from 'react-toastify';
+import { toast, ToastContainer } from 'react-toastify';
 import CustomCheckbox from './../../components/CheckBox';
-
+import colors from '../colors';
 
 const departmentOptions = [
     { label: 'HR', value: 'hr' },
@@ -29,7 +28,6 @@ const employeeNameOptions = [
 ];
 
 const AddInstantVisitors = () => {
-
     const [formErrors, setFormErrors] = useState({});
     const [formData, setFormData] = useState({
         number: '',
@@ -48,7 +46,6 @@ const AddInstantVisitors = () => {
         sms: true
     });
 
-
     const handleChange = (name, value) => {
         setFormData({
             ...formData,
@@ -58,7 +55,6 @@ const AddInstantVisitors = () => {
 
     const validate = (values) => {
         const errors = {};
-
         const numberRegex = /^\d{10}$/;
 
         if (!values.number) {
@@ -93,10 +89,21 @@ const AddInstantVisitors = () => {
 
         return errors;
     };
-
-
-
-
+    const styles = {
+        navbar: {
+            backgroundColor: colors.navbar,
+            color: '#fff',
+            padding: '10px',
+        },
+        resetButton: {
+            backgroundColor: colors.resetButtonBackground,
+            color: colors.resetButtonColor,
+            // padding: '8px 16px',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer',
+        },
+    };
     const handleSubmit = (event) => {
         event.preventDefault();
         const errors = validate(formData);
@@ -108,27 +115,57 @@ const AddInstantVisitors = () => {
                 autoClose: 3000,
                 position: "top-right",
                 style: {
-                    backgroundColor: 'rgb(60,86,91)',
+                    backgroundColor: '#0075a8',
                     color: "white",
                 },
             });
-
+            setFormData({
+                number: '',
+                name: '',
+                visitorcompany: '',
+                department: null,
+                purpose: null,
+                employeeName: null,
+                visitorAddress: '',
+                possessionAllowed: '',
+                visitorCardNo: '',
+                vehicleNumber: '',
+                laptop: '',
+                approvalRequired: 'yes',
+                mail: true,
+                sms: true
+            });
         } else {
             toast.error("Validation Error! Please check the form for errors.", {
                 autoClose: 3000,
                 position: "top-right",
                 style: {
-                    backgroundColor: 'rgb(60,86,91)',
+                    backgroundColor: '#0075a8',
                     color: "white",
                 },
             });
-
         }
-
-
     };
 
-
+    const handleReset = () => {
+        setFormData({
+            number: '',
+            name: '',
+            visitorcompany: '',
+            department: null,
+            purpose: null,
+            employeeName: null,
+            visitorAddress: '',
+            possessionAllowed: '',
+            visitorCardNo: '',
+            vehicleNumber: '',
+            laptop: '',
+            approvalRequired: 'yes',
+            mail: true,
+            sms: true
+        });
+        setFormErrors({});
+    };
 
     return (
         <>
@@ -149,9 +186,9 @@ const AddInstantVisitors = () => {
                                 value={formData.number}
                                 onChange={(e) => handleChange(e.target.name, e.target.value)}
                             />
-                            <IconButton color="primary">
+                            {/* <IconButton color="primary">
                                 <Search />
-                            </IconButton>
+                            </IconButton> */}
                         </Box>
                     </Grid>
                     <Grid item lg={6} md={6} xs={12} sm={12}>
@@ -208,7 +245,7 @@ const AddInstantVisitors = () => {
                                 required
                                 options={departmentOptions}
                                 value={formData.department}
-                                onChange={(e, value) => handleChange('department', value)}
+                                onChange={(value) => handleChange('department', value)}
                                 error={formErrors.department}
                                 helperText={formErrors.department}
                             />
@@ -223,7 +260,7 @@ const AddInstantVisitors = () => {
                                 required
                                 options={employeeNameOptions}
                                 value={formData.employeeName}
-                                onChange={(e, value) => handleChange('employeeName', value)}
+                                onChange={(value) => handleChange('employeeName', value)}
                                 error={formErrors.employeeName}
                                 helperText={formErrors.employeeName}
                             />
@@ -290,16 +327,18 @@ const AddInstantVisitors = () => {
                                 required
                                 options={purposeOptions}
                                 value={formData.purpose}
-                                onChange={(e, value) => handleChange('purpose', value)}
+                                onChange={(value) => handleChange('purpose', value)}
                                 error={formErrors.purpose}
                                 helperText={formErrors.purpose}
                             />
                         </Box>
                     </Grid>
                     <Grid item lg={6} md={6} xs={12} sm={12}>
-                        <Box>
+                        <Box display="flex" style={{ gap: "5px" }}>
+                            <Typography marginTop="12px">Approval Required</Typography>
+
                             <ReusableRadioButton
-                                label="Approval Required"
+                                // label="Approval Required"
                                 options={[
                                     { label: "Yes", value: "yes" },
                                     { label: "No", value: "no" }
@@ -310,10 +349,11 @@ const AddInstantVisitors = () => {
                         </Box>
                     </Grid>
                     <Grid item lg={6} md={6} xs={12} sm={12}>
-                        <Box>
+                        {/* <Box>
                             <Typography>Notify Employee</Typography>
-                        </Box>
-                        <Box >
+                        </Box> */}
+                        <Box display="flex" style={{ gap: "5px" }}>
+                            <Typography marginTop="10px">Notify Employee</Typography>
 
                             <CustomCheckbox
                                 label="Mail"
@@ -327,23 +367,25 @@ const AddInstantVisitors = () => {
                     </Grid>
                 </Grid>
                 <Grid container>
-                    <Grid item lg={6} md={6} xs={12}>
-                        <Box sx={{ display: "flex", ml: "25px", flexDirection: "row", gap: "20px" }}>
+                    <Grid item lg={12} md={12} xs={12}>
+                        <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", ml: "25px", flexDirection: "row", gap: "20px" }}>
                             <Box>
                                 <ButtonComponent
                                     name="Submit"
                                     size="small"
                                     type="submit"
                                     onClick={handleSubmit}
-                                    style={{ backgroundColor: "#3C565B", color: "white" }}
+                                    variant="contained"
+                                    backgroundColor={colors.navbar}
                                 />
                             </Box>
                             <Box>
                                 <ButtonComponent
                                     name="Reset"
                                     size="small"
-                                    style={{ backgroundColor: "#660000", color: "white" }}
-
+                                    variant="contained"
+                                    onClick={handleReset}
+                                    style={styles.resetButton}
                                 />
                             </Box>
                         </Box>

@@ -19,6 +19,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
 import ReusableCheckbox from '../../../components/CheckBox';
+import colors from './../../colors';
 
 const dateOptions = [
     { label: "Date Wise", value: "dateWise" },
@@ -151,7 +152,7 @@ const ViewContact = () => {
     }, []);
 
     const floatingActionButtonOptions = selectedRows.length === 0 ? [
-        { label: 'Visitor Entry', icon: <Add /> },
+        { label: 'Add', icon: <Add /> },
     ] : selectedRows.length === 1 ? [
         { label: 'Edit', icon: <EditIcon /> },
         { label: 'Delete', icon: <DeleteIcon /> },
@@ -262,33 +263,74 @@ const ViewContact = () => {
             toast.success("Form submitted successfully!", {
                 autoClose: 3000,
                 position: "top-right",
-                style: {
-                    backgroundColor: 'rgb(60,86,91)',
-                    color: "white",
-                },
+                // style: {
+                //     backgroundColor: 'rgb(60,86,91)',
+                //     color: "white",
+                // },
             });
         } else {
             toast.error("Please correct the highlighted errors.", {
                 autoClose: 3000,
                 position: "top-right",
-                style: {
-                    backgroundColor: 'rgb(60,86,91)',
-                    color: "white",
-                },
+                // style: {
+                //     backgroundColor: 'rgb(60,86,91)',
+                //     color: "white",
+                // },
             });
         }
+    };
+
+    const handleDelete = () => {
+        if (selectedRows.length > 0) {
+            const remainingData = filteredData.filter(item => !selectedRows.includes(item));
+            setFilteredData(remainingData);
+            setSelectedRows([]);
+            toast.success("Selected rows deleted successfully!", {
+                autoClose: 3000,
+                position: "top-right",
+                // style: {
+                //     backgroundColor: 'rgb(60,86,91)',
+                //     color: "white",
+                // },
+            });
+        }
+    };
+
+    const handleFloatingButtonClick = (label) => {
+        if (label === 'Add') {
+            handleAddVisitorClick();
+        } else if (label === 'Delete') {
+            handleDelete();
+        } else if (label === 'Edit') {
+            // Handle edit action here
+        }
+    };
+    const styles = {
+        navbar: {
+            backgroundColor: colors.navbar,
+            color: '#fff',
+            padding: '10px',
+        },
+        resetButton: {
+            backgroundColor: colors.resetButtonBackground,
+            color: colors.resetButtonColor,
+            // padding: '8px 16px',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer',
+        },
     };
 
 
     const addInstantVisitors = (
         <>
-            <ToastContainer style={{ marginTop: '60px' }} />
+            <ToastContainer style={{ marginTop: '45px' }} />
 
-            <Box component="form" sx={{ mt: "70px", mb: "20px", gap: "10px" }} >
+            <Box component="form" sx={{ mt: "63px", mb: "20px", gap: "10px" }} >
                 <Grid container>
                     <Grid item lg={12} md={12} sm={12} xs={12}>
-                        <Box display="flex" justifyContent="space-between" backgroundColor="rgb(60,86,91)" style={{ marginTop: "20px" }}>
-                            <Typography variant="h5" color="white" mt="5px" ml="10px">Create User</Typography>
+                        <Box display="flex" justifyContent="space-between" backgroundColor={colors.navbar}>
+                            <Typography variant="h6" color="white" mt="5px" ml="10px">Create User</Typography>
                             <IconButton onClick={handleCloseDrawer}>
                                 <CloseIcon style={{ color: 'white' }} />
                             </IconButton>
@@ -389,13 +431,16 @@ const ViewContact = () => {
                         </Grid>
 
                         <Grid item lg={6} md={6} sm={6} xs={6}>
-                            <ReusableCheckbox
-                                name="createUser"
-                                value={createUserChecked}
-                                onChange={handleCheckboxChange}
-                                // label="Create User"
-                                options={accessRights}
-                            />
+                            <Box display="flex" style={{ gap: "15px" }}>
+                                <Typography marginTop="10px">Create User</Typography>
+                                <ReusableCheckbox
+                                    name="createUser"
+                                    value={createUserChecked}
+                                    onChange={handleCheckboxChange}
+                                    // label="Create User"
+                                    options={accessRights}
+                                />
+                            </Box>
                         </Grid>
 
                         {createUserChecked && (
@@ -501,6 +546,7 @@ const ViewContact = () => {
                                 <ButtonComponent
                                     onClick={handleFormSubmit}
                                     variant="contained"
+                                    backgroundColor={colors.navbar}
                                     color="primary"
                                     text="Submit"
                                     name="Submit"
@@ -508,7 +554,8 @@ const ViewContact = () => {
                                 <ButtonComponent
                                     onClick={handleCloseDrawer}
                                     variant="contained"
-                                    color="secondary"
+                                    // color="red"
+                                    style={{ backgroundColor: "red", color: "white" }}
                                     name="Cancel"
                                 />
                                 <ButtonComponent
@@ -516,7 +563,7 @@ const ViewContact = () => {
                                     color="primary"
                                     text="Reset"
                                     name="Reset"
-                                    style={{ color: "white", backgroundColor: "red" }}
+                                    style={styles.resetButton}
                                 />
                             </Box>
                         </Grid>
@@ -555,15 +602,17 @@ const ViewContact = () => {
         });
     };
 
-    const handleFormClick = () => {
+    const handleAddVisitorClick = () => {
         setOpen(true);
     };
     const handleAutocompleteChange = (value) => {
         // console.log("Selected value:", value);
         // Handle the selected value here
     };
+
     return (
         <>
+            <ToastContainer style={{ marginTop: '45px', color: "white" }} />
             <SwipeableDrawer
                 anchor="right"
                 open={open}
@@ -574,15 +623,12 @@ const ViewContact = () => {
                     {addInstantVisitors}
                 </Box>
             </SwipeableDrawer>
-
-            <Box display="flex" alignItems="center" justifyContent="space-between" mb={2}>
-                <Typography variant="h5">View Contact</Typography>
-                <IconButton onClick={handleRefresh}>
-                    <RefreshIcon />
-                </IconButton>
+            <Box backgroundColor={colors.navbar}>
+                <Typography style={{ marginTop: "-15px", color: "white", marginLeft: "10px" }}>View Contact</Typography>
+                {/* <hr style={{ marginTop: "-0px", height: "4px", borderWidth: "0", color: "rgb(60,86,91)", backgroundColor: "rgb(60,86,91)" }} /> */}
             </Box>
-            <hr style={{ width: "100%" }} />
-            <Box boxShadow={3} p={3} m={2} borderRadius={2}>
+            {/* <hr style={{ width: "100%" }} /> */}
+            <Box boxShadow={3} p={3} borderRadius={2} marginTop="8px">
                 <Grid container spacing={3}>
                     <Grid item lg={2} md={2} sm={12} xs={12}>
                         <Box>
@@ -622,14 +668,12 @@ const ViewContact = () => {
                     </Grid>
                 </Grid>
             </Box>
-            <Grid container spacing={2}>
+            <Grid container spacing={2} marginTop="5px">
                 <Grid item lg={12} md={12} sm={12} xs={12}>
-                    <Box width="100%" height="40px" boxShadow={3} borderRadius={2} bgcolor='rgb(60,86,91)'>
-                        <Box display="flex" mt="8px" justifyContent="space-between" alignItems="center" px={2}>
-                            <Typography variant="subtitle1" mt="8px" color="white">
-                                Filtered By: {statusOptions.find(option => option.value === status)?.label}
-                            </Typography>
-                            <Typography color="white">count : {filteredData.length}</Typography>
+                    <Box boxShadow={3} borderRadius={2} bgcolor={colors.navbar} height="35px" borderWidth="0">
+                        <Box display="flex" justifyContent="space-between" alignItems="center">
+                            <Typography ml="10px" mt="8px" variant="h10" fontSize="10px" color="white">Filtered By : </Typography>
+                            {/* <Typography mr="10px" variant="h10" color="white">Count = 0 </Typography> */}
                         </Box>
                     </Box>
                 </Grid>
@@ -640,7 +684,8 @@ const ViewContact = () => {
                             data={filteredData}
                             onSearch={handleSearch}
                             copyEnabled={true}
-                            onCopy={handleCopy}
+                            onCopy={handleCopy} onSelectedRowsChange={(selected) => setSelectedRows(selected.selectedRows)}
+
                             downloadEnabled={true}
                             onDownloadXLSX={handleDownloadXLSX}
                         />
@@ -650,7 +695,7 @@ const ViewContact = () => {
                 <FloatingButton
                     options={floatingActionButtonOptions}
                     bottomOffset="100px"
-                    onAddVisitorClick={handleFormClick}
+                    onButtonClick={handleFloatingButtonClick}
                 />
             </Grid>
         </>

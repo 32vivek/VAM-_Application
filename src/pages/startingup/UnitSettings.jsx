@@ -13,6 +13,7 @@ import Texxt from '../../components/Textfield';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
 import { Search, Add, Close as CloseIcon, Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
+import colors from '../colors';
 
 
 
@@ -24,7 +25,7 @@ const UnitSettings = () => {
     const [errors, setErrors] = useState({});
     const [selectedRows, setSelectedRows] = useState([]);
     const [showAdditionalFields, setShowAdditionalFields] = useState(false);
-
+    const [searchNumber, setSearchNumber] = useState('');
     const [formData, setFormData] = useState({
         unitName: "",
         ip: "",
@@ -32,15 +33,10 @@ const UnitSettings = () => {
         passAddress: "",
         passDisclaimer: ""
     });
-
-
-
-
     const floatingActionButtonOptions = selectedRows.length === 0 ? [
-        { label: 'Edit', icon: <EditIcon /> },
         { label: 'Add', icon: <Add /> },
     ] : selectedRows.length === 1 ? [
-        // { label: 'Edit', icon: <EditIcon /> },
+        { label: 'Edit', icon: <EditIcon /> },
         { label: 'Delete', icon: <DeleteIcon /> },
     ] : [
         { label: 'Delete', icon: <DeleteIcon /> },
@@ -169,20 +165,20 @@ const UnitSettings = () => {
             toast.success("Form submitted successfully!", {
                 autoClose: 3000,
                 position: "top-right",
-                style: {
-                    backgroundColor: 'rgb(60,86,91)',
-                    color: 'white'
-                },
+                // style: {
+                //     backgroundColor: 'rgb(60,86,91)',
+                //     color: 'white'
+                // },
             });
 
         } else {
             toast.error("Please correct the highlighted errors.", {
                 autoClose: 3000,
                 position: "top-right",
-                style: {
-                    backgroundColor: 'rgb(60,86,91)',
-                    color: 'white'
-                },
+                // style: {
+                //     backgroundColor: 'rgb(60,86,91)',
+                //     color: 'white'
+                // },
             });
         }
     };
@@ -217,9 +213,51 @@ const UnitSettings = () => {
         });
     };
 
+    const handleDelete = () => {
+        if (selectedRows.length > 0) {
+            const remainingData = filteredData.filter(item => !selectedRows.includes(item));
+            setFilteredData(remainingData);
+            setSelectedRows([]);
+            toast.success("Selected rows deleted successfully!", {
+                autoClose: 3000,
+                position: "top-right",
+                // style: {
+                //     backgroundColor: 'rgb(60,86,91)',
+                //     color: "white",
+                // },
+            });
+        }
+    };
+
+    const handleFloatingButtonClick = (label) => {
+        if (label === 'Add') {
+            handleAddVisitorClick();
+        } else if (label === 'Delete') {
+            handleDelete();
+        } else if (label === 'Edit') {
+            // Handle edit action here
+        }
+    };
+
+    const styles = {
+        navbar: {
+            backgroundColor: colors.navbar,
+            color: '#fff',
+            padding: '10px',
+        },
+        resetButton: {
+            backgroundColor: colors.resetButtonBackground,
+            color: colors.resetButtonColor,
+            // padding: '8px 16px',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer',
+        },
+    };
+
     const addInstantVisitors = (
         <>
-            <Box display="flex" justifyContent="space-between" backgroundColor="rgb(60,86,91)" >
+            <Box display="flex" justifyContent="space-between" backgroundColor={colors.navbar} >
                 <Typography color="white" style={{ marginLeft: "10px", marginTop: "10px" }}>Add Unit Settings</Typography>
                 <IconButton onClick={handleCloseDrawer}>
                     <CloseIcon style={{ color: "white", marginRight: "10px" }} />
@@ -310,8 +348,8 @@ const UnitSettings = () => {
             </Grid>
 
             <Grid container spacing={3} >
-                <Grid item lg={6} md={6} xs={12}>
-                    <Box sx={{ display: "flex", ml: "25px", flexDirection: "row", gap: "20px" }}>
+                <Grid item lg={12} md={12} xs={12}>
+                    <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", ml: "25px", flexDirection: "row", gap: "20px" }}>
                         <Box>
                             <ButtonComponent
                                 name="Submit"
@@ -319,6 +357,7 @@ const UnitSettings = () => {
                                 type="submit"
                                 onClick={handleFormSubmit}
                                 variant="contained"
+                                backgroundColor={colors.navbar}
                             // style={{ backgroundColor: "rgb(60,86,91)", fontSize: "12px", color: "white" }}
                             />
                         </Box>
@@ -327,9 +366,10 @@ const UnitSettings = () => {
                                 name="Reset"
                                 size="small"
                                 type="submit"
-                                color="success"
+                                // color="success"
                                 variant="contained"
-                            // style={{ backgroundColor: "rgb(60,86,91)", color: "red" }}
+                                // style={{ backgroundColor: "rgb(60,86,91)", color: "gray" }}
+                                style={styles.resetButton}
                             />
                         </Box>
                         <Box>
@@ -351,44 +391,56 @@ const UnitSettings = () => {
         setOpen(true);
     };
 
+    const handleSearchNumberChange = (event) => {
+        const searchText = event.target.value;
+        setSearchNumber(searchText);
+        const filtered = visitorsData.filter(item =>
+            item.number && item.number.toString().includes(searchText)
+        );
+        setFilteredData(filtered);
+    };
+
     return (
         <>
-            <ToastContainer style={{ marginTop: '60px', color: "white" }} />
+            <ToastContainer style={{ marginTop: '45px', color: "white" }} />
             <SwipeableDrawer
                 anchor="right"
                 open={open}
                 onClose={() => toggleDrawer(false)}
                 onOpen={() => toggleDrawer(true)}
             >
-                <Box sx={{ width: '600px', marginTop: "100px" }}>
+                <Box sx={{ width: '600px', marginTop: "63px" }}>
                     {addInstantVisitors}
                 </Box>
             </SwipeableDrawer>
             <Grid container spacing={3}>
                 <Grid item lg={12} md={12} sm={12} xs={12}>
-                    <Box>
-                        <Typography variant="h5">View Unit Settings</Typography>
-                        <hr style={{ width: "100%" }} />
+                    <Box backgroundColor={colors.navbar}>
+                        <Typography style={{ marginTop: "-15px", color: "white", marginLeft: "10px" }}>Unit Settings View</Typography>
+                        {/* <hr style={{ marginTop: "-0px", height: "4px", borderWidth: "0", color: "rgb(60,86,91)", backgroundColor: "rgb(60,86,91)" }} /> */}
                     </Box>
                 </Grid>
-                <Box boxShadow={3} padding={2} borderRadius={2} marginLeft="20px" width="100%">
+                <Box boxShadow={3} padding={2} borderRadius={2} marginLeft="20px" width="100%" marginTop="9px">
                     <Grid item lg={4} md={4} sm={12} xs={12}>
                         <Box >
                             <Box marginBottom={2} display="flex" style={{ gap: "10px" }}>
-                                <Texxt placeholder="Search" variant="standard" label="Search" size="small" fullWidth />
-                                <IconButton color="primary">
+                                <Texxt placeholder="Enter Data" label="Search Data" size="small" fullWidth
+                                    value={searchNumber}
+                                    onChange={handleSearchNumberChange}
+                                />
+                                {/* <IconButton color="primary">
                                     <Search />
-                                </IconButton>
+                                </IconButton> */}
                             </Box>
 
                         </Box>
                     </Grid>
                 </Box>
                 <Grid item lg={12} md={12} sm={12} xs={12}>
-                    <Box width="auto" boxShadow={3} borderRadius={2} bgcolor='rgb(60,86,91)'>
+                    <Box boxShadow={3} borderRadius={2} backgroundColor={colors.navbar} height="35px" borderWidth="0">
                         <Box display="flex" justifyContent="space-between" alignItems="center">
-                            <Typography ml="10px" variant="h10" color="white">Filtered By : </Typography>
-                            <Typography mr="10px" variant="h10" color="white">Count = 0 </Typography>
+                            <Typography ml="10px" mt="8px" variant="h10" fontSize="10px" color="white">Filtered By : </Typography>
+                            {/* <Typography mr="10px" variant="h10" color="white">Count = 0 </Typography> */}
                         </Box>
                     </Box>
                 </Grid>
@@ -399,13 +451,17 @@ const UnitSettings = () => {
                             data={filteredData}
                             onSearch={handleSearch}
                             copyEnabled={true}
+                            onSelectedRowsChange={(selected) => setSelectedRows(selected.selectedRows)}
+
                             onCopy={handleCopy}
                             downloadEnabled={true}
                             onDownloadXLSX={handleDownloadXLSX}
                         />
                     </Box>
                 </Grid>
-                <FloatingButton options={floatingActionButtonOptions} bottomOffset="100px" onAddVisitorClick={handleAddVisitorClick} />
+                <FloatingButton options={floatingActionButtonOptions}
+                    bottomOffset="100px"
+                    onButtonClick={handleFloatingButtonClick} />
             </Grid>
         </>
     )

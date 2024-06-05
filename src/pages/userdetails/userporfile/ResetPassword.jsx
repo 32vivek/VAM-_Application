@@ -6,6 +6,7 @@ import { toast, ToastContainer } from 'react-toastify';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { Box, Grid, IconButton, InputAdornment, TextField } from '@mui/material';
 import CustomCheckbox from '../../../components/CheckBox';
+import colors from '../../colors';
 
 const ResetPassword = () => {
 
@@ -37,6 +38,21 @@ const ResetPassword = () => {
             [field]: !showPassword[field]
         });
     };
+    const styles = {
+        navbar: {
+            backgroundColor: colors.navbar,
+            color: '#fff',
+            padding: '10px',
+        },
+        resetButton: {
+            backgroundColor: colors.resetButtonBackground,
+            color: colors.resetButtonColor,
+            padding: '8px 16px',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer',
+        },
+    };
 
     const validate = (values) => {
         const errors = {};
@@ -67,10 +83,10 @@ const ResetPassword = () => {
             toast.success("Password has been changed successfully!", {
                 autoClose: 3000,
                 position: "top-right",
-                style: {
-                    backgroundColor: 'rgb(60,86,91)',
-                    color: "white",
-                },
+                // style: {
+                //     backgroundColor: 'rgb(60,86,91)',
+                //     color: "white",
+                // },
             });
             setFormData({
                 oldPassword: "",
@@ -83,17 +99,17 @@ const ResetPassword = () => {
             toast.error("Validation Error! Please check the form for errors.", {
                 autoClose: 3000,
                 position: "top-right",
-                style: {
-                    backgroundColor: 'rgb(60,86,91)',
-                    color: "white",
-                },
+                // style: {
+                //     backgroundColor: 'rgb(60,86,91)',
+                //     color: "white",
+                // },
             });
         }
     };
 
     return (
         <>
-            <ToastContainer style={{ marginTop: '60px' }} toastStyle={{ color: 'white' }} />
+            <ToastContainer style={{ marginTop: '45px' }} toastStyle={{ color: 'white' }} />
             <Box boxShadow={3} p={2} borderRadius={3} width="100%">
                 <Grid container spacing={1}>
                     <Grid item lg={8} md={8} sm={12} xs={12}>
@@ -126,7 +142,12 @@ const ResetPassword = () => {
                                         </InputAdornment>
                                     )
                                 }}
-                                sx={{ width: '100%' }}
+                                sx={{
+                                    width: '100%',
+                                    '& .MuiInputLabel-asterisk': {
+                                        color: 'red',
+                                    },
+                                }}
                             />
                         </Box>
                     </Grid>
@@ -160,7 +181,12 @@ const ResetPassword = () => {
                                         </InputAdornment>
                                     )
                                 }}
-                                sx={{ width: '100%' }}
+                                sx={{
+                                    width: '100%',
+                                    '& .MuiInputLabel-asterisk': {
+                                        color: 'red',
+                                    },
+                                }}
                             />
                         </Box>
                     </Grid>
@@ -194,7 +220,12 @@ const ResetPassword = () => {
                                         </InputAdornment>
                                     )
                                 }}
-                                sx={{ width: '100%' }}
+                                sx={{
+                                    width: '100%',
+                                    '& .MuiInputLabel-asterisk': {
+                                        color: 'red',
+                                    },
+                                }}
                             />
                         </Box>
                     </Grid>
@@ -223,7 +254,8 @@ const ResetPassword = () => {
                             <Button
                                 variant="contained"
                                 onClick={handleSubmit}
-                                style={{ backgroundColor: "rgb(60,86,91)", color: "white" }}
+                                backgroundColor={colors.navbar}
+                                style={{ fontSize: "10px" }}
                             >
                                 Submit
                             </Button>

@@ -21,7 +21,12 @@ const Texxt = ({ name, size, label, type, variant, placeholder, required, multil
                 value={value}
                 variant={variant}
                 InputLabelProps={{
-                    style: { color: 'black', fontSize: "12px" }
+                    style: { color: 'black', fontSize: '12px' }
+                }}
+                sx={{
+                    '& .MuiInputLabel-asterisk': {
+                        color: 'red', // Set the color of the asterisk to red
+                    },
                 }}
             />
         </FormControl>

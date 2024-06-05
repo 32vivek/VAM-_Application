@@ -18,6 +18,7 @@ import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
+import colors from '../../colors';
 
 const dateOptions = [
     { label: "Date Wise", value: "dateWise" },
@@ -87,7 +88,7 @@ const ViewDepartment = () => {
     }, []);
 
     const floatingActionButtonOptions = selectedRows.length === 0 ? [
-        { label: 'Visitor Entry', icon: <Add /> },
+        { label: 'Add', icon: <Add /> },
     ] : selectedRows.length === 1 ? [
         { label: 'Edit', icon: <EditIcon /> },
         { label: 'Delete', icon: <DeleteIcon /> },
@@ -184,15 +185,59 @@ const ViewDepartment = () => {
         }
     };
 
+
+
+    const handleDelete = () => {
+        if (selectedRows.length > 0) {
+            const remainingData = filteredData.filter(item => !selectedRows.includes(item));
+            setFilteredData(remainingData);
+            setSelectedRows([]);
+            toast.success("Selected rows deleted successfully!", {
+                autoClose: 3000,
+                position: "top-right",
+                style: {
+                    backgroundColor: 'rgb(60,86,91)',
+                    color: "white",
+                },
+            });
+        }
+    };
+    const styles = {
+        navbar: {
+            backgroundColor: colors.navbar,
+            color: '#fff',
+            padding: '10px',
+        },
+        resetButton: {
+            backgroundColor: colors.resetButtonBackground,
+            color: colors.resetButtonColor,
+            // padding: '8px 16px',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer',
+        },
+    };
+
+    const handleFloatingButtonClick = (label) => {
+        if (label === 'Add') {
+            handleAddVisitorClick();
+        } else if (label === 'Delete') {
+            handleDelete();
+        } else if (label === 'Edit') {
+            // Handle edit action here
+        }
+    };
+
+
     const addInstantVisitors = (
         <>
-            <ToastContainer style={{ marginTop: '60px' }} />
+            <ToastContainer style={{ marginTop: '45px' }} />
 
-            <Box component="form" sx={{ mt: "70px", mb: "20px", gap: "10px" }} >
+            <Box component="form" sx={{ mt: "63px", mb: "20px", gap: "10px" }} >
                 <Grid container>
                     <Grid item lg={12} md={12} sm={12} xs={12}>
-                        <Box display="flex" justifyContent="space-between" backgroundColor="rgb(60,86,91)" style={{ marginTop: "20px" }}>
-                            <Typography variant="h5" color="white" mt="5px" ml="10px">Add Department</Typography>
+                        <Box display="flex" justifyContent="space-between" backgroundColor={colors.navbar}>
+                            <Typography variant="h6" color="white" ml="10px">Add Department</Typography>
                             <IconButton onClick={handleCloseDrawer}>
                                 <CloseIcon style={{ color: "white" }} />
                             </IconButton>
@@ -252,12 +297,13 @@ const ViewDepartment = () => {
                 ))}
                 <Grid item lg={12} md={12} sm={12} xs={12}>
                     <Box display="flex" justifyContent="center" alignItems="center" style={{ gap: "10px" }}>
-                        <ButtonComponent name="Save" variant="contained" size="small" onClick={handleSubmit} />
-                        <ButtonComponent name="Cancel" variant="contained" color="secondary" size="small" onClick={handleCloseDrawer} />
-                        <ButtonComponent name="Reset" variant="contained" size="small" style={{ backgroundColor: "red", color: "white" }} onClick={() => {
+                        <ButtonComponent name="Save" variant="contained" size="small" backgroundColor={colors.navbar} onClick={handleSubmit} />
+                        <ButtonComponent name="Reset" variant="contained" size="small" style={styles.resetButton} onClick={() => {
                             setDepartments([{ department: '', departmentCode: '' }]);
                             setErrors([{ department: '', departmentCode: '' }]);
                         }} />
+                        <ButtonComponent name="Cancel" variant="contained" style={{ color: "white", backgroundColor: "red" }} size="small" onClick={handleCloseDrawer} />
+
                     </Box>
                 </Grid>
             </Grid>
@@ -292,6 +338,10 @@ const ViewDepartment = () => {
         });
     };
 
+    const handleAddVisitorClick = () => {
+        setOpen(true);
+    };
+
     const handleFormClick = () => {
         setOpen(true);
     };
@@ -314,14 +364,12 @@ const ViewDepartment = () => {
             </SwipeableDrawer>
 
 
-            <Box display="flex" alignItems="center" justifyContent="space-between" mb={2}>
-                <Typography variant="h5">View Department</Typography>
-                <IconButton onClick={handleRefresh}>
-                    <RefreshIcon />
-                </IconButton>
+            <Box backgroundColor={colors.navbar}>
+                <Typography style={{ marginTop: "-15px", color: "white", marginLeft: "10px" }}>View Department</Typography>
+                {/* <hr style={{ marginTop: "-0px", height: "4px", borderWidth: "0", color: "rgb(60,86,91)", backgroundColor: "rgb(60,86,91)" }} /> */}
             </Box>
-            <hr style={{ width: "100%" }} />
-            <Box boxShadow={3} p={3} m={2} borderRadius={2}>
+            {/* <hr style={{ width: "100%" }} /> */}
+            <Box boxShadow={3} p={3} borderRadius={2} marginTop="10px">
                 <Grid container spacing={3}>
                     <Grid item lg={2} md={2} sm={12} xs={12}>
                         <Box>
@@ -360,15 +408,12 @@ const ViewDepartment = () => {
                     </Grid>
                 </Grid>
             </Box>
-            <Grid container spacing={2}>
+            <Grid container spacing={2} marginTop="10px">
                 <Grid item lg={12} md={12} sm={12} xs={12}>
-                    <Box width="100%" height="40px" boxShadow={3} borderRadius={2} bgcolor='rgb(60,86,91)'>
-                        <Box display="flex" mt="8px" justifyContent="space-between" alignItems="center" px={2}>
-
-                            <Typography variant="subtitle1" mt="8px" color="white">Filtered By: {statusOptions.find(option => option.value === status)?.label}</Typography>
-
-
-                            <Typography color="white">count : {filteredData.length}</Typography>
+                    <Box boxShadow={3} borderRadius={2} bgcolor={colors.navbar} height="35px" borderWidth="0">
+                        <Box display="flex" justifyContent="space-between" alignItems="center">
+                            <Typography ml="10px" mt="8px" variant="h10" fontSize="10px" color="white">Filtered By : </Typography>
+                            {/* <Typography mr="10px" variant="h10" color="white">Count = 0 </Typography> */}
                         </Box>
                     </Box>
                 </Grid>
@@ -381,6 +426,7 @@ const ViewDepartment = () => {
                             copyEnabled={true}
                             onCopy={handleCopy}
                             downloadEnabled={true}
+                            onSelectedRowsChange={(selected) => setSelectedRows(selected.selectedRows)}
                             onDownloadXLSX={handleDownloadXLSX}
                         />
                     </Box>
@@ -389,7 +435,7 @@ const ViewDepartment = () => {
                 <FloatingButton
                     options={floatingActionButtonOptions}
                     bottomOffset="100px"
-                    onAddVisitorClick={handleFormClick}
+                    onButtonClick={handleFloatingButtonClick}
                 />
             </Grid>
         </>

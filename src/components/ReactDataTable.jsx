@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
 import DataTable from "react-data-table-component";
 import { Box, IconButton, CircularProgress, createTheme, ThemeProvider } from "@mui/material";
-import { FileCopy, GetApp, Description } from '@mui/icons-material'; // Import icons for copy, download as XLSX, download as CSV
-
+import { FileCopy, GetApp } from '@mui/icons-material'; // Import icons for copy, download as XLSX
 
 const CustomDataTable = ({ columns, data, onSearch, copyEnabled, onCopy, downloadEnabled, onDownloadXLSX }) => {
     const [loading, setLoading] = useState(true);
@@ -13,7 +12,7 @@ const CustomDataTable = ({ columns, data, onSearch, copyEnabled, onCopy, downloa
                 fontWeight: "bold",
                 fontSize: "14px",
                 color: "white",
-                backgroundColor: "#3C565B",
+                backgroundColor: '#0075a8',
             },
         },
         cells: {
@@ -36,20 +35,29 @@ const CustomDataTable = ({ columns, data, onSearch, copyEnabled, onCopy, downloa
         pagination: {
             style: {
                 fontSize: '12px',
-                color: 'black',
+                color: 'white',
+                backgroundColor: '#0075a8',
                 borderTopStyle: 'solid',
                 borderTopWidth: '1px',
                 borderTopColor: '#E0E0E0',
+                minHeight: '40px', // Adjusted footer height
+                display: 'flex',
+                justifyContent: 'flex-end', // Right-align the pagination buttons
+                alignItems: 'center', // Vertically center the pagination buttons
+                paddingRight: '10px', // Add some padding to the right
             },
             pageButtonsStyle: {
                 borderRadius: '50%',
-                height: '40px',
-                width: '40px',
-                padding: '8px',
-                margin: '2px',
+                height: '30px', // Adjusted button height
+                width: '30px', // Adjusted button width
+                padding: '6px', // Consistent padding
+                margin: '2px', // Consistent margin
                 cursor: 'pointer',
                 transition: '0.2s',
                 backgroundColor: 'white',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
                 '&:hover:not(:disabled)': {
                     backgroundColor: '#3C565B',
                     color: 'white',
@@ -88,7 +96,7 @@ const CustomDataTable = ({ columns, data, onSearch, copyEnabled, onCopy, downloa
 
     return (
         <ThemeProvider theme={theme}>
-            <Box sx={{ overflowX: 'auto', width: "98.5%" }}>
+            <Box>
                 {loading ? (
                     <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '300px' }}>
                         <CircularProgress color="primary" />
@@ -115,7 +123,7 @@ const CustomDataTable = ({ columns, data, onSearch, copyEnabled, onCopy, downloa
                                     onChange={(e) => onSearch(e.target.value)}
                                     style={{
                                         width: '100%',
-                                        height: '40px',
+                                        height: '30px',
                                         padding: '10px',
                                         fontSize: '14px',
                                         borderRadius: '5px',

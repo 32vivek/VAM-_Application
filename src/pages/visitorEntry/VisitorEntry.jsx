@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Grid, Typography, FormControl, IconButton, Tooltip, SwipeableDrawer } from '@mui/material';
+import { Box, Grid, Typography, FormControl, IconButton, Tooltip, SwipeableDrawer, Divider } from '@mui/material';
 import Texxt from '../../components/Textfield';
 import ReusableDatePicker from '../../components/DateRangePicker';
 import ButtonComponent from '../../components/Button';
@@ -16,6 +16,7 @@ import ReusableTabs from '../../components/Tabs';
 import { Outlet, useNavigate } from 'react-router-dom';
 import { Close as CloseIcon } from '@mui/icons-material';
 import DatePickers from '../../components/DateRangePicker';
+import colors from '../colors';
 
 const data1 = [
     { label: 'IN', value: 200, color: '#0088FE' },
@@ -35,7 +36,11 @@ const VisitorActivity = () => {
     const [filteredData, setFilteredData] = useState([]);
     const [selectedTab, setSelectedTab] = useState(0);
     const navigate = useNavigate();
-
+    const [formData, setFormValues] = useState({
+        dateWise: null,
+        fromDate: null,
+        toDate: null
+    });
     const toggleDrawer = (isOpen) => {
         setOpen(isOpen);
     };
@@ -64,14 +69,29 @@ const VisitorActivity = () => {
 
     const floatingActionButtonOptions = [
         { label: 'Visitor Entry', icon: <Add /> },
-        { label: 'Visitor Exit', icon: <ExitToApp /> },
-        { label: 'Re-print', icon: <Print /> }
+        // { label: 'Visitor Exit', icon: <ExitToApp /> },
+        // { label: 'Re-print', icon: <Print /> }
     ];
 
     const tabs = [
         { label: 'Add Instant Visitors', route: '/visitor/visitoractivity' },
         { label: 'Add Pre Visitors', route: '/visitor/visitoractivity/addprevisitors' }
     ];
+    const styles = {
+        navbar: {
+            backgroundColor: colors.navbar,
+            color: '#fff',
+            padding: '10px',
+        },
+        resetButton: {
+            backgroundColor: colors.resetButtonBackground,
+            color: colors.resetButtonColor,
+            padding: '8px 16px',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer',
+        },
+    };
 
     const fetchData = async () => {
         try {
@@ -130,27 +150,30 @@ const VisitorActivity = () => {
 
 
     const addInstantVisitors = (
-        <Box component="form" sx={{ mt: "70px", mb: "20px" }}>
+        <Box component="form" sx={{ mt: "63px", }}>
             {/* <Box display="flex" justifyContent="flex-end">
                 <IconButton onClick={handleCloseDrawer}>
                     <CloseIcon />
                 </IconButton>
             </Box> */}
-            <Grid item lg={12} md={12} sm={12} xs={12}>
+            {/* <Grid item lg={12} md={12} sm={12} xs={12}>
                 <Box display="flex" justifyContent="space-between" style={{ marginLeft: "10px" }}>
                     <Typography variant="h5">ADD VISITORS</Typography>
                     <IconButton onClick={handleCloseDrawer}>
                         <CloseIcon style={{ color: "black" }} />
                     </IconButton>
                 </Box>
-            </Grid>
+            </Grid> */}
             <Grid item lg={12} md={12} sm={12} xs={12}>
-                <Box display="flex" backgroundColor="rgb(60,86,91)" mt="10px">
+                <Box display="flex" justifyContent="space-between" backgroundColor={colors.navbar}  >
                     <ReusableTabs
                         tabs={tabs}
                         selectedTab={selectedTab}
                         onChange={handleTabChange}
                     />
+                    <IconButton onClick={handleCloseDrawer}>
+                        <CloseIcon style={{ color: "white" }} />
+                    </IconButton>
                 </Box>
             </Grid>
             <Grid item lg={12} md={12} sm={12} xs={12}>
@@ -166,6 +189,10 @@ const VisitorActivity = () => {
 
     const handleFormClick = () => {
         setOpen(true);
+    };
+    const handleInputChange = (event) => {
+        const { name, value } = event.target;
+        setFormValues((prevValues) => ({ ...prevValues, [name]: value }));
     };
 
 
@@ -183,48 +210,60 @@ const VisitorActivity = () => {
 
             </SwipeableDrawer>
 
+            <Box backgroundColor={colors.navbar}>
+                <Typography style={{ marginTop: "-15px", color: "white", marginLeft: "10px" }}>Visitors Activity</Typography>
+                {/* <hr style={{ marginTop: "-0px", height: "4px", borderWidth: "0", color: "rgb(60,86,91)", backgroundColor: "rgb(60,86,91)" }} /> */}
+            </Box>
 
-            <Grid container spacing={2}>
-                <Grid item lg={12} md={12} sm={12} xs={12}>
+            <Grid container spacing={1}>
+                {/* <Grid item lg={12} md={12} sm={12} xs={12}>
                     <Box display="flex">
                         <Typography variant="h5">Visitors Activity</Typography>
                     </Box>
                     <hr width="100%" />
-                </Grid>
+                </Grid> */}
 
-                <Grid item lg={4} md={4} sm={12} xs={12}>
+                <Grid item lg={4} md={4} sm={12} xs={12} style={{ marginTop: "8px" }}>
                     <Box  >
-                        <Box marginBottom={2}>
-                            <Texxt placeholder="Search" variant="standard" label="Search" size="small" fullWidth onChange={(e) => handleSearch(e.target.value)} />
+                        <Box >
+                            <Texxt placeholder="Enter Data" label="Search Visitors Activity" size="small" fullWidth onChange={(e) => handleSearch(e.target.value)} />
                         </Box>
 
                         <Box display="flex" style={{ gap: "10px", marginTop: "15px" }}>
                             {/* <ReusableDatePicker label="From Date" />
                             <ReusableDatePicker label="To Date" /> */}
                             <DatePickers
+                                label="From Date"
+                                // name="fromDate"
                                 placeholder="From Date"
+                                value={formData.fromDate}
+                                handleInputChange={handleInputChange}
                             />
                             <DatePickers
+                                label="To Date"
+                                // name="fromDate"
                                 placeholder="To Date"
+                                value={formData.toDate}
+                                handleInputChange={handleInputChange}
                             />
                         </Box>
                         {showMoreFilters && (
                             <>
                                 <Box display="flex" style={{ gap: "10px", marginTop: "15px" }}>
                                     <FormControl fullWidth>
-                                        <Autocmp size="small" label="In" variant="standard" options={data}
+                                        <Autocmp size="small" label="In" options={data}
                                             onChange={(event, value) => handleAutocompleteChange(value)}
                                         />
                                     </FormControl>
                                     <FormControl fullWidth>
-                                        <Autocmp size="small" label="Purpose" variant="standard" options={data}
+                                        <Autocmp size="small" label="Purpose" options={data}
                                             onChange={(event, value) => handleAutocompleteChange(value)}
                                         />
                                     </FormControl>
                                 </Box>
                                 <Box display="flex" style={{ gap: "10px", marginTop: "15px" }}>
                                     <FormControl fullWidth>
-                                        <Autocmp size="small" label="Request Status" variant="standard" options={data}
+                                        <Autocmp size="small" label="Request Status" options={data}
                                             onChange={(event, value) => handleAutocompleteChange(value)}
                                         />
                                     </FormControl>
@@ -232,12 +271,18 @@ const VisitorActivity = () => {
                             </>
                         )}
                         <Box style={{ gap: "10px", marginTop: "15px", display: "flex", justifyContent: "space-between" }}>
-                            <ButtonComponent style={{ backgroundColor: "rgb(60,86,91)", color: "white" }} name="Submit" size="small" />
+                            <ButtonComponent backgroundColor={colors.navbar} style={{ borderRadius: "8px", fontSize: "12px", textTransform: "none", p: '4px', color: "white" }}
+                                name="Submit" size="small"
+                                variant="contained"
+                            />
                             <ButtonComponent
-                                style={{ backgroundColor: "rgb(60,86,91)", color: "white" }}
+                                // style={{ backgroundColor: "rgb(60,86,91)", color: "white" }}
                                 name={showMoreFilters ? "Hide Filters" : "More Filters"}
                                 onClick={handleMoreFiltersClick}
                                 size="small"
+                                variant="contained"
+                                backgroundColor={colors.navbar}
+                                style={{ borderRadius: "8px", fontSize: "12px", textTransform: "none", p: '4px', color: "white" }}
                             />
                         </Box>
                     </Box>
@@ -248,7 +293,7 @@ const VisitorActivity = () => {
                     </Box>
                 </Grid>
                 <Grid item lg={4} md={4} sm={12} xs={12}>
-                    <Box  >
+                    <Box mt="10px">
                         <Box display="flex" flexDirection="row" gap="20px">
                             <Box width="50%" boxShadow={1} padding={1} borderRadius={2} justifyContent="center" alignItems="center" backgroundColor="#413839" color="white">
                                 <Typography variant="body1" display="flex" justifyContent="center" alignItems="center" fontSize="12px" >Visitors in</Typography>
@@ -281,10 +326,10 @@ const VisitorActivity = () => {
                 </Grid>
 
                 <Grid item lg={12} md={12} sm={12} xs={12}>
-                    <Box width="100%" bgcolor='rgb(60,86,91)'>
+                    <Box width="100%" bgcolor={colors.navbar}>
                         <Box display="flex" justifyContent="space-between" alignItems="center">
                             <Typography ml="10px" variant="h10" color="white">Filtered By : </Typography>
-                            <Typography variant="h10" color="white">Count = {filteredData.length} </Typography>
+                            {/* <Typography variant="h10" color="white">Count = {filteredData.length} </Typography> */}
                             <Box display="flex" alignItems="center">
                                 <Tooltip title="Export to Excel">
                                     <IconButton onClick={exportToExcel} style={{ color: 'white' }}>
@@ -306,7 +351,7 @@ const VisitorActivity = () => {
                         />
                     </Box>
                 </Grid>
-                <FloatingButton options={floatingActionButtonOptions} bottomOffset="100px" onAddVisitorClick={handleFormClick} />
+                <FloatingButton options={floatingActionButtonOptions} bottomOffset="100px" onButtonClick={handleFormClick} />
             </Grid>
 
         </>

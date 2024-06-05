@@ -1,27 +1,48 @@
-import React from 'react';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import 'react-datepicker/dist/react-datepicker.css';
-import DatePicker from 'react-datepicker';
-import { Form, InputGroup } from 'react-bootstrap';
-import './components.css';
+import * as React from 'react';
+import { useState } from 'react';
+import { DemoItem } from '@mui/x-date-pickers/internals/demo';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import Box from '@mui/material/Box';
+import { FormControl, TextField } from '@mui/material';
 
-const DatePickers = ({ label, required, selectedDate, placeholder, onChange, ...props }) => {
+export default function DatePickers({ name, selectedDate, handleInputChange, placeholder, label }) {
+    const handleDateChange = (date) => {
+        handleInputChange({ target: { name, value: date } });
+    };
 
     return (
-        <Form.Group>
-            <InputGroup className="date-picker-standard">
-                <DatePicker
-                    selected={selectedDate}
-                    onChange={onChange}
-                    required={required}
-                    placeholderText={placeholder}
-                    customInput={<Form.Control style={{ fontSize: "12px", fontWeight: "bold" }} required={required} />}
-                    {...props}
-                />
-            </InputGroup>
-        </Form.Group>
+        <div>
+            <FormControl fullWidth>
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                    <Box>
+                        <DemoItem>
+                            <DatePicker
+                                value={selectedDate}
+                                onChange={handleDateChange}
+                                label={label}
+                                slotProps={{
+                                    textField: {
+                                        size: 'small',
+
+                                    },
+                                    field: { clearable: true, onClear: () => handleDateChange(null) },
+                                }}
+                                renderInput={(params) => (
+                                    <TextField
+                                        {...params}
+                                        size="small"
+
+                                        // placeholder={placeholder}
+                                        InputLabelProps={{ shrink: true }}
+                                    />
+                                )}
+                            />
+                        </DemoItem>
+                    </Box>
+                </LocalizationProvider>
+            </FormControl>
+        </div>
     );
-
-};
-
-export default DatePickers;
+}

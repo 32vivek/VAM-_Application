@@ -7,6 +7,7 @@ import ReusableRadioButton from '../../components/RadioButton';
 import Autocmp from '../../components/AutoComplete';
 import ButtonComponent from '../../components/Button';
 import { toast, ToastContainer, POSITION } from 'react-toastify';
+import colors from '../colors';
 
 
 
@@ -45,8 +46,8 @@ const AddPreVisitors = () => {
         visitorCardNo: '',
         vehicleNumber: '',
         laptop: '',
-        mail: false,
-        sms: false
+        mail: true,
+        sms: true
     });
 
     const handleChange = (name, value) => {
@@ -104,25 +105,75 @@ const AddPreVisitors = () => {
             toast.success("Form submitted successfully!", {
                 autoClose: 3000,
                 position: "top-right",
-                style: {
-                    backgroundColor: 'rgb(60,86,91)',
-                    color: "white",
-                },
+                // style: {
+                //     backgroundColor: 'rgb(60,86,91)',
+                //     color: "white",
+                // },
+            });
+            setFormData({
+                number: '',
+                name: '',
+                visitorcompany: '',
+                department: null,
+                purpose: null,
+                employeeName: null,
+                visitorAddress: '',
+                possessionAllowed: '',
+                visitorCardNo: '',
+                vehicleNumber: '',
+                laptop: '',
+                mail: true,
+                sms: true
             });
 
         } else {
             toast.error("Validation Error! Please check the form for errors.", {
                 autoClose: 3000,
                 position: "top-right",
-                style: {
-                    backgroundColor: 'rgb(60,86,91)',
-                    color: "white"
-                },
+                // style: {
+                //     backgroundColor: 'rgb(60,86,91)',
+                //     color: "white"
+                // },
             });
 
         }
 
 
+    };
+
+    const handleReset = () => {
+        setFormData({
+            number: '',
+            name: '',
+            visitorcompany: '',
+            department: null,
+            purpose: null,
+            employeeName: null,
+            visitorAddress: '',
+            possessionAllowed: '',
+            visitorCardNo: '',
+            vehicleNumber: '',
+            laptop: '',
+            mail: true,
+            sms: true
+        });
+        setFormErrors({});
+    };
+
+    const styles = {
+        navbar: {
+            backgroundColor: colors.navbar,
+            color: '#fff',
+            padding: '10px',
+        },
+        resetButton: {
+            backgroundColor: colors.resetButtonBackground,
+            color: colors.resetButtonColor,
+            // padding: '8px 16px',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer',
+        },
     };
 
 
@@ -140,9 +191,9 @@ const AddPreVisitors = () => {
                                 label="OTP"
                                 placeholder="Enter OTP"
                             />
-                            <IconButton color="primary">
+                            {/* <IconButton color="primary">
                                 <Search />
-                            </IconButton>
+                            </IconButton> */}
 
                         </Box>
                     </Grid>
@@ -216,7 +267,7 @@ const AddPreVisitors = () => {
                                 required
                                 options={departmentOptions}
                                 value={formData.department}
-                                onChange={(e, value) => handleChange('department', value)}
+                                onChange={(value) => handleChange('department', value)}
                                 error={formErrors.department}
                                 helperText={formErrors.department}
                             />
@@ -231,7 +282,7 @@ const AddPreVisitors = () => {
                                 required
                                 options={employeeNameOptions}
                                 value={formData.employeeName}
-                                onChange={(e, value) => handleChange('employeeName', value)}
+                                onChange={(value) => handleChange('employeeName', value)}
                                 error={formErrors.employeeName}
                                 helperText={formErrors.employeeName}
                             />
@@ -298,16 +349,16 @@ const AddPreVisitors = () => {
                                 required
                                 options={purposeOptions}
                                 value={formData.purpose}
-                                onChange={(e, value) => handleChange('purpose', value)}
+                                onChange={(value) => handleChange('purpose', value)}
                                 error={formErrors.purpose}
                                 helperText={formErrors.purpose}
                             />
                         </Box>
                     </Grid>
                     <Grid item lg={6} md={6} xs={12} sm={12}>
-                        <Box >  <Typography>Notify Employee</Typography></Box>
-                        <Box >
-
+                        {/* <Box >  <Typography>Notify Employee</Typography></Box> */}
+                        <Box display="flex" style={{ gap: "5px" }}>
+                            <Typography marginTop="10px">Notify Employee</Typography>
                             <CustomCheckbox
                                 label="Mail"
                                 checked={formData.mail} onChange={(e) => handleChange('mail', e.target.checked)}
@@ -334,14 +385,15 @@ const AddPreVisitors = () => {
 
                 </Grid>
                 <Grid container>
-                    <Grid item lg={6} md={6} xs={12}>
-                        <Box sx={{ display: "flex", ml: "25px", flexDirection: "row", gap: "20px" }}>
+                    <Grid item lg={12} md={12} xs={12}>
+                        <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", ml: "25px", flexDirection: "row", gap: "20px" }}>
                             <Box>
                                 <ButtonComponent
                                     name="Submit"
                                     size="small"
                                     type="submit"
-                                    style={{ backgroundColor: "#3C565B", color: "white" }}
+                                    variant="contained"
+                                    backgroundColor={colors.navbar}
                                     onClick={handleSubmit}
                                 />
                             </Box>
@@ -349,7 +401,9 @@ const AddPreVisitors = () => {
                                 <ButtonComponent
                                     name="Reset"
                                     size="small"
-                                    style={{ backgroundColor: "#660000", color: "white" }}
+                                    variant="contained"
+                                    onClick={handleReset}
+                                    style={styles.resetButton}
                                 />
                             </Box>
 

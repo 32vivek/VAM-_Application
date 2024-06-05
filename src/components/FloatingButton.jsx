@@ -1,21 +1,45 @@
 import React from 'react';
-import { Fab } from '@mui/material';
+import { Box, IconButton } from '@mui/material';
 
-const FloatingButton = ({ options, bottomOffset, onAddVisitorClick }) => {
+const FloatingButton = ({ options, bottomOffset, onButtonClick }) => {
     return (
-        <div style={{ position: 'fixed', bottom: bottomOffset || '20px', right: '20px', display: 'flex', flexDirection: 'column', justifyContent: 'center', zIndex: '999' }}>
-            {options.map((option, index) => (
-                <Fab
-                    key={index}
+        <Box
+            sx={{
+                position: 'fixed',
+                bottom: 0, // Set bottom to 0 to show the button at the bottom of the screen
+                right: '2px',
+                display: 'flex',
+                padding: "5px",
+                flexDirection: 'column',
+                gap: '10px',
+                marginTop: "10px"
+                // marginBottom: "20px",
+            }}
+        >
+            {options.map((option) => (
+                <IconButton
+                    key={option.label}
+                    onClick={() => onButtonClick(option.label)}
                     color="primary"
-                    aria-label={option.label}
-                    style={{ marginBottom: '10px', fontSize: '12px', width: '36px', height: '36px' }}
-                    onClick={onAddVisitorClick}
+                    sx={{
+                        backgroundColor: '#0075a8',
+                        color: 'white',
+                        boxShadow: 3,
+                        '&:hover': {
+                            backgroundColor: '#0075a8',
+                        },
+                        '&::after': {
+                            content: '""',
+                            display: 'block',
+                            width: '100%',
+                            height: '2px',
+                        },
+                    }}
                 >
                     {option.icon}
-                </Fab>
+                </IconButton>
             ))}
-        </div>
+        </Box>
     );
 };
 

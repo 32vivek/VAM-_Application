@@ -10,13 +10,17 @@ const ReusableTabs = ({ tabs, selectedTab, onChange }) => {
                 variant="scrollable"
                 scrollButtons="auto"
                 aria-label="scrollable auto tabs example"
+                TabIndicatorProps={{
+                    style: {
+                        backgroundColor: 'white', // Set the underline color to white
+                    },
+                }}
             >
                 {tabs.map((tab, index) => (
                     <Tab
                         key={index}
                         label={tab.label}
                         value={index}
-
                         sx={{
                             color: 'white',
                             fontSize: "10px",

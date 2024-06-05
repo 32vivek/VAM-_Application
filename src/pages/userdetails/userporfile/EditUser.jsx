@@ -2,8 +2,8 @@ import { Grid, Box } from '@mui/material'
 import React, { useState } from 'react'
 import Texxt from '../../../components/Textfield'
 import ButtonComponent from '../../../components/Button'
-
 import { toast, ToastContainer, POSITION } from 'react-toastify';
+import colors from '../../colors'
 const EditUser = () => {
 
     const [formData, setFormData] = useState({
@@ -83,14 +83,29 @@ const EditUser = () => {
 
 
     };
+
+    const styles = {
+        navbar: {
+            backgroundColor: colors.navbar,
+            color: '#fff',
+            padding: '10px',
+        },
+        resetButton: {
+            backgroundColor: colors.resetButtonBackground,
+            color: colors.resetButtonColor,
+            padding: '8px 16px',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer',
+        },
+    };
+
     return (
         <>
             <ToastContainer style={{ marginTop: '60px' }} toastStyle={{ color: 'white' }} />
-
             <Box boxShadow={3} p={2} borderRadius={3}>
                 <Grid container spacing={1}>
                     <Grid item lg={6} md={6} sm={12} xs={12}>
-
                         <Box>
                             <Texxt
                                 name="name"
@@ -174,7 +189,8 @@ const EditUser = () => {
                                 name="Save"
                                 size="medium"
                                 variant="contained"
-                                style={{ backgroundColor: "rgb(60,86,91)", color: "white" }}
+                                backgroundColor={colors.navbar}
+                                style={{ fontSize: "10px" }}
                                 onClick={handleSubmit}
                             />
                         </Box>

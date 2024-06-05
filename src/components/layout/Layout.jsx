@@ -33,7 +33,8 @@ import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import FeedbackIcon from '@mui/icons-material/Feedback';
 import LogoutIcon from '@mui/icons-material/Logout';
 import Footer from "./Footer";
-
+import Cookies from 'js-cookie';
+import colors from "../.././pages/colors";
 const drawerWidth = 240;
 
 const openedMixin = (theme) => ({
@@ -81,7 +82,8 @@ const AppBar = styled(MuiAppBar, {
             duration: theme.transitions.duration.enteringScreen,
         }),
     }),
-    backgroundColor: '#3C565B', // Set the background color of the AppBar
+    // backgroundColor: '#3C565B',
+    backgroundColor: colors.navbar,
 }));
 
 const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' })(
@@ -151,13 +153,35 @@ export default function MiniDrawer() {
         }
     };
 
+    const handleLogout = () => {
+        // Remove cookies with specified path and domain if needed
+        Cookies.remove('access_token', { path: '/' });
+        Cookies.remove('refresh_token', { path: '/' });
+
+        // Debugging logs to check if cookies are removed
+        console.log('Access Token after removal:', Cookies.get('access_token'));
+        console.log('Refresh Token after removal:', Cookies.get('refresh_token'));
+
+        // Navigate to the login page
+        navigate('/');
+    };
+
     const isActiveRoute = (route) => location.pathname.startsWith(route);
 
     const settings = [
         { text: 'Profile', route: '/userprofile', icon: <AccountCircleIcon /> },
         { text: 'My Feedback', route: '/userfeedback', icon: <FeedbackIcon /> },
-        { text: 'Logout', route: '/', icon: <LogoutIcon /> }
+        { text: 'Logout', route: '/', icon: <LogoutIcon />, action: handleLogout }
     ];
+
+    const styles = {
+        navbar: {
+            backgroundColor: colors.navbar,
+            color: '#fff',
+            padding: '10px',
+        },
+
+    };
 
     return (
         <Box sx={{ display: 'flex' }}>
@@ -254,7 +278,7 @@ export default function MiniDrawer() {
                                 >
                                     {item.icon}
                                 </ListItemIcon>
-                                <ListItemText primary={item.text} sx={{ opacity: open ? 1 : 0 }} />
+                                <ListItemText fontSize="10px" primary={item.text} sx={{ opacity: open ? 1 : 0 }} />
                             </ListItemButton>
                         </ListItem>
                     ))}
@@ -281,7 +305,7 @@ export default function MiniDrawer() {
                             >
                                 <DashboardIcon />
                             </ListItemIcon>
-                            <ListItemText primary="Dashboard" sx={{ opacity: open ? 1 : 0 }} />
+                            <ListItemText fontSize="10px" primary="Dashboard" sx={{ opacity: open ? 1 : 0 }} />
                             {dashboardOpen ? <ExpandLess /> : <ExpandMore />}
                         </ListItemButton>
                         <Collapse in={dashboardOpen} timeout="auto" unmountOnExit>
@@ -316,7 +340,7 @@ export default function MiniDrawer() {
                             >
                                 <PersonIcon />
                             </ListItemIcon>
-                            <ListItemText primary="Visitor" sx={{ opacity: open ? 1 : 0 }} />
+                            <ListItemText fontSize="10px" primary="Visitor" sx={{ opacity: open ? 1 : 0 }} />
                             {visitorOpen ? <ExpandLess /> : <ExpandMore />}
                         </ListItemButton>
                         <Collapse in={visitorOpen} timeout="auto" unmountOnExit>
