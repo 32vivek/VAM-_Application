@@ -1,21 +1,20 @@
+import React, { useState, useEffect } from 'react';
 import {
     Grid, FormControl, Box, IconButton, Typography, SwipeableDrawer
 } from '@mui/material';
-import React, { useState, useEffect } from 'react'
+import { toast, ToastContainer } from 'react-toastify';
 import Autocmp from '../../components/AutoComplete';
 import ButtonComponent from '../../components/Button';
 import CustomDataTable from '../../components/ReactDataTable';
-import axios from 'axios';
-import { user_api } from '../../Api/Api';
 import FloatingButton from '../../components/FloatingButton';
-import { toast, ToastContainer, POSITION } from 'react-toastify';
 import Texxt from '../../components/Textfield';
+import axios from 'axios';
+import { getUnit, user_api } from '../../Api/Api';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
 import { Search, Add, Close as CloseIcon, Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
 import colors from '../colors';
-
-
+import Cookies from 'js-cookie'; // Import js-cookie
 
 const UnitSettings = () => {
     const [open, setOpen] = useState(false);
@@ -33,6 +32,7 @@ const UnitSettings = () => {
         passAddress: "",
         passDisclaimer: ""
     });
+
     const floatingActionButtonOptions = selectedRows.length === 0 ? [
         { label: 'Add', icon: <Add /> },
     ] : selectedRows.length === 1 ? [
@@ -63,13 +63,42 @@ const UnitSettings = () => {
 
     const fetchData = async () => {
         try {
-            const response = await axios.get(user_api);
-            setVisitorsData(response.data);
-            setFilteredData(response.data);
+            const accessToken = Cookies.get('token');
+
+            if (!accessToken) {
+                throw new Error('Access token is missing');
+            }
+
+            const unitResponse = await axios.get(getUnit, {
+                headers: {
+                    'authorization': `Bearer ${accessToken}`,
+                    'Accept': '*/*',
+                    'Accept-Encoding': `gzip, deflate, br`,
+                    'Referrer-Policy': 'same-origin'
+                }
+            });
+            console.log('Unit Data:', unitResponse.data);
+            setVisitorsData(unitResponse.data);
+            setFilteredData(unitResponse.data);
         } catch (error) {
-            console.error('Error fetching data:', error);
+            console.error('Error fetching data:', error.message);
+            if (error.response) {
+                console.error('Server Error:', error.response.data);
+            } else if (error.request) {
+                console.error('Network Error:', error.message);
+            } else {
+                console.error('Error:', error.message);
+            }
+            // toast.error('Failed to fetch data. Please try again later.', {
+            //     autoClose: 3000,
+            //     position: "top-right",
+            //     style: {
+            //         color: "#0075a8"
+            //     },
+            // });
         }
     };
+
 
     const validateForm = () => {
         const newErrors = {};
@@ -78,10 +107,10 @@ const UnitSettings = () => {
             newErrors.unitName = 'Unit Name is required';
         }
         if (!formData.ip) {
-            newErrors.ip = 'ip is required';
+            newErrors.ip = 'IP is required';
         }
         if (!formData.city) {
-            newErrors.city = 'city is required';
+            newErrors.city = 'City is required';
         }
         if (!formData.passAddress) {
             newErrors.passAddress = 'Pass Address is required';
@@ -123,8 +152,6 @@ const UnitSettings = () => {
         setOpen(false);
     };
 
-
-
     const handleChange = (e, name, value) => {
         if (e && e.target && e.target.name) {
             const { name, value } = e.target;
@@ -159,30 +186,25 @@ const UnitSettings = () => {
                 city: "",
                 passAddress: "",
                 passDisclaimer: "",
-            })
+            });
 
-            // For demonstration, always showing success. Implement actual form validation and error handling as needed.
             toast.success("Form submitted successfully!", {
                 autoClose: 3000,
                 position: "top-right",
                 style: {
-                    // backgroundColor: 'rgb(60,86,91)',
                     color: "#0075a8"
                 },
             });
-
         } else {
             toast.error("Please correct the highlighted errors.", {
                 autoClose: 3000,
                 position: "top-right",
                 style: {
-                    // backgroundColor: 'rgb(60,86,91)',
                     color: "#0075a8"
                 },
             });
         }
     };
-
 
     const handleCopy = () => {
         const dataString = filteredData.map(row => Object.values(row).join('\t')).join('\n');
@@ -191,7 +213,6 @@ const UnitSettings = () => {
             autoClose: 3000,
             position: "top-right",
             style: {
-                // backgroundColor: 'rgb(60,86,91)',
                 color: "#0075a8"
             },
         });
@@ -201,7 +222,7 @@ const UnitSettings = () => {
         const worksheet = XLSX.utils.json_to_sheet(filteredData);
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, worksheet, "Sheet1");
-        const wbout = XLSX.write(wb, { type: 'array', bookType: "xlsx" }); // Changed to 'array'
+        const wbout = XLSX.write(wb, { type: 'array', bookType: "xlsx" });
         const blob = new Blob([wbout], { type: "application/octet-stream" });
         const fileName = 'table_data.xlsx';
         saveAs(blob, fileName);
@@ -209,7 +230,6 @@ const UnitSettings = () => {
             autoClose: 3000,
             position: "top-right",
             style: {
-                // backgroundColor: 'rgb(60,86,91)',
                 color: "#0075a8"
             },
         });
@@ -224,7 +244,6 @@ const UnitSettings = () => {
                 autoClose: 3000,
                 position: "top-right",
                 style: {
-                    // backgroundColor: 'rgb(60,86,91)',
                     color: "#0075a8"
                 },
             });
@@ -250,7 +269,6 @@ const UnitSettings = () => {
         resetButton: {
             backgroundColor: colors.resetButtonBackground,
             color: colors.resetButtonColor,
-            // padding: '8px 16px',
             border: 'none',
             borderRadius: '4px',
             cursor: 'pointer',
@@ -266,8 +284,7 @@ const UnitSettings = () => {
                 </IconButton>
             </Box>
 
-
-            <Grid container spacing={2} sx={{ p: 3 }}>
+            <Grid container spacing={3} padding={2}>
                 <Grid item lg={6} md={6} sm={12} xs={12}>
                     <Box>
                         <Texxt

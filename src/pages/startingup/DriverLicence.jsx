@@ -11,7 +11,7 @@ import Autocmp from "../../components/AutoComplete";
 import ButtonComponent from "../../components/Button";
 import CustomDataTable from "../../components/ReactDataTable";
 import axios from "axios";
-import { user_api } from "../../Api/Api";
+import { getDL, user_api } from "../../Api/Api";
 import FloatingButton from "../../components/FloatingButton";
 import { toast, ToastContainer } from "react-toastify";
 import Texxt from "../../components/Textfield";
@@ -27,6 +27,7 @@ import {
 import DatePickers from "../../components/DateRangePicker";
 import InputFileUpload from "../../components/FileUpload";
 import colors from "../colors";
+import Cookies from 'js-cookie';
 
 const statuss = [
     {
@@ -91,15 +92,15 @@ const DriverLicence = () => {
         setShowMoreFilters(!showMoreFilters);
     };
 
-    const fetchData = async () => {
-        try {
-            const response = await axios.get(user_api);
-            setVisitorsData(response.data);
-            setFilteredData(response.data);
-        } catch (error) {
-            console.error("Error fetching data:", error);
-        }
-    };
+    // const fetchData = async () => {
+    //     try {
+    //         const response = await axios.get(user_api);
+    //         setVisitorsData(response.data);
+    //         setFilteredData(response.data);
+    //     } catch (error) {
+    //         console.error("Error fetching data:", error);
+    //     }
+    // };
 
     const validateForm = () => {
         const newErrors = {};
@@ -123,9 +124,9 @@ const DriverLicence = () => {
         return Object.keys(newErrors).length === 0;
     };
 
-    useEffect(() => {
-        fetchData();
-    }, []);
+    // useEffect(() => {
+    //     fetchData();
+    // }, []);
 
     const handleSearch = (searchText) => {
         const filtered = visitorsData.filter((item) =>
@@ -310,6 +311,41 @@ const DriverLicence = () => {
             cursor: 'pointer',
         },
     };
+
+    const fetchData = async () => {
+        try {
+            const accessToken = Cookies.get('token');
+
+            if (!accessToken) {
+                throw new Error('Access token is missing');
+            }
+
+
+            const unitResponse = await axios.get(getDL, {
+
+                headers: {
+                    Authorization: `Bearer ${accessToken}`
+                }
+
+            });
+            console.log('DL Data:', unitResponse.data);
+        } catch (error) {
+            if (error.response) {
+
+                console.error('Server Error:', error.response.data);
+            } else if (error.request) {
+
+                console.error('Network Error:', error.message);
+            } else {
+
+                console.error('Error:', error.message);
+            }
+        }
+    };
+
+    useEffect(() => {
+        fetchData();
+    }, []);
 
     const addInstantVisitors = (
         <>

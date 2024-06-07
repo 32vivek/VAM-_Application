@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import DataTable from "react-data-table-component";
-import { Box, IconButton, CircularProgress, createTheme, ThemeProvider } from "@mui/material";
+import { Box, IconButton, CircularProgress, createTheme, ThemeProvider, Tooltip } from "@mui/material";
 import { FileCopy, GetApp } from '@mui/icons-material'; // Import icons for copy, download as XLSX
 
 const CustomDataTable = ({ columns, data, onSearch, copyEnabled, onCopy, downloadEnabled, onDownloadXLSX }) => {
@@ -132,14 +132,18 @@ const CustomDataTable = ({ columns, data, onSearch, copyEnabled, onCopy, downloa
                                     }}
                                 />
                                 {copyEnabled && (
-                                    <IconButton onClick={handleCopy}>
-                                        <FileCopy />
-                                    </IconButton>
+                                    <Tooltip title="Copy to clipboard">
+                                        <IconButton onClick={handleCopy}>
+                                            <FileCopy />
+                                        </IconButton>
+                                    </Tooltip>
                                 )}
                                 {downloadEnabled && (
-                                    <IconButton onClick={handleDownloadXLSX}>
-                                        <GetApp />
-                                    </IconButton>
+                                    <Tooltip title="Download as XLSX">
+                                        <IconButton onClick={handleDownloadXLSX}>
+                                            <GetApp />
+                                        </IconButton>
+                                    </Tooltip>
                                 )}
                             </Box>
                         }

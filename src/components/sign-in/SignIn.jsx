@@ -82,8 +82,8 @@ export default function SignInSide() {
             if (response.ok) {
                 const data = await response.json();
                 // Store tokens in cookies
-                Cookies.set('token', data.access_token);
-                Cookies.set('refreshToken', data.refresh_token);
+                Cookies.set('token', data.accessToken);
+                Cookies.set('refreshToken', data.refreshToken);
                 navigate("/home/today");
             } else {
                 const errorData = await response.json();

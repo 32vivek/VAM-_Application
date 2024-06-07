@@ -2,7 +2,7 @@ import React from 'react';
 import { Outlet, Navigate, useLocation } from 'react-router-dom';
 
 const PrivateRoutes = () => {
-    const isAuthenticated = !!document.cookie.includes('token='); // Check if token cookie exists
+    const isAuthenticated = !!document.cookie.includes('token=');
     const location = useLocation();
 
     const isLoginRoute = () => {

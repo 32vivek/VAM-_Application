@@ -386,7 +386,7 @@ const AddPreVisitors = () => {
                 </Grid>
                 <Grid container>
                     <Grid item lg={12} md={12} xs={12}>
-                        <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", ml: "25px", flexDirection: "row", gap: "20px" }}>
+                        <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", ml: "25px", flexDirection: "row", gap: "20px", marginBottom: "20px" }}>
                             <Box>
                                 <ButtonComponent
                                     name="Submit"

@@ -1,7 +1,7 @@
 
 
 import { useEffect, useState } from 'react';
-// import { API_Auth_Refresh } from '../API/Api';
+import { auth_apiRefresh } from '../Api/Api';
 
 const TokenRefresh = ({ children }) => {
     const [tokenExpiryTime, setTokenExpiryTime] = useState(null);
@@ -9,12 +9,12 @@ const TokenRefresh = ({ children }) => {
     const handleTokenRefresh = async () => {
         try {
             const currentRefreshToken = localStorage.getItem("refreshToken");
-            const response = await fetch("");
+            const response = await fetch("auth_apiRefresh");
             if (response.ok) {
                 const data = await response.json();
-                document.cookie = `token=${data.access_token}; path=/`; // Store access token in cookies
-                localStorage.setItem("refreshToken", data.refresh_token);
-                const expiryTime = calculateExpiryTime(data.access_token);
+                document.cookie = `token=${data.accessToken}; path=/`; // Store access token in cookies
+                localStorage.setItem("refreshToken", data.refreshToken);
+                const expiryTime = calculateExpiryTime(data.accessToken);
                 setTokenExpiryTime(expiryTime);
             } else {
                 console.error("Failed to refresh token:", response.statusText);

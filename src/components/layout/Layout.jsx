@@ -105,7 +105,7 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
 
 export default function MiniDrawer() {
     const theme = useTheme();
-    const [open, setOpen] = React.useState(true);
+    const [open, setOpen] = React.useState(false);
     const [dashboardOpen, setDashboardOpen] = React.useState(false);
     const [visitorOpen, setVisitorOpen] = React.useState(false);
     const [startingUpOpen, setStartingUpOpen] = React.useState(false);
@@ -154,15 +154,22 @@ export default function MiniDrawer() {
     };
 
     const handleLogout = () => {
-        // Remove cookies with specified path and domain if needed
-        Cookies.remove('access_token', { path: '/' });
-        Cookies.remove('refresh_token', { path: '/' });
+        // const cookieOptions = { path: '/' }; // Adjust the path and domain if necessary
+        // console.log('Before removing cookies:');
+        // console.log('Access Token:', Cookies.get('token'));
+        // console.log('Refresh Token:', Cookies.get('refreshToken'));
 
-        // Debugging logs to check if cookies are removed
-        console.log('Access Token after removal:', Cookies.get('access_token'));
-        console.log('Refresh Token after removal:', Cookies.get('refresh_token'));
+        // Remove the cookies
+        // Cookies.remove('token');
+        // Cookies.remove('refreshToken', cookieOptions);
 
-        // Navigate to the login page
+        // Check if the cookies are removed
+        // console.log('After removing cookies:');
+        // console.log('Access Token:', Cookies.get('token'));
+        // console.log('Refresh Token:', Cookies.get('refreshToken'));
+
+        // Navigate to the desired route after logout
+        localStorage.removeItem('token')
         navigate('/');
     };
 

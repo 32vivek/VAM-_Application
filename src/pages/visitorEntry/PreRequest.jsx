@@ -195,20 +195,34 @@ const PreRequest = () => {
             toast.success("Form submitted successfully!", {
                 autoClose: 3000,
                 position: "top-right",
-                // style: {
-                //     backgroundColor: 'rgb(60,86,91)',
-                //     color: "white",
-                // },
+                style: {
+                    // backgroundColor: "rgb(60,86,91)",
+                    color: "#0075a8"
+                },
+            });
+            setFormData({
+                visitorName: null,
+                visitorMobile: null,
+                visitorEmail: '',
+                visitorOrganization: null,
+                purpose: null,
+                address: "",
+                possessionAllowed: '',
+                confrenceRoom: '',
+                laptop: '',
+                mail: true,
+                sms: true,
+                pass: false,
             });
         } else {
             console.log("Validation Failed");
             toast.error("Validation Error! Please check the form for errors.", {
                 autoClose: 3000,
                 position: "top-right",
-                // style: {
-                //     backgroundColor: 'rgb(60,86,91)',
-                //     color: "white",
-                // },
+                style: {
+                    // backgroundColor: "rgb(60,86,91)",
+                    color: "#0075a8"
+                },
             });
         }
     };
@@ -253,7 +267,7 @@ const PreRequest = () => {
                     <CloseIcon style={{ color: "white", marginRight: "10px" }} />
                 </IconButton>
             </Box>
-            <Grid container spacing={2} sx={{ p: 3 }}>
+            <Grid container spacing={1} sx={{ p: 3 }}>
                 <Grid item lg={6} md={6} xs={12} sm={12}>
                     <Box>
                         <Autocmp
@@ -572,7 +586,7 @@ const PreRequest = () => {
                         </Box>
                         <Box display="flex" flexDirection="row" gap="20px" mt="20px">
                             <Box width="50%" borderRadius={2} justifyContent="space-between" alignItems="center" backgroundColor="#FF4500" color="white">
-                                <Typography variant="body1" display="flex" justifyContent="center" alignItems="center" fontSize="12px">Cancelled</Typography>
+                                <Typography variant="body1" mt="10px" display="flex" justifyContent="center" alignItems="center" fontSize="12px">Cancelled</Typography>
                                 <Box display="flex" justifyContent="center" alignItems="center"><Typography variant="body1" fontSize="12px">0</Typography></Box>
                             </Box>
                             <Box width="50%" boxShadow={1} padding={1} borderRadius={2} justifyContent="space-between" alignItems="center" backgroundColor="#AA6C39" color="white">
