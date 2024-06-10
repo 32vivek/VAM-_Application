@@ -26,7 +26,7 @@ const Autocmp = ({ name, label, size, style, required, options, multiple, varian
             )}
             size={size}
             value={value}
-            onChange={(event, newValue) => onChange(newValue)}
+            onChange={(event, newValue) => onChange(event, newValue)}
         />
     );
 };

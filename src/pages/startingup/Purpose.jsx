@@ -6,7 +6,7 @@ import Autocmp from '../../components/AutoComplete';
 import ButtonComponent from '../../components/Button';
 import CustomDataTable from '../../components/ReactDataTable';
 import axios from 'axios';
-import { user_api } from '../../Api/Api';
+import { user_api, getAllPurpose } from '../../Api/Api';
 import FloatingButton from '../../components/FloatingButton';
 import ReusableRadioButton from '../../components/RadioButton';
 import { toast, ToastContainer, POSITION } from 'react-toastify';
@@ -15,6 +15,7 @@ import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
 import { Search, Add, Close as CloseIcon, Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
 import colors from './../colors';
+import axiosInstance from '../../components/Auth';
 
 
 const data = [
@@ -87,12 +88,27 @@ const Purpose = () => {
             cell: (row) => <input type="checkbox" checked={row.selected} onChange={() => handleRowSelected(row)} />,
             sortable: false,
         },
-        { name: 'name', selector: row => row.name, sortable: true },
-        { name: 'email', selector: row => row.email, sortable: true },
-        { name: 'number', selector: row => row.number, sortable: true },
-        { name: 'address', selector: row => row.address, sortable: true },
-        { name: 'department', selector: row => row.department, sortable: true },
-        { name: 'number', selector: row => row.number, sortable: true },
+        {
+            name: 'Purpose', selector: row => row.
+                purposeBrief, sortable: true
+        },
+        { name: 'Purpose For', selector: row => row.purposeFor, sortable: true },
+        { name: 'Alert After', selector: row => row.alertAfter, sortable: true },
+        { name: 'Alert To', selector: row => row.alertTo, sortable: true },
+        {
+            name: 'Employee Name', selector: row => row.createdBy, sortable: true
+        },
+        { name: 'updated By', selector: row => row.updatedBy, sortable: true },
+        {
+            name: 'Created On', selector: row => row.createdAt, sortable: true
+        },
+        {
+            name: 'Status',
+            cell: (row) => row.status ? 'Active' : 'Inactive',
+            sortable: true,
+        },
+
+
     ];
 
     const handleMoreFiltersClick = () => {
@@ -101,11 +117,21 @@ const Purpose = () => {
 
     const fetchData = async () => {
         try {
-            const response = await axios.get(user_api);
-            setVisitorsData(response.data);
-            setFilteredData(response.data);
+            const response = await axiosInstance.get(`${getAllPurpose}`, {
+                // params: {
+                //     page: page - 1,
+                //     size: rowsPerPage
+                // }
+            });
+
+            // const activePlants = response.data.content.filter(plant => plant.status === true);
+            console.log(response.data);
+
+            setFilteredData(response.data.content);
+            setVisitorsData(response.data.content);
+            // setTotalRows(response.data.totalElements);
         } catch (error) {
-            console.error('Error fetching data:', error);
+            console.error('Error fetching data:', error.message);
         }
     };
 

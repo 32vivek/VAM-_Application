@@ -1,14 +1,25 @@
-// import axios from 'axios';
+import axios from 'axios';
+import Cookies from 'js-cookie';
+import { auth_api } from '../Api/Api';
 
+const axiosInstance = axios.create({
+    baseURL: 'auth_api',
+    headers: {
+        'Content-Type': 'application/json',
+    },
+});
 
-// const setAuthToken = (token) => {
-//     if (token) {
-//         // If a token exists, set the Authorization header
-//         axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-//     } else {
-//         // If no token exists, remove the Authorization header
-//         delete axios.defaults.headers.common['Authorization'];
-//     }
-// };
+axiosInstance.interceptors.request.use(
+    (config) => {
+        const token = Cookies.get('token');
+        if (token) {
+            config.headers.Authorization = `Bearer ${token}`;
+        }
+        return config;
+    },
+    (error) => {
+        return Promise.reject(error);
+    }
+);
 
-// export default setAuthToken;
+export default axiosInstance;

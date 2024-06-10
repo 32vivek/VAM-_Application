@@ -6,7 +6,7 @@ import Autocmp from '../../components/AutoComplete';
 import ButtonComponent from '../../components/Button';
 import CustomDataTable from '../../components/ReactDataTable';
 import axios from 'axios';
-import { user_api } from '../../Api/Api';
+import { user_api, getAllPlants, createPlants, unitIdDD, deletePlants, downloadPlants } from '../../Api/Api';
 import FloatingButton from '../../components/FloatingButton';
 import { toast, ToastContainer, POSITION } from 'react-toastify';
 import Texxt from '../../components/Textfield';
@@ -14,6 +14,8 @@ import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
 import { Search, Add, Close as CloseIcon, Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
 import colors from '../colors';
+import axiosInstance from '../../components/Auth';
+import Swal from 'sweetalert2';
 
 const data = [
     { label: 'HR', value: 'hr' },
@@ -32,16 +34,25 @@ const Plant = () => {
     const [searchNumber, setSearchNumber] = useState('');
     const [formData, setFormData] = useState({
         plantName: "",
-        brief: "",
+        plantBrief: "",
+        unitId: null,
+        status: true,
     });
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [searchText, setSearchText] = useState('');
 
 
+    const [currentPage, setCurrentPage] = useState(1);
+    const [rowsPerPage, setRowsPerPage] = useState(10);
+    const [totalRows, setTotalRows] = useState(0);
+
+    const [unitIds, setUnitIds] = useState([]);
 
 
     const floatingActionButtonOptions = selectedRows.length === 0 ? [
         { label: 'Add', icon: <Add /> },
     ] : selectedRows.length === 1 ? [
-        { label: 'Edit', icon: <EditIcon /> },
+        // { label: 'Edit', icon: <EditIcon /> },
         { label: 'Delete', icon: <DeleteIcon /> },
     ] : [
         { label: 'Delete', icon: <DeleteIcon /> },
@@ -54,27 +65,68 @@ const Plant = () => {
             cell: (row) => <input type="checkbox" checked={row.selected} onChange={() => handleRowSelected(row)} />,
             sortable: false,
         },
-        { name: 'name', selector: row => row.name, sortable: true },
-        { name: 'email', selector: row => row.email, sortable: true },
-        { name: 'number', selector: row => row.number, sortable: true },
-        { name: 'address', selector: row => row.address, sortable: true },
-        { name: 'department', selector: row => row.department, sortable: true },
-        { name: 'number', selector: row => row.number, sortable: true },
+        {
+            name: 'Created At',
+            selector: row => formatDate(row.createdAt),
+            sortable: true
+        },
+        { name: 'UpdatedAt', selector: row => formatDate(row.updatedAt), sortable: true },
+        { name: 'plantBrief', selector: row => row.plantBrief, sortable: true },
+        { name: 'Plant Name', selector: row => row.plantName, sortable: true },
+        {
+            name: 'Status',
+            cell: (row) => row.status ? 'Active' : 'Inactive',
+            sortable: true,
+        },
+        // { name: 'number', selector: row => row.number, sortable: true },
     ];
 
     const handleMoreFiltersClick = () => {
         setShowMoreFilters(!showMoreFilters);
     };
 
-    const fetchData = async () => {
+
+    const fetchData = async (page = 1, rowsPerPage = 10) => {
         try {
-            const response = await axios.get(user_api);
-            setVisitorsData(response.data);
-            setFilteredData(response.data);
+            const response = await axiosInstance.get(`${getAllPlants}`, {
+                params: {
+                    page: page - 1,
+                    size: rowsPerPage
+                }
+            });
+
+            const activePlants = response.data.content.filter(plant => plant.status === true);
+
+            setFilteredData(activePlants);
+            setVisitorsData(activePlants);
+            setTotalRows(response.data.totalElements);
         } catch (error) {
-            console.error('Error fetching data:', error);
+            console.error('Error fetching data:', error.message);
         }
     };
+    const formatDate = (dateString) => {
+        const date = new Date(dateString);
+        const day = date.getDate().toString().padStart(2, '0');
+        const month = (date.getMonth() + 1).toString().padStart(2, '0');
+        const year = date.getFullYear().toString().slice(-2);
+        const hours = date.getHours().toString().padStart(2, '0');
+        const minutes = date.getMinutes().toString().padStart(2, '0');
+        const seconds = date.getSeconds().toString().padStart(2, '0');
+        return `${day}/${month}/${year}, ${hours}:${minutes}:${seconds}`;
+    };
+
+    const fetchUnitIds = async () => {
+        try {
+            const response = await axiosInstance.get(`${unitIdDD}`);
+            const unitIdOptions = response.data.map(unit => ({ label: unit.name, value: unit.id }));
+            setUnitIds(unitIdOptions);
+            console.log('Unit IDs:', unitIdOptions); // Log unitIds after fetching
+
+        } catch (error) {
+            console.error('Error fetching unit IDs:', error.message);
+        }
+    };
+
 
     const validateForm = () => {
         const newErrors = {};
@@ -82,8 +134,11 @@ const Plant = () => {
         if (!formData.plantName) {
             newErrors.plantName = 'Plant Name is required';
         }
-        if (!formData.brief) {
-            newErrors.brief = 'Brief is required';
+        if (!formData.plantBrief) {
+            newErrors.plantBrief = 'Plant Brief is required';
+        }
+        if (!formData.unitId) {
+            newErrors.unitId = 'UnitId is required';
         }
 
         setErrors(newErrors);
@@ -91,17 +146,41 @@ const Plant = () => {
     };
 
     useEffect(() => {
-        fetchData();
-    }, []);
+        fetchData(currentPage, rowsPerPage);
+        fetchUnitIds();
+    }, [currentPage, rowsPerPage]);
 
-    const handleSearch = (searchText) => {
-        const filtered = visitorsData.filter(item =>
-            Object.values(item).some(value =>
-                value.toString().toLowerCase().includes(searchText.toLowerCase())
-            )
-        );
+    const handlePageChange = (page) => {
+        setCurrentPage(page);
+        fetchData(page, rowsPerPage);
+    };
+
+    const handleRowsPerPageChange = (newPerPage) => {
+        setRowsPerPage(newPerPage);
+        setCurrentPage(1);
+        fetchData(1, newPerPage);
+    };
+
+    const handleSearch = (value) => {
+        const searchString = value ? value.toString().toLowerCase() : '';
+        setSearchText(searchString);
+
+        let filtered;
+        if (searchString) {
+            filtered = filteredData.filter(item =>
+                Object.values(item).some(val =>
+                    val && val.toString().toLowerCase().includes(searchString)
+                )
+            );
+        } else {
+            // If search field is empty, show all data
+            filtered = filteredData;
+        }
+
         setFilteredData(filtered);
     };
+
+
 
     const handleRowSelected = (row) => {
         const updatedData = filteredData.map((item) =>
@@ -120,58 +199,52 @@ const Plant = () => {
     };
 
 
-
-    const handleChange = (e, name, value) => {
-        if (e && e.target && e.target.name) {
-            const { name, value } = e.target;
-            setFormData((prevFormData) => ({
-                ...prevFormData,
-                [name]: value,
-            }));
-        } else {
-            setFormData({
-                ...formData,
-                [name]: value
-            });
-        }
+    const handleChange = (e) => {
+        const { name, value } = e.target || e;
+        setFormData((prevFormData) => ({
+            ...prevFormData,
+            [name]: value,
+        }));
     };
 
-    const handleFormSubmit = (e) => {
-        e.preventDefault();
+    const handleAutocompleteChange = (event, newValue) => {
+        setFormData((prevFormData) => ({
+            ...prevFormData,
+            unitId: newValue ? newValue.value : null,
+        }));
+    };
+    const handleFormSubmit = async (event) => {
+        event.preventDefault();
+        if (!validateForm()) return;
 
-        if (validateForm()) {
-            setFormData([{ plantName: "", brief: "" }])
-            console.log('Form Data:', formData);
-
+        setIsSubmitting(true);
+        try {
+            const response = await axiosInstance.post(createPlants, formData);
+            toast.success("Plant added successfully!", {
+                autoClose: 3000,
+                position: "top-right",
+                style: {
+                    backgroundColor: 'color: "#0075a8"',
+                },
+            });
+            fetchData();
+            handleCloseDrawer();
             setFormData({
                 plantName: "",
-                brief: "",
-            })
-
-            // For demonstration, always showing success. Implement actual form validation and error handling as needed.
-            toast.success("Form submitted successfully!", {
+                plantBrief: "",
+                unitId: "",
+                status: true,
+            });
+        } catch (error) {
+            toast.error(`Error adding plant: ${error.message}`, {
                 autoClose: 3000,
                 position: "top-right",
-                style: {
-                    // backgroundColor: 'rgb(60,86,91)',
-                    color: "#0075a8"
-                },
-
             });
-
-        } else {
-            toast.error("Please fill all required filled ...", {
-                autoClose: 3000,
-                position: "top-right",
-                style: {
-                    // backgroundColor: 'rgb(60,86,91)',
-                    color: "#0075a8"
-                },
-            });
+            console.error('Error adding plant:', error.message);
+        } finally {
+            setIsSubmitting(false);
         }
     };
-
-
     const handleCopy = () => {
         const dataString = filteredData.map(row => Object.values(row).join('\t')).join('\n');
         navigator.clipboard.writeText(dataString);
@@ -179,32 +252,34 @@ const Plant = () => {
             autoClose: 3000,
             position: "top-right",
             style: {
-                backgroundColor: 'rgb(60,86,91)',
+                backgroundColor: 'color: "#0075a8"',
             },
         });
     };
 
-    const handleDownloadXLSX = () => {
-        const worksheet = XLSX.utils.json_to_sheet(filteredData);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, worksheet, "Sheet1");
-        const wbout = XLSX.write(wb, { type: 'array', bookType: "xlsx" }); // Changed to 'array'
-        const blob = new Blob([wbout], { type: "application/octet-stream" });
-        const fileName = 'table_data.xlsx';
-        saveAs(blob, fileName);
-        toast.success("Table data downloaded as XLSX successfully!", {
-            autoClose: 3000,
-            position: "top-right",
-            style: {
-                backgroundColor: 'rgb(60,86,91)',
-            },
-        });
+    const handleDownloadXLSX = async () => {
+        try {
+            const response = await axiosInstance.get(downloadPlants, {
+                responseType: 'arraybuffer',
+            });
+
+            const blob = new Blob([response.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+            saveAs(blob, 'plants.xlsx');
+
+            toast.success("Plants data downloaded successfully!", {
+                autoClose: 3000,
+                position: "top-right",
+            });
+        } catch (error) {
+            console.error('Error downloading plants data:', error.message);
+            toast.error("Error downloading plants data. Please try again later.", {
+                autoClose: 3000,
+                position: "top-right",
+            });
+        }
     };
 
-    const handleAutocompleteChange = (value) => {
-        // console.log("Selected value:", value);
-        // Handle the selected value here
-    };
+
 
     const handleSearchNumberChange = (event) => {
         const searchText = event.target.value;
@@ -215,21 +290,49 @@ const Plant = () => {
         setFilteredData(filtered);
     };
 
-    const handleDelete = () => {
-        if (selectedRows.length > 0) {
-            const remainingData = filteredData.filter(item => !selectedRows.includes(item));
-            setFilteredData(remainingData);
-            setSelectedRows([]);
-            toast.success("Selected rows deleted successfully!", {
-                autoClose: 3000,
-                position: "top-right",
-                style: {
-                    // backgroundColor: 'rgb(60,86,91)',
-                    color: "#0075a8"
-                },
-            });
+
+    const handleDelete = async () => {
+        if (selectedRows.length === 0) {
+
+            return;
         }
+
+        Swal.fire({
+            title: 'Are you sure?',
+            text: 'Are you sure you want to delete the selected plants?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!',
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                try {
+                    const deleteRequests = selectedRows.map(row => axiosInstance.delete(`${deletePlants}/${row.id}`));
+                    await Promise.all(deleteRequests);
+                    toast.success("Plants deleted successfully!", {
+                        autoClose: 3000,
+                        position: "top-right",
+                        style: {
+                            backgroundColor: 'color: "#0075a8"',
+                        },
+                    });
+
+                    fetchData(currentPage, rowsPerPage);
+                } catch (error) {
+                    toast.error(`Error deleting plants: ${error.message}`, {
+                        autoClose: 3000,
+                        position: "top-right",
+                    });
+                    console.error('Error deleting plants:', error.message);
+                }
+            }
+        });
     };
+
+
+
+
 
     const styles = {
         navbar: {
@@ -247,6 +350,15 @@ const Plant = () => {
         },
     };
 
+
+    const handleReset = () => {
+        setFormData({
+            plantName: "",
+            plantBrief: "",
+            status: true,
+        });
+    }
+
     const addInstantVisitors = (
         <>
             <Box display="flex" justifyContent="space-between" backgroundColor={colors.navbar} >
@@ -255,7 +367,6 @@ const Plant = () => {
                     <CloseIcon style={{ color: "white", marginRight: "10px" }} />
                 </IconButton>
             </Box>
-
 
             <Grid container spacing={2} sx={{ p: 3 }}>
                 <Grid item lg={6} md={6} sm={12} xs={12}>
@@ -271,6 +382,7 @@ const Plant = () => {
                             error={errors.plantName}
                             helperText={errors.plantName}
                         />
+
                     </Box>
                 </Grid>
                 <Grid item lg={6} md={6} sm={12} xs={12}>
@@ -278,14 +390,34 @@ const Plant = () => {
                         <Texxt
                             label="Brief"
                             required
-                            name="brief"
-                            value={formData.brief}
+                            name="plantBrief"
+                            value={formData.plantBrief}
                             onChange={handleChange}
                             size="small"
                             placeholder="Enter Data"
-                            error={errors.brief}
-                            helperText={errors.brief}
+                            error={errors.plantBrief}
+                            helperText={errors.plantBrief}
                         />
+                    </Box>
+                </Grid>
+
+                <Grid item lg={6} md={6} sm={12} xs={12}>
+                    <Box>
+                        <Autocmp
+                            label="Unit ID"
+                            name="unitId"
+                            value={unitIds.find(option => option.value === formData.unitId) || null}
+                            onChange={handleAutocompleteChange}
+                            options={unitIds}
+                            getOptionLabel={(option) => option.value} // Display label in dropdown
+                            getOptionSelected={(option, value) => option.value === value.value} // Compare by value
+                            size="small"
+                            error={errors.unitId}
+                        />
+                        {errors.unitId && (
+                            <Typography variant="caption" color="error">{errors.unitId}</Typography>
+                        )}
+
                     </Box>
                 </Grid>
             </Grid>
@@ -301,7 +433,6 @@ const Plant = () => {
                                 onClick={handleFormSubmit}
                                 variant="contained"
                                 backgroundColor={colors.navbar}
-                            // style={{ backgroundColor: "rgb(60,86,91)", fontSize: "12px", color: "white" }}
                             />
                         </Box>
                         <Box>
@@ -309,10 +440,10 @@ const Plant = () => {
                                 name="Reset"
                                 size="small"
                                 type="submit"
+                                onClick={handleReset}
                                 color="success"
                                 variant="contained"
                                 style={styles.resetButton}
-                            // style={{ backgroundColor: "rgb(60,86,91)", color: "red" }}
                             />
                         </Box>
                         <Box>
@@ -326,7 +457,6 @@ const Plant = () => {
                     </Box>
                 </Grid>
             </Grid>
-
         </>
     );
 
@@ -410,7 +540,7 @@ const Plant = () => {
                 <Grid item lg={12} md={12} sm={12} xs={12}>
                     <Box boxShadow={3} borderRadius={2} backgroundColor={colors.navbar} height="35px" borderWidth="0">
                         <Box display="flex" justifyContent="space-between" alignItems="center">
-                            <Typography ml="10px" mt="8px" variant="h10" fontSize="10px" color="white">Filtered By : </Typography>
+                            <Typography ml="10px" mt="8px" variant="h10" fontSize="10px" color="white">Filtered By : Active </Typography>
                             {/* <Typography mr="10px" variant="h10" color="white">Count = 0 </Typography> */}
                         </Box>
                     </Box>
@@ -421,11 +551,18 @@ const Plant = () => {
                             columns={columns}
                             data={filteredData}
                             onSearch={handleSearch}
+                            pagination
+                            paginationServer
+                            paginationTotalRows={totalRows}
+                            onChangePage={handlePageChange}
+                            onChangeRowsPerPage={handleRowsPerPageChange}
                             copyEnabled={true}
                             onCopy={handleCopy}
                             downloadEnabled={true}
                             onSelectedRowsChange={(selected) => setSelectedRows(selected.selectedRows)}
                             onDownloadXLSX={handleDownloadXLSX}
+                            paginationPerPageOptions={[10, 20, 30]}
+                            paginationRowsPerPageOptionsLabel={`Rows per page: ${rowsPerPage} (${currentPage * rowsPerPage - rowsPerPage + 1}-${Math.min(currentPage * rowsPerPage, totalRows)} of ${totalRows})`}
                         />
                     </Box>
                 </Grid>

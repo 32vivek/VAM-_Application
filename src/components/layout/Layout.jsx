@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useEffect } from 'react';
 import { styled, useTheme } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import MuiDrawer from '@mui/material/Drawer';
@@ -35,6 +35,7 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import Footer from "./Footer";
 import Cookies from 'js-cookie';
 import colors from "../.././pages/colors";
+
 const drawerWidth = 240;
 
 const openedMixin = (theme) => ({
@@ -103,6 +104,10 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
     }),
 );
 
+
+
+
+
 export default function MiniDrawer() {
     const theme = useTheme();
     const [open, setOpen] = React.useState(false);
@@ -153,25 +158,16 @@ export default function MiniDrawer() {
         }
     };
 
+
+
     const handleLogout = () => {
-        // const cookieOptions = { path: '/' }; // Adjust the path and domain if necessary
-        // console.log('Before removing cookies:');
-        // console.log('Access Token:', Cookies.get('token'));
-        // console.log('Refresh Token:', Cookies.get('refreshToken'));
 
-        // Remove the cookies
-        // Cookies.remove('token');
-        // Cookies.remove('refreshToken', cookieOptions);
-
-        // Check if the cookies are removed
-        // console.log('After removing cookies:');
-        // console.log('Access Token:', Cookies.get('token'));
-        // console.log('Refresh Token:', Cookies.get('refreshToken'));
-
-        // Navigate to the desired route after logout
         localStorage.removeItem('token')
         navigate('/');
     };
+
+
+
 
     const isActiveRoute = (route) => location.pathname.startsWith(route);
 

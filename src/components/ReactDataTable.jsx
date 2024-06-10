@@ -3,7 +3,7 @@ import DataTable from "react-data-table-component";
 import { Box, IconButton, CircularProgress, createTheme, ThemeProvider, Tooltip } from "@mui/material";
 import { FileCopy, GetApp } from '@mui/icons-material'; // Import icons for copy, download as XLSX
 
-const CustomDataTable = ({ columns, data, onSearch, copyEnabled, onCopy, downloadEnabled, onDownloadXLSX }) => {
+const CustomDataTable = ({ columns, data, onSearch, copyEnabled, onCopy, downloadEnabled, onDownloadXLSX, paginationTotalRows, onChangePage, onChangeRowsPerPage }) => {
     const [loading, setLoading] = useState(true);
 
     const tableCustomStyles = {
@@ -114,6 +114,11 @@ const CustomDataTable = ({ columns, data, onSearch, copyEnabled, onCopy, downloa
                         highlightOnHover
                         striped
                         dense
+
+                        paginationServer
+                        paginationTotalRows={paginationTotalRows}
+                        onChangePage={onChangePage}
+                        onChangeRowsPerPage={onChangeRowsPerPage}
                         subHeader
                         subHeaderComponent={
                             <Box display="flex" alignItems="center">
