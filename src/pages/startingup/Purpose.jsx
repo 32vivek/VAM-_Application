@@ -6,7 +6,7 @@ import Autocmp from '../../components/AutoComplete';
 import ButtonComponent from '../../components/Button';
 import CustomDataTable from '../../components/ReactDataTable';
 import axios from 'axios';
-import { user_api, getAllPurpose } from '../../Api/Api';
+import { unitIdDD, getAllPurpose, deletePurpose, downloadPurpose } from '../../Api/Api';
 import FloatingButton from '../../components/FloatingButton';
 import ReusableRadioButton from '../../components/RadioButton';
 import { toast, ToastContainer, POSITION } from 'react-toastify';
@@ -16,12 +16,15 @@ import { saveAs } from 'file-saver';
 import { Search, Add, Close as CloseIcon, Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
 import colors from './../colors';
 import axiosInstance from '../../components/Auth';
+import CustomTimePicker from '../../components/TimePicker';
+import TimePicker from '../../components/TimePicker';
+import Swal from 'sweetalert2';
 
 
 const data = [
-    { label: 'HR', value: 'hr' },
-    { label: 'Engineering', value: 'engineering' },
-    { label: 'Marketing', value: 'marketing' },
+    { label: 'Visitor', value: 'visitor' },
+    { label: 'Vehicle', value: 'vehicle' },
+    // { label: 'Marketing', value: 'marketing' },
 ];
 
 
@@ -50,6 +53,11 @@ const Purpose = () => {
         notifyEmployee: []
     });
 
+    const [currentPage, setCurrentPage] = useState(1);
+    const [rowsPerPage, setRowsPerPage] = useState(10);
+    const [totalRows, setTotalRows] = useState(0);
+    const [unitIds, setUnitIds] = useState([]);
+
     const styles = {
         navbar: {
             backgroundColor: colors.navbar,
@@ -66,10 +74,10 @@ const Purpose = () => {
         },
     };
 
-    const [time, setTime] = useState(null);
+    const [selectedTime, setSelectedTime] = useState(null);
 
     const handleTimeChange = (newTime) => {
-        setTime(newTime);
+        setSelectedTime(newTime);
     };
 
     const floatingActionButtonOptions = selectedRows.length === 0 ? [
@@ -115,6 +123,7 @@ const Purpose = () => {
         setShowMoreFilters(!showMoreFilters);
     };
 
+
     const fetchData = async () => {
         try {
             const response = await axiosInstance.get(`${getAllPurpose}`, {
@@ -135,9 +144,23 @@ const Purpose = () => {
         }
     };
 
+
+
+    const fetchUnitIds = async () => {
+        try {
+            const response = await axiosInstance.get(`${unitIdDD}`);
+            const unitIdOptions = response.data.map(unit => ({ label: unit.id, value: unit.id }));
+            setUnitIds(unitIdOptions);
+            console.log('Unit IDs:', unitIdOptions); // Log unitIds after fetching
+
+        } catch (error) {
+            console.error('Error fetching unit IDs:', error.message);
+        }
+    };
     useEffect(() => {
-        fetchData();
-    }, []);
+        fetchData(currentPage, rowsPerPage);
+        fetchUnitIds();
+    }, [currentPage, rowsPerPage]);
 
     const handleSearch = (searchText) => {
         const filtered = visitorsData.filter(item =>
@@ -228,38 +251,74 @@ const Purpose = () => {
         });
     };
 
-    const handleDownloadXLSX = () => {
-        const worksheet = XLSX.utils.json_to_sheet(filteredData);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, worksheet, "Sheet1");
-        const wbout = XLSX.write(wb, { type: 'array', bookType: "xlsx" }); // Changed to 'array'
-        const blob = new Blob([wbout], { type: "application/octet-stream" });
-        const fileName = 'table_data.xlsx';
-        saveAs(blob, fileName);
-        toast.success("Table data downloaded as XLSX successfully!", {
-            autoClose: 3000,
-            position: "top-right",
-            style: {
-                // backgroundColor: 'rgb(60,86,91)',
-                color: "#0075a8"
-            },
-        });
+    const handlePageChange = (page) => {
+        setCurrentPage(page);
+        fetchData(page, rowsPerPage);
     };
 
-    const handleDelete = () => {
-        if (selectedRows.length > 0) {
-            const remainingData = filteredData.filter(item => !selectedRows.includes(item));
-            setFilteredData(remainingData);
-            setSelectedRows([]);
-            toast.success("Selected rows deleted successfully!", {
+    const handleRowsPerPageChange = (newPerPage) => {
+        setRowsPerPage(newPerPage);
+        setCurrentPage(1);
+        fetchData(1, newPerPage);
+    };
+
+    const handleDownloadXLSX = async () => {
+        try {
+            const response = await axiosInstance.get(downloadPurpose, {
+                responseType: 'arraybuffer',
+            });
+
+            const blob = new Blob([response.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+            saveAs(blob, 'purpose.xlsx');
+
+            toast.success("Purpose data downloaded successfully!", {
                 autoClose: 3000,
                 position: "top-right",
-                style: {
-                    // backgroundColor: 'rgb(60,86,91)',
-                    color: "#0075a8"
-                },
+            });
+        } catch (error) {
+            console.error('Error downloading purpose data:', error.message);
+            toast.error("Error downloading purpose data. Please try again later.", {
+                autoClose: 3000,
+                position: "top-right",
             });
         }
+    };
+
+    const handleDelete = async () => {
+        // if (selectedRows.length === 0) {
+        //     return;
+        // }
+        Swal.fire({
+            title: 'Are you sure?',
+            text: 'Are you sure you want to delete the selected plants?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!',
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                try {
+                    const deleteRequests = selectedRows.map(row => axiosInstance.delete(`${deletePurpose}/${row.id}`));
+                    await Promise.all(deleteRequests);
+                    toast.success("Plants deleted successfully!", {
+                        autoClose: 3000,
+                        position: "top-right",
+                        style: {
+                            backgroundColor: 'color: "#0075a8"',
+                        },
+                    });
+
+                    fetchData();
+                } catch (error) {
+                    toast.error(`Error deleting plants: ${error.message}`, {
+                        autoClose: 3000,
+                        position: "top-right",
+                    });
+                    console.error('Error deleting plants:', error.message);
+                }
+            }
+        });
     };
 
     const handleFloatingButtonClick = (label) => {
@@ -270,6 +329,13 @@ const Purpose = () => {
         } else if (label === 'Edit') {
             // Handle edit action here
         }
+    };
+
+    const handleAutocompleteChange = (event, newValue) => {
+        setFormData((prevFormData) => ({
+            ...prevFormData,
+            unitId: newValue ? newValue.value : null,
+        }));
     };
 
     const addInstantVisitors = (
@@ -285,12 +351,9 @@ const Purpose = () => {
                     <Box>
                         <Autocmp
                             options={data}
-                            name="visitorOrganization"
-                            label="Visitor Organization"
-                            value={formData.visitorOrganization}
-                            onChange={(event, newValue) => handleChange('visitorOrganization', newValue)}
-                            error={!!errors.visitorOrganization}
-                            helperText={errors.visitorOrganization}
+                            name="purposeFor"
+                            label="Purpose For"
+                            required
                             size="small"
                         // options={data}
                         />
@@ -299,13 +362,11 @@ const Purpose = () => {
                 <Grid item lg={6} md={6} xs={12} sm={12}>
                     <Box>
                         <Texxt
-                            label="Visitor Mobile"
+                            name="purposeBrief"
+                            label="Purpose"
                             required
-                            value={formData.visitorMobile}
-                            onChange={(event) => handleChange('visitorMobile', event.target.value)}
-                            error={!!errors.visitorMobile}
                             size="small"
-                            helperText={errors.visitorMobile}
+
                         />
                     </Box>
                 </Grid>
@@ -326,45 +387,58 @@ const Purpose = () => {
                         />
                     </Box>
                 </Grid>
+                <Grid item lg={6} md={6} sm={12} xs={12}>
+                    <Box>
+                        <Autocmp
+                            label="Unit ID"
+                            name="unitId"
+                            value={unitIds.find(option => option.value === formData.unitId) || null}
+                            onChange={handleAutocompleteChange}
+                            options={unitIds}
+                            getOptionLabel={(option) => option.value} // Display label in dropdown
+                            getOptionSelected={(option, value) => option.value === value.value} // Compare by value
+                            size="small"
+                        // error={errors.unitId}
+                        />
+                        {errors.unitId && (
+                            <Typography variant="caption" color="error">{errors.unitId}</Typography>
+                        )}
+
+                    </Box>
+                </Grid>
                 {showAdditionalFields && (
                     <>
                         <Grid item lg={6} md={6} xs={12} sm={12}>
                             <Box>
-                                <Texxt
-                                    label="Visitor Email"
+                                <TimePicker
+                                    label="Alert After"
+                                    value={selectedTime}
                                     required
-                                    size="small"
-                                    value={formData.visitorEmail}
-                                    onChange={(event) => handleChange('visitorEmail', event.target.value)}
-                                    error={!!errors.visitorEmail}
-                                    helperText={errors.visitorEmail}
+                                    onChange={handleTimeChange}
                                 />
                             </Box>
                         </Grid>
                         <Grid item lg={6} md={6} xs={12} sm={12}>
                             <Box>
                                 <Autocmp
-                                    options={data}
+                                    // options={department}
                                     size="small"
-                                    name="purpose"
-                                    label="Purpose of Meeting"
-                                    value={formData.purpose}
-                                    onChange={(event, newValue) => handleChange('purpose', newValue)}
-                                    error={!!errors.purpose}
-                                    helperText={errors.purpose}
-                                // options={data}
+                                    name="Department"
+                                    label="Department"
+                                    required
                                 />
                             </Box>
                         </Grid>
-                        {/* <Grid item lg={6} md={6} xs={12} sm={12}>
+                        <Grid item lg={6} md={6} xs={12} sm={12}>
                             <Box>
                                 <Autocmp
                                     label="Employee Name"
                                     required
                                     size="small"
+                                // data={employee}
                                 />
                             </Box>
-                        </Grid> */}
+                        </Grid>
                     </>
                 )}
             </Grid>
@@ -409,10 +483,8 @@ const Purpose = () => {
     const handleAddVisitorClick = () => {
         setOpen(true);
     };
-    const handleAutocompleteChange = (value) => {
-        // console.log("Selected value:", value);
-        // Handle the selected value here
-    };
+
+
 
     const handleSearchNumberChange = (event) => {
         const searchText = event.target.value;
@@ -514,6 +586,14 @@ const Purpose = () => {
                             onSelectedRowsChange={(selected) => setSelectedRows(selected.selectedRows)}
                             selectableRows
                             pagination
+                            paginationServer
+                            paginationTotalRows={totalRows}
+                            onChangePage={handlePageChange}
+                            onChangeRowsPerPage={handleRowsPerPageChange}
+                            copyEnabled={true}
+                            onCopy={handleCopy}
+                            downloadEnabled={true}
+                            onDownloadXLSX={handleDownloadXLSX}
                             selectableRowsHighlight
                         />
                     </Box>

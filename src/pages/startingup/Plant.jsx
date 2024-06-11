@@ -6,7 +6,7 @@ import Autocmp from '../../components/AutoComplete';
 import ButtonComponent from '../../components/Button';
 import CustomDataTable from '../../components/ReactDataTable';
 import axios from 'axios';
-import { user_api, getAllPlants, createPlants, unitIdDD, deletePlants, downloadPlants } from '../../Api/Api';
+import { user_api, getAllPlants, createPlants, unitIdDD, deletePlants, downloadPlants, updatePlants } from '../../Api/Api';
 import FloatingButton from '../../components/FloatingButton';
 import { toast, ToastContainer, POSITION } from 'react-toastify';
 import Texxt from '../../components/Textfield';
@@ -48,11 +48,13 @@ const Plant = () => {
 
     const [unitIds, setUnitIds] = useState([]);
 
+    const [isEditing, setIsEditing] = useState(false);
+    const [plantToEdit, setPlantToEdit] = useState(null);
 
     const floatingActionButtonOptions = selectedRows.length === 0 ? [
         { label: 'Add', icon: <Add /> },
     ] : selectedRows.length === 1 ? [
-        // { label: 'Edit', icon: <EditIcon /> },
+        { label: 'Edit', icon: <EditIcon /> },
         { label: 'Delete', icon: <DeleteIcon /> },
     ] : [
         { label: 'Delete', icon: <DeleteIcon /> },
@@ -118,7 +120,7 @@ const Plant = () => {
     const fetchUnitIds = async () => {
         try {
             const response = await axiosInstance.get(`${unitIdDD}`);
-            const unitIdOptions = response.data.map(unit => ({ label: unit.name, value: unit.id }));
+            const unitIdOptions = response.data.map(unit => ({ label: unit.id, value: unit.id }));
             setUnitIds(unitIdOptions);
             console.log('Unit IDs:', unitIdOptions); // Log unitIds after fetching
 
@@ -196,6 +198,13 @@ const Plant = () => {
 
     const handleCloseDrawer = () => {
         setOpen(false);
+        setIsEditing(false);
+        setFormData({
+            plantName: "",
+            plantBrief: "",
+            unitId: "",
+            status: true,
+        });
     };
 
 
@@ -219,14 +228,28 @@ const Plant = () => {
 
         setIsSubmitting(true);
         try {
-            const response = await axiosInstance.post(createPlants, formData);
-            toast.success("Plant added successfully!", {
-                autoClose: 3000,
-                position: "top-right",
-                style: {
-                    backgroundColor: 'color: "#0075a8"',
-                },
-            });
+            if (isEditing) {
+                // Update existing plant
+                const response = await axiosInstance.put(`${updatePlants}/${plantToEdit.id}`, formData);
+                toast.success("Plant updated successfully!", {
+                    autoClose: 3000,
+                    position: "top-right",
+                    style: {
+                        backgroundColor: 'color: "#0075a8"',
+                    },
+                });
+            } else {
+                // Create new plant
+                const response = await axiosInstance.post(createPlants, formData);
+                toast.success("Plant added successfully!", {
+                    autoClose: 3000,
+                    position: "top-right",
+                    style: {
+                        backgroundColor: 'color: "#0075a8"',
+                    },
+                });
+            }
+
             fetchData();
             handleCloseDrawer();
             setFormData({
@@ -235,16 +258,18 @@ const Plant = () => {
                 unitId: "",
                 status: true,
             });
+            setIsEditing(false);
         } catch (error) {
-            toast.error(`Error adding plant: ${error.message}`, {
+            toast.error(`Error ${isEditing ? 'updating' : 'adding'} plant: ${error.message}`, {
                 autoClose: 3000,
                 position: "top-right",
             });
-            console.error('Error adding plant:', error.message);
+            console.error(`Error ${isEditing ? 'updating' : 'adding'} plant:`, error.message);
         } finally {
             setIsSubmitting(false);
         }
     };
+
     const handleCopy = () => {
         const dataString = filteredData.map(row => Object.values(row).join('\t')).join('\n');
         navigator.clipboard.writeText(dataString);
@@ -280,7 +305,6 @@ const Plant = () => {
     };
 
 
-
     const handleSearchNumberChange = (event) => {
         const searchText = event.target.value;
         setSearchNumber(searchText);
@@ -293,10 +317,8 @@ const Plant = () => {
 
     const handleDelete = async () => {
         if (selectedRows.length === 0) {
-
             return;
         }
-
         Swal.fire({
             title: 'Are you sure?',
             text: 'Are you sure you want to delete the selected plants?',
@@ -329,10 +351,6 @@ const Plant = () => {
             }
         });
     };
-
-
-
-
 
     const styles = {
         navbar: {
@@ -409,8 +427,8 @@ const Plant = () => {
                             value={unitIds.find(option => option.value === formData.unitId) || null}
                             onChange={handleAutocompleteChange}
                             options={unitIds}
-                            getOptionLabel={(option) => option.value} // Display label in dropdown
-                            getOptionSelected={(option, value) => option.value === value.value} // Compare by value
+                            getOptionLabel={(option) => option.value}
+                            getOptionSelected={(option, value) => option.value === value.value}
                             size="small"
                             error={errors.unitId}
                         />
@@ -463,17 +481,29 @@ const Plant = () => {
     const handleAddVisitorClick = () => {
         setOpen(true);
     };
+
     const handleFloatingButtonClick = (label) => {
         if (label === 'Add') {
             handleAddVisitorClick();
         } else if (label === 'Delete') {
             handleDelete();
         } else if (label === 'Edit') {
-            // Handle edit action here
+            handleEdit();
         }
     };
 
-
+    const handleEdit = () => {
+        const plant = selectedRows[0];
+        setPlantToEdit(plant);
+        setFormData({
+            plantName: plant.plantName,
+            plantBrief: plant.plantBrief,
+            unitId: plant.unitId,
+            status: plant.status,
+        });
+        setIsEditing(true);
+        setOpen(true);
+    };
 
     return (
         <>

@@ -433,6 +433,13 @@ export default function MiniDrawer() {
                                 >
                                     <ListItemText primary="Vehicle Licence" />
                                 </ListItemButton>
+                                <ListItemButton
+                                    sx={{ pl: 4 }}
+                                    onClick={() => handleItemClick('/startingup/vehicleentry')}
+                                    selected={isActiveRoute('/startingup/vehicleentry')}
+                                >
+                                    <ListItemText primary="Vehicle Entry" />
+                                </ListItemButton>
                             </List>
                         </Collapse>
                     </ListItem>

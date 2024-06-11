@@ -5,6 +5,7 @@ export const userDetails = "http://localhost:8080/api/get-user-details"
 export const auth_apiRefresh = "http://localhost:8080/api/regenerate-token"
 export const createUnit = "http://localhost:8080/api/units/create-unit"
 export const getUnit = "http://localhost:8080/api/units/get-all-units"
+export const downloadUnit = "http://localhost:8080/api/units/download-excel-data"
 export const updateUnit = "http://localhost:8080/api/units/update-unit"
 export const deleteUnit = "http://localhost:8080/api/units/delete-unit"
 export const getDL = "http://localhost:8080/api/driving-licence/get-all"
@@ -12,8 +13,11 @@ export const getAllPlants = "http://localhost:8080/api/plants/get-all-plants"
 export const createPlants = "http://localhost:8080/api/plants/create-plant"
 export const deletePlants = "http://localhost:8080/api/plants/delete-plant"
 export const downloadPlants = "http://localhost:8080/api/plants/download-excel-data"
-
+export const updatePlants = "http://localhost:8080/api/plants/update-plant"
 export const getAllPurpose = "http://localhost:8080/api/purposes/get-all-purposes"
+export const deletePurpose = "http://localhost:8080/api/purposes/delete-purpose"
+export const downloadPurpose = "http://localhost:8080/api/purposes/download-excel-data"
+
 
 
 
@@ -30,5 +34,10 @@ export default {
     unitIdDD,
     deletePlants,
     downloadPlants,
-    getAllPurpose
+    getAllPurpose,
+    downloadUnit,
+    updatePlants,
+    updateUnit,
+    deletePurpose,
+    downloadPurpose
 };

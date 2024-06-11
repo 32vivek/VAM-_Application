@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { Box, Grid, IconButton, Typography } from '@mui/material';
-import { Search } from '@mui/icons-material';
+import { Box, Grid, IconButton, Button, Typography } from '@mui/material';
 import Texxt from '../../components/Textfield';
 import ReusableRadioButton from '../../components/RadioButton';
 import Autocmp from '../../components/AutoComplete';
@@ -9,6 +8,7 @@ import { toast, ToastContainer } from 'react-toastify';
 import CustomCheckbox from './../../components/CheckBox';
 import colors from '../colors';
 
+import { Search as SearchIcon } from '@mui/icons-material';
 const departmentOptions = [
     { label: 'HR', value: 'hr' },
     { label: 'Engineering', value: 'engineering' },
@@ -173,7 +173,7 @@ const AddInstantVisitors = () => {
             <Box sx={{}}>
                 <Grid container spacing={1} sx={{ p: 1 }}>
                     <Grid item lg={10} md={10} sm={12} xs={12}>
-                        <Box display="flex" style={{ gap: "10px" }}>
+                        <Box style={{ gap: "10px" }}>
                             <Texxt
                                 name="number"
                                 size="small"
@@ -189,6 +189,14 @@ const AddInstantVisitors = () => {
                             {/* <IconButton color="primary">
                                 <Search />
                             </IconButton> */}
+                        </Box>
+
+                    </Grid>
+                    <Grid item lg={1} md={1} sm={12} xs={12}>
+                        <Box marginTop="10px">
+                            <Button variant="contained">
+                                <SearchIcon />
+                            </Button>
                         </Box>
                     </Grid>
                     <Grid item lg={6} md={6} xs={12} sm={12}>

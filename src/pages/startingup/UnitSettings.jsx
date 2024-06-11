@@ -9,7 +9,7 @@ import CustomDataTable from '../../components/ReactDataTable';
 import FloatingButton from '../../components/FloatingButton';
 import Texxt from '../../components/Textfield';
 import axios from 'axios';
-import { getUnit, createUnit, deleteUnit, unitIdDD, } from '../../Api/Api';
+import { getUnit, createUnit, deleteUnit, unitIdDD, downloadUnit, updateUnit } from '../../Api/Api';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
 import { Search, Add, Close as CloseIcon, Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
@@ -46,7 +46,7 @@ const UnitSettings = () => {
     const floatingActionButtonOptions = selectedRows.length === 0 ? [
         { label: 'Add', icon: <Add /> },
     ] : selectedRows.length === 1 ? [
-        // { label: 'Edit', icon: <EditIcon /> },
+        { label: 'Edit', icon: <EditIcon /> },
         { label: 'Delete', icon: <DeleteIcon /> },
     ] : [
         { label: 'Delete', icon: <DeleteIcon /> },
@@ -72,6 +72,7 @@ const UnitSettings = () => {
             setOpen(true);
         }
     };
+
 
 
 
@@ -156,7 +157,7 @@ const UnitSettings = () => {
     const fetchUnitIds = async () => {
         try {
             const response = await axiosInstance.get(unitIdDD);
-            const unitIdOptions = response.data.map(unit => ({ label: unit.name, value: unit.id }));
+            const unitIdOptions = response.data.map(unit => ({ label: unit.id, value: unit.id }));
             setUnitIds(unitIdOptions);
         } catch (error) {
             console.error('Error fetching unit IDs:', error.message);
@@ -271,17 +272,31 @@ const UnitSettings = () => {
         const { unitName, unitIp, unitCity, passAddress, passDisclaimer, unitId } = formData;
 
         try {
-            await axiosInstance.post(createUnit, {
-                unitName,
-                unitIp,
-                unitCity,
-                passAddress,
-                passDisclaimer,
-                unitId,
-                status: true,
-            });
-
-            toast.success('Form submitted successfully', { autoClose: 1000 });
+            if (selectedRowData) {
+                // If there's selectedRowData, we're editing an existing unit
+                await axiosInstance.put(`${updateUnit}/${selectedRowData.id}`, {
+                    unitName,
+                    unitIp,
+                    unitCity,
+                    passAddress,
+                    passDisclaimer,
+                    unitId,
+                    status: true,
+                });
+                toast.success('Unit updated successfully', { autoClose: 1000 });
+            } else {
+                // Otherwise, we're creating a new unit
+                await axiosInstance.post(createUnit, {
+                    unitName,
+                    unitIp,
+                    unitCity,
+                    passAddress,
+                    passDisclaimer,
+                    unitId,
+                    status: true,
+                });
+                toast.success('Unit created successfully', { autoClose: 1000 });
+            }
             fetchData(currentPage, rowsPerPage);
             setFormData({
                 unitName: "",
@@ -298,6 +313,7 @@ const UnitSettings = () => {
             toast.error('Failed to submit form');
         }
     };
+
 
 
 
@@ -326,21 +342,26 @@ const UnitSettings = () => {
         });
     }
 
-    const handleDownloadXLSX = () => {
-        const worksheet = XLSX.utils.json_to_sheet(filteredData);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, worksheet, "Sheet1");
-        const wbout = XLSX.write(wb, { type: 'array', bookType: "xlsx" });
-        const blob = new Blob([wbout], { type: "application/octet-stream" });
-        const fileName = 'table_data.xlsx';
-        saveAs(blob, fileName);
-        toast.success("Table data downloaded as XLSX successfully!", {
-            autoClose: 3000,
-            position: "top-right",
-            style: {
-                color: "#0075a8"
-            },
-        });
+    const handleDownloadXLSX = async () => {
+        try {
+            const response = await axiosInstance.get(downloadUnit, {
+                responseType: 'arraybuffer',
+            });
+
+            const blob = new Blob([response.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+            saveAs(blob, 'unit.xlsx');
+
+            toast.success("Unit data downloaded successfully!", {
+                autoClose: 3000,
+                position: "top-right",
+            });
+        } catch (error) {
+            console.error('Error downloading Unit data:', error.message);
+            toast.error("Error downloading Unit data. Please try again later.", {
+                autoClose: 3000,
+                position: "top-right",
+            });
+        }
     };
 
     const handleDelete = async () => {

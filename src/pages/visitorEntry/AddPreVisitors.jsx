@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, Grid, Typography, IconButton } from '@mui/material';
+import { Box, Grid, Typography, IconButton, Button } from '@mui/material';
 import { Search } from '@mui/icons-material';
 import Texxt from '../../components/Textfield';
 import CustomCheckbox from '../../components/CheckBox';
@@ -8,7 +8,7 @@ import Autocmp from '../../components/AutoComplete';
 import ButtonComponent from '../../components/Button';
 import { toast, ToastContainer, POSITION } from 'react-toastify';
 import colors from '../colors';
-
+import { Search as SearchIcon } from '@mui/icons-material';
 
 
 const departmentOptions = [
@@ -195,6 +195,13 @@ const AddPreVisitors = () => {
                                 <Search />
                             </IconButton> */}
 
+                        </Box>
+                    </Grid>
+                    <Grid item lg={1} md={1} sm={12} xs={12}>
+                        <Box marginTop="10px">
+                            <Button variant="contained">
+                                <SearchIcon />
+                            </Button>
                         </Box>
                     </Grid>
                     <Grid item lg={6} md={6} xs={12} sm={12}>

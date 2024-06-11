@@ -32,6 +32,10 @@ import UserProfile from './pages/userdetails/userporfile/UserProfile';
 import BasicDetails from './pages/userdetails/userporfile/BasicDetails';
 import ResetPassword from './pages/userdetails/userporfile/ResetPassword';
 import EditUser from './pages/userdetails/userporfile/EditUser';
+import VehicleEntry from './pages/vehicleentry/VehicleEntry';
+import WithMaterial from './pages/vehicleentry/W-Material';
+import WithoutMaterial from './pages/vehicleentry/W-Out-Material';
+import Reporting from './pages/vehicleentry/Reporting';
 
 function App() {
   return (
@@ -75,6 +79,11 @@ function App() {
                 <Route path='/userprofile/edituser' element={<EditUser />} />
               </Route>
               <Route path='/userfeedback' element={<UserFeedback />} />
+              <Route path='/startingup/vehicleentry' element={<VehicleEntry />}>
+                <Route path='/startingup/vehicleentry' element={<WithMaterial />} />
+                <Route path='/startingup/vehicleentry/out' element={<WithoutMaterial />} />
+                <Route path='/startingup/vehicleentry/reporting' element={<Reporting />} />
+              </Route>
             </Route>
           </Route>
         </Routes>
