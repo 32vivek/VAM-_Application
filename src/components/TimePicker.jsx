@@ -1,33 +1,21 @@
-import React, { useState } from 'react';
-import PropTypes from 'prop-types';
-import { Form } from 'react-bootstrap';
+import React from 'react';
+import TextField from '@mui/material/TextField';
+import { LocalizationProvider, TimePicker } from '@mui/x-date-pickers';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns'; // Import as named export
 
-const TimePicker = ({ label, value, onChange }) => {
-    const [selectedTime, setSelectedTime] = useState(value);
-
-    const handleTimeChange = (e) => {
-        const newTime = e.target.value;
-        setSelectedTime(newTime);
-        onChange(newTime);
-    };
-
+const ReusableTimePicker = ({ label, value, onChange }) => {
     return (
-        <Form.Group className="mb-3">
-            <Form.Label className="me-3">{label}</Form.Label>
-            &nbsp;&nbsp;
-            <Form.Control
-                type="time"
-                value={selectedTime}
-                onChange={handleTimeChange}
+        <LocalizationProvider dateAdapter={AdapterDateFns}>
+            <TimePicker
+                label={label}
+                value={value}
+                size="small"
+                onChange={onChange}
+                renderInput={(params) => <TextField {...params} />}
+                ampm={false}
             />
-        </Form.Group>
+        </LocalizationProvider>
     );
 };
 
-TimePicker.propTypes = {
-    label: PropTypes.string.isRequired,
-    value: PropTypes.string.isRequired,
-    onChange: PropTypes.func.isRequired,
-};
-
-export default TimePicker;
+export default ReusableTimePicker;

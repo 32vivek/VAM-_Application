@@ -8,7 +8,7 @@ import RemoveIcon from '@mui/icons-material/Remove';
 import Texxt from '../../../components/Textfield';
 import Autocmp from '../../../components/AutoComplete';
 import CustomDataTable from './../../../components/ReactDataTable';
-import { user_api } from '../../../Api/Api';
+import { getDepartmentsData, user_api } from '../../../Api/Api';
 import axios from 'axios';
 import FloatingButton from '../../../components/FloatingButton';
 import { Add } from "@mui/icons-material";
@@ -20,6 +20,9 @@ import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
 import ReusableCheckbox from '../../../components/CheckBox';
 import colors from './../../colors';
+import axiosInstance from '../../../components/Auth';
+import MyTable from '../../../components/ReactTable';
+import StickyHeadTable from '../../../components/ReactTable';
 
 const dateOptions = [
     { label: "Date Wise", value: "dateWise" },
@@ -57,7 +60,14 @@ const userTypes = [
     { label: "Admin", value: 'admin' }
 ]
 
-
+const columns = [
+    { id: 'departmentName', label: 'Department Name', minWidth: 170 },
+    { id: 'departmentCode', label: 'Department Name', minWidth: 100 },
+    { id: 'departmentName', label: 'Department Name', minWidth: 170 },
+    { id: 'departmentCode', label: 'Department Name', minWidth: 100 }, { id: 'departmentName', label: 'Department Name', minWidth: 170 },
+    { id: 'departmentCode', label: 'Department Name', minWidth: 100 }, { id: 'departmentName', label: 'Department Name', minWidth: 170 },
+    { id: 'departmentCode', label: 'Department Name', minWidth: 100 },
+];
 
 const ViewContact = () => {
 
@@ -70,6 +80,7 @@ const ViewContact = () => {
     const [createUserChecked, setCreateUserChecked] = useState(false);
     const [information, setInformation] = useState(false);
 
+    const [data, setData] = useState([]); // Example state initialization
 
 
     const [formData, setFormData] = useState({
@@ -95,9 +106,7 @@ const ViewContact = () => {
         setOpen(false);
     };
 
-    const handleRefresh = () => {
-        console.log('Refresh clicked');
-    };
+
 
     const handleChange = (e, name, value) => {
         if (e && e.target && e.target.name) {
@@ -115,35 +124,24 @@ const ViewContact = () => {
     };
 
 
-    const handleInputChange = (name, value) => {
-        setFormData({
-            ...formData,
-            [name]: value
-        });
-    };
 
-    const columns = [
-        {
-            name: 'Select',
-            selector: 'select',
-            cell: (row) => <input type="checkbox" checked={row.selected} onChange={() => handleRowSelected(row)} />,
-            sortable: false,
-        },
-        { name: 'name', selector: row => row.name, sortable: true },
-        { name: 'email', selector: row => row.email, sortable: true },
-        { name: 'number', selector: row => row.number, sortable: true },
-        { name: 'address', selector: row => row.address, sortable: true },
-        { name: 'department', selector: row => row.department, sortable: true },
-        { name: 'number', selector: row => row.number, sortable: true },
-    ];
+
+
+
 
     const fetchData = async () => {
         try {
-            const response = await axios.get(user_api);
-            setVisitorsData(response.data);
-            setFilteredData(response.data);
+            // console.log(`Fetching data for page ${page} with size ${size}`);
+            const response = await axiosInstance.get(`${getDepartmentsData}`, {
+
+            });
+            console.log('API Response:', response.data); // Log the response data
+            const activePlants = response.data.content.filter(plant => plant.status === true);
+            setFilteredData(activePlants);
+            setVisitorsData(activePlants);
+
         } catch (error) {
-            console.error('Error fetching data:', error);
+            console.error('Error fetching data:', error.message);
         }
     };
 
@@ -165,13 +163,12 @@ const ViewContact = () => {
     };
 
     const handleRowSelected = (row) => {
-        const updatedData = filteredData.map((item) =>
+        const updatedData = data.map(item =>
             item === row ? { ...item, selected: !item.selected } : item
         );
-        setFilteredData(updatedData);
-        const selected = updatedData.filter(item => item.selected);
-        setSelectedRows(selected);
+        setData(updatedData);  // Assuming 'setData' is your state updater for 'data'
     };
+
 
     const handleSearch = (searchText) => {
         const filtered = visitorsData.filter(item =>
@@ -191,94 +188,10 @@ const ViewContact = () => {
         setInformation(checked);
     };
 
-    const validateForm = () => {
-        const newErrors = {};
-
-        if (!formData.employeeId) {
-            newErrors.employeeId = 'Employee ID is required';
-        }
-        if (!formData.department) {
-            newErrors.department = 'Department is required';
-        }
-        if (!formData.contactName) {
-            newErrors.contactName = 'Contact Name is required';
-        }
-        if (!formData.communicationName) {
-            newErrors.communicationName = 'Communication Name is required';
-        }
-        if (!formData.mobileNumber) {
-            newErrors.mobileNumber = 'Mobile Number is required';
-        } else if (!/^\d{10}$/.test(formData.mobileNumber)) {
-            newErrors.mobileNumber = 'Mobile Number should be 10 digits long';
-        }
-        if (!formData.emailId) {
-            newErrors.emailId = 'Email is required';
-        } else if (!/^\S+@\S+\.\S+$/.test(formData.emailId)) {
-            newErrors.emailId = 'Invalid email address';
-        }
-        if (createUserChecked) {
-            if (!formData.userType) {
-                newErrors.userType = 'User Type is required';
-            }
-            if (!formData.loginId) {
-                newErrors.loginId = 'Login ID is required';
-            }
-            if (!formData.password) {
-                newErrors.password = 'Password is required';
-            }
-            if (formData.password !== formData.confirmPassword) {
-                newErrors.confirmPassword = 'Passwords do not match';
-            }
-            if (!formData.accessRights) {
-                newErrors.accessRights = 'Access Rights is required';
-            }
-        }
-
-        setErrors(newErrors);
-        return Object.keys(newErrors).length === 0;
-    };
 
 
-    const handleFormSubmit = (e) => {
-        e.preventDefault();
 
-        if (validateForm()) {
-            console.log('Form Data:', formData);
 
-            // Clear form fields
-            setFormData({
-                department: null,
-                contactName: '',
-                communicationName: '',
-                mobileNumber: '',
-                emailId: '',
-                userType: null,
-                loginId: '',
-                password: '',
-                confirmPassword: '',
-                accessRights: null,
-            });
-
-            // For demonstration, always showing success. Implement actual form validation and error handling as needed.
-            toast.success("Form submitted successfully!", {
-                autoClose: 3000,
-                position: "top-right",
-                style: {
-                    // backgroundColor: "rgb(60,86,91)",
-                    color: "#0075a8"
-                },
-            });
-        } else {
-            toast.error("Please correct the highlighted errors.", {
-                autoClose: 3000,
-                position: "top-right",
-                style: {
-                    // backgroundColor: "rgb(60,86,91)",
-                    color: "#0075a8"
-                },
-            });
-        }
-    };
 
     const handleDelete = () => {
         if (selectedRows.length > 0) {
@@ -544,7 +457,7 @@ const ViewContact = () => {
                         <Grid item lg={12} md={12} sm={12} xs={12}>
                             <Box display="flex" justifyContent="center" m={2} style={{ gap: "10px" }}>
                                 <ButtonComponent
-                                    onClick={handleFormSubmit}
+                                    // onClick={handleFormSubmit}
                                     variant="contained"
                                     backgroundColor={colors.navbar}
                                     color="primary"
@@ -573,36 +486,9 @@ const ViewContact = () => {
         </>
     );
 
-    const handleCopy = () => {
-        const dataString = filteredData.map(row => Object.values(row).join('\t')).join('\n');
-        navigator.clipboard.writeText(dataString);
-        toast.success("Table data copied successfully!", {
-            autoClose: 3000,
-            position: "top-right",
-            style: {
-                // backgroundColor: "rgb(60,86,91)",
-                color: "#0075a8"
-            },
-        });
-    };
 
-    const handleDownloadXLSX = () => {
-        const worksheet = XLSX.utils.json_to_sheet(filteredData);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, worksheet, "Sheet1");
-        const wbout = XLSX.write(wb, { type: 'array', bookType: "xlsx" }); // Changed to 'array'
-        const blob = new Blob([wbout], { type: "application/octet-stream" });
-        const fileName = 'table_data.xlsx';
-        saveAs(blob, fileName);
-        toast.success("Table data downloaded as XLSX successfully!", {
-            autoClose: 3000,
-            position: "top-right",
-            style: {
-                // backgroundColor: "rgb(60,86,91)",
-                color: "#0075a8"
-            },
-        });
-    };
+
+
 
     const handleAddVisitorClick = () => {
         setOpen(true);
@@ -681,16 +567,7 @@ const ViewContact = () => {
                 </Grid>
                 <Grid item lg={12} md={12} sm={12} xs={12}>
                     <Box width="100%" boxShadow={3} padding={2} borderRadius={2} bgcolor='white'>
-                        <CustomDataTable
-                            columns={columns}
-                            data={filteredData}
-                            onSearch={handleSearch}
-                            copyEnabled={true}
-                            onCopy={handleCopy} onSelectedRowsChange={(selected) => setSelectedRows(selected.selectedRows)}
-
-                            downloadEnabled={true}
-                            onDownloadXLSX={handleDownloadXLSX}
-                        />
+                        <StickyHeadTable columns={columns} rows={filteredData} />
                     </Box>
                 </Grid>
 

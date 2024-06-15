@@ -11,7 +11,7 @@ import Autocmp from "../../components/AutoComplete";
 import ButtonComponent from "../../components/Button";
 import CustomDataTable from "../../components/ReactDataTable";
 import axios from "axios";
-import { getDL, user_api } from "../../Api/Api";
+import { getDLData, addDLData, unitIdDD, downloadDLData, deleteDLData, updateDLData } from "../../Api/Api";
 import FloatingButton from "../../components/FloatingButton";
 import { toast, ToastContainer } from "react-toastify";
 import Texxt from "../../components/Textfield";
@@ -24,11 +24,14 @@ import {
     Edit as EditIcon,
     Delete as DeleteIcon,
 } from "@mui/icons-material";
+import Swal from 'sweetalert2';
+
 import DatePickers from "../../components/DateRangePicker";
 import InputFileUpload from "../../components/FileUpload";
 import colors from "../colors";
 import Cookies from 'js-cookie';
 import axiosInstance from "../../components/Auth";
+import { format } from 'date-fns';
 
 const statuss = [
     {
@@ -52,15 +55,22 @@ const DriverLicence = () => {
     const [showAdditionalFields, setShowAdditionalFields] = useState(false);
     const [attachedFile, setAttachedFile] = useState(null);
     const [selectedStatus, setSelectedStatus] = useState([statuss[0]]);
-    const [formData, setFormData] = useState({
+    const initialFormData = {
         driverName: "",
         driverMobile: "",
         licence: "",
         brief: "",
         expDate: null,
-        fromDate: null,
-        toDate: null
-    });
+        unitId: null,
+    };
+    const [currentPage, setCurrentPage] = useState(1);
+    const [rowsPerPage, setRowsPerPage] = useState(10);
+    const [totalRows, setTotalRows] = useState(0);
+    const [editingRowId, setEditingRowId] = useState(null);
+    const [isEditing, setIsEditing] = useState(false);
+    const [formData, setFormData] = useState(initialFormData);
+    const [unitIds, setUnitIds] = useState([]);
+
     const [searchNumber, setSearchNumber] = useState('');
 
 
@@ -80,8 +90,12 @@ const DriverLicence = () => {
             cell: (row) => <input type="checkbox" checked={row.selected} onChange={() => handleRowSelected(row)} />,
             sortable: false,
         },
-        { name: 'Created At', selector: row => row.createdAt, sortable: true },
-        { name: 'Updated At', selector: row => row.updatedAt, sortable: true },
+        {
+            name: 'Created At',
+            selector: row => formatDate(row.createdAt),
+            sortable: true
+        },
+        { name: 'Brief', selector: row => row.brief, sortable: true },
         { name: 'Mobile No', selector: row => row.driverMobile, sortable: true },
         { name: 'Driver Name', selector: row => row.driverName, sortable: true },
         { name: 'Licence', selector: row => row.licence, sortable: true },
@@ -94,26 +108,78 @@ const DriverLicence = () => {
         // { name: 'unitId', selector: row => row.unitId, sortable: true },
     ];
 
-    const fetchData = async () => {
+    const fetchData = async (page, pageSize) => {
         try {
-            const response = await axiosInstance.get('http://localhost:8080/api/driving-licence/get-all');
-            console.log(response.data.content[0]); // Check if data is being logged correctly
-            setFilteredData(response.data.content);
-            setVisitorsData(response.data.content); // This might be needed for filtering
+            const response = await axiosInstance.get(`${getDLData}`, {
+                params: {
+                    page: page - 1,
+                    size: pageSize
+                }
+            });
+
+            // Filter active data
+            const activeData = response.data.content.filter(item => item.status === true);
+
+            // Update state with active data
+            setFilteredData(activeData);
+            setVisitorsData(response.data.content); // Optionally store all data for search purposes
+
+            // Update total rows count for pagination
+            setTotalRows(response.data.totalElements);
         } catch (error) {
             console.error('Error fetching data:', error.message);
         }
     };
 
+
+    const formatDate = (dateString) => {
+        const date = new Date(dateString);
+        const day = date.getDate().toString().padStart(2, '0');
+        const month = (date.getMonth() + 1).toString().padStart(2, '0');
+        const year = date.getFullYear().toString().slice(-2);
+        const hours = date.getHours().toString().padStart(2, '0');
+        const minutes = date.getMinutes().toString().padStart(2, '0');
+        const seconds = date.getSeconds().toString().padStart(2, '0');
+        return `${day}/${month}/${year}, ${hours}:${minutes}:${seconds}`;
+    };
+
+    const fetchUnitIds = async () => {
+        try {
+            const response = await axiosInstance.get(`${unitIdDD}`);
+            const unitIdOptions = response.data.map(unit => ({ label: unit.name, value: unit.id }));
+            setUnitIds(unitIdOptions);
+            console.log('Unit IDs:', unitIdOptions); // Log unitIds after fetching
+
+        } catch (error) {
+            console.error('Error fetching unit IDs:', error.message);
+        }
+    };
+
     useEffect(() => {
-        fetchData();
-    }, []);
+        fetchUnitIds();
+        fetchData(currentPage, rowsPerPage);
+    }, [currentPage, rowsPerPage]);
+
 
 
 
     const handleMoreFiltersClick = () => {
         setShowMoreFilters(!showMoreFilters);
     };
+
+    const handlePageChange = (page) => {
+        setCurrentPage(page);
+        fetchData(page, rowsPerPage);
+    };
+
+
+    const handleRowsPerPageChange = (newRowsPerPage) => {
+        setRowsPerPage(newRowsPerPage);
+        setCurrentPage(1); // Reset to first page
+        fetchData(1, newRowsPerPage);
+    };
+
+
 
 
 
@@ -183,42 +249,83 @@ const DriverLicence = () => {
         }
     };
 
-    const handleFormSubmit = (e) => {
+    const handleDateChange = (date) => {
+        if (date) {
+            setFormData((prevData) => ({
+                ...prevData,
+                expDate: date,
+            }));
+        }
+    };
+    const handleFormSubmit = async (e) => {
         e.preventDefault();
-
         if (validateForm()) {
+            try {
+                const formDataToSend = new FormData();
+                const licenceReqDto = {
+                    driverName: formData.driverName,
+                    driverMobile: formData.driverMobile,
+                    licence: formData.licence,
+                    brief: formData.brief,
+                    expDate: formData.expDate.target.value.substring(0, 10),
+                    unitId: formData.unitId,
+                };
 
-            console.log("Form Data:", formData, "Attached File:", attachedFile);
+                formDataToSend.append('licenceReqDto', JSON.stringify(licenceReqDto));
 
-            // Reset the form after successful submission
-            setFormData({
-                driverName: "",
-                driverMobile: "",
-                licence: "",
-                brief: "",
-                expDate: null,
-            });
-            setAttachedFile(null);
+                // Append file to form data only if attachedFile exists
+                if (attachedFile) {
+                    formDataToSend.append('file', attachedFile);
+                }
 
-            toast.success("Form submitted successfully!", {
-                autoClose: 3000,
-                position: "top-right",
-                style: {
-                    // backgroundColor: "rgb(60,86,91)",
-                    color: "#0075a8"
-                },
-            });
+                let response;
+                if (isEditing) {
+                    // Handle edit request
+                    response = await axiosInstance.put(`${updateDLData}/${editingRowId}`, formDataToSend, {
+                        headers: {
+                            'Content-Type': 'multipart/form-data',
+                        },
+                    });
+                } else {
+                    // Handle add request
+                    response = await axiosInstance.post(addDLData, formDataToSend, {
+                        headers: {
+                            'Content-Type': 'multipart/form-data',
+                        },
+                    });
+                }
+
+                if (response.status === 201 || response.status === 200) {
+                    setFormData(initialFormData);
+                    setAttachedFile(null);
+                    fetchData();
+                    toast.success(`${isEditing ? 'Updated' : 'Added'} successfully!`, {
+                        autoClose: 3000,
+                        position: 'top-right',
+                        style: { color: '#0075a8' },
+                    });
+                    setIsEditing(false); // Reset editing mode after successful submission
+                } else {
+                    throw new Error('Failed to submit form');
+                }
+            } catch (error) {
+                console.error('Error submitting form:', error.message);
+                toast.error(`Failed to ${isEditing ? 'update' : 'submit'} form. Please try again.`, {
+                    autoClose: 3000,
+                    position: 'top-right',
+                    style: { color: '#0075a8' },
+                });
+            }
         } else {
-            toast.error("Please fill all the required fields.", {
+            toast.error('Please fill all the required fields.', {
                 autoClose: 3000,
-                position: "top-right",
-                style: {
-                    // backgroundColor: "rgb(60,86,91)",
-                    color: "#0075a8"
-                },
+                position: 'top-right',
+                style: { color: '#0075a8' },
             });
         }
     };
+
+
 
     const handleCopy = () => {
         const dataString = filteredData
@@ -235,25 +342,37 @@ const DriverLicence = () => {
         });
     };
 
-    const handleDownloadXLSX = () => {
-        const worksheet = XLSX.utils.json_to_sheet(filteredData);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, worksheet, "Sheet1");
-        const wbout = XLSX.write(wb, { type: "array", bookType: "xlsx" });
-        const blob = new Blob([wbout], { type: "application/octet-stream" });
-        const fileName = "table_data.xlsx";
-        saveAs(blob, fileName);
-        toast.success("Table data downloaded as XLSX successfully!", {
-            autoClose: 3000,
-            position: "top-right",
-            sstyle: {
-                // backgroundColor: "rgb(60,86,91)",
-                color: "#0075a8"
-            },
-        });
+    const handleDownloadXLSX = async () => {
+        try {
+            const response = await axiosInstance.get(downloadDLData, {
+                responseType: 'arraybuffer',
+            });
+
+            const blob = new Blob([response.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+            saveAs(blob, 'DriverLicence.xlsx');
+
+            toast.success("DriverLicence data downloaded successfully!", {
+                autoClose: 3000,
+                position: "top-right",
+            });
+        } catch (error) {
+            console.error('Error downloading DriverLicence data:', error.message);
+            toast.error("Error downloading DriverLicence data. Please try again later.", {
+                autoClose: 3000,
+                position: "top-right",
+            });
+        }
+    };
+
+    const handleAutocompleteChange = (event, newValue) => {
+        setFormData((prevFormData) => ({
+            ...prevFormData,
+            unitId: newValue ? newValue.value : null,
+        }));
     };
 
     const handleFileSelect = (file) => {
+        console.log("file new", file)
         setAttachedFile(file);
     };
 
@@ -281,31 +400,63 @@ const DriverLicence = () => {
         });
         setAttachedFile(null);
     }
-    const handleDelete = () => {
-        if (selectedRows.length > 0) {
-            const remainingData = filteredData.filter(item => !selectedRows.includes(item));
-            setFilteredData(remainingData);
-            setSelectedRows([]);
-            toast.success("Selected rows deleted successfully!", {
-                autoClose: 3000,
-                position: "top-right",
-                style: {
-                    // backgroundColor: "rgb(60,86,91)",
-                    color: "#0075a8"
-                },
-            });
+    const handleDelete = async () => {
+        if (selectedRows.length === 0) {
+            return;
         }
+        Swal.fire({
+            title: 'Are you sure?',
+            text: 'Are you sure you want to delete the selected plants?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!',
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                try {
+                    const deleteRequests = selectedRows.map(row => axiosInstance.delete(`${deleteDLData}/${row.id}`));
+                    await Promise.all(deleteRequests);
+                    toast.success("Driver Licence Data deleted successfully!", {
+                        autoClose: 3000,
+                        position: "top-right",
+                        style: {
+                            backgroundColor: 'color: "#0075a8"',
+                        },
+                    });
+
+                    setTotalRows(prevTotalRows => prevTotalRows - 1);
+
+                    // If deleting the last item on the current page, move to the previous page
+                    if (filteredData.length === 1 && currentPage > 1) {
+                        setCurrentPage(currentPage - 1);
+                        fetchData(currentPage - 1, rowsPerPage);
+                    } else {
+                        fetchData(currentPage, rowsPerPage);
+                    }
+                } catch (error) {
+                    toast.error(`Error deleting Driver Licence: ${error.message}`, {
+                        autoClose: 3000,
+                        position: "top-right",
+                    });
+                    console.error('Error deleting Driver Licence:', error.message);
+                }
+            }
+        });
     };
+
+
 
     const handleFloatingButtonClick = (label) => {
         if (label === 'Add') {
             handleAddVisitorClick();
         } else if (label === 'Delete') {
             handleDelete();
-        } else if (label === 'Edit') {
-            // Handle edit action here
+        } else if (label === 'Edit' && selectedRows.length === 1) {
+            handleEdit(selectedRows[0]);
         }
     };
+
 
     const handleInputChange = (event) => {
         const { name, value } = event.target;
@@ -327,6 +478,22 @@ const DriverLicence = () => {
         },
     };
 
+    const handleEdit = (row) => {
+        setEditingRowId(row.id);
+        setIsEditing(true);
+
+        setFormData({
+            driverName: row.driverName,
+            driverMobile: row.driverMobile,
+            licence: row.licence,
+            brief: row.brief,
+            expDate: format(new Date(row.expDate), 'MM-dd-yyyy'),
+            unitId: row.unitId,
+        });
+        setOpen(true);
+    };
+    console.log(formData, "date");
+
 
     const addInstantVisitors = (
         <>
@@ -346,7 +513,7 @@ const DriverLicence = () => {
                 </IconButton>
             </Box>
 
-            <Grid container spacing={2} sx={{ p: 3 }}>
+            <Grid container spacing={1} sx={{ p: 2 }}>
                 <Grid item lg={6} md={6} sm={12} xs={12}>
                     <Box>
                         <Texxt
@@ -396,11 +563,32 @@ const DriverLicence = () => {
                     </Box>
                 </Grid>
                 <Grid item lg={6} md={6} sm={12} xs={12}>
-                    <Box style={{ marginTop: "15px" }}>
+                    <Box>
+                        <Autocmp
+                            label="Unit ID"
+                            name="unitId"
+                            value={unitIds.find(option => option.value === formData.unitId) || null}
+                            onChange={handleAutocompleteChange}
+                            options={unitIds}
+                            required
+                            getOptionLabel={(option) => option.value}
+                            getOptionSelected={(option, value) => option.value === value.value}
+                            size="small"
+                            error={errors.unitId}
+                        />
+                        {errors.unitId && (
+                            <Typography variant="caption" color="error">{errors.unitId}</Typography>
+                        )}
+
+                    </Box>
+                </Grid>
+                <Grid item lg={6} md={6} sm={12} xs={12}>
+                    <Box style={{ marginTop: "10px" }}>
                         <DatePickers
                             placeholder="From Date"
-                            value={formData.fromDate}
-                            handleInputChange={handleInputChange}
+                            value={formData.expDate}
+                            handleInputChange={handleDateChange}
+                            required
                         />
 
                     </Box>
@@ -434,7 +622,6 @@ const DriverLicence = () => {
                             <>
                                 <Typography>No file attached</Typography>
                                 <InputFileUpload onFileSelect={handleFileSelect}
-
                                 />
                             </>
                         )}
@@ -580,14 +767,14 @@ const DriverLicence = () => {
                                     size="small"
                                     variant="contained"
                                     backgroundColor={colors.navbar}
-                                    style={{ marginLeft: "10px", fontSize: "10px" }}
+                                    style={{ borderRadius: "8px", fontSize: "12px", textTransform: "none" }}
                                     name="Submit"
                                 />
                                 <ButtonComponent
                                     size="small"
                                     variant="contained"
                                     backgroundColor={colors.navbar}
-                                    style={{ marginLeft: "10px", fontSize: "10px" }}
+                                    style={{ borderRadius: "8px", fontSize: "12px", textTransform: "none" }}
                                     name={showMoreFilters ? "Hide Filters" : "More Filters"}
                                     onClick={handleMoreFiltersClick}
                                 />
@@ -598,7 +785,7 @@ const DriverLicence = () => {
                 <Grid item lg={12} md={12} sm={12} xs={12}>
                     <Box boxShadow={3} borderRadius={2} backgroundColor={colors.navbar} height="35px" borderWidth="0">
                         <Box display="flex" justifyContent="space-between" alignItems="center">
-                            <Typography ml="10px" mt="8px" variant="h10" fontSize="10px" color="white">Filtered By : </Typography>
+                            <Typography ml="10px" mt="8px" variant="h10" fontSize="12px" color="white">Filtered By : </Typography>
                             {/* <Typography mr="10px" variant="h10" color="white">Count = 0 </Typography> */}
                         </Box>
                     </Box>
@@ -615,12 +802,18 @@ const DriverLicence = () => {
                             columns={columns}
                             data={filteredData}
                             onSearch={handleSearch}
-                            copyEnabled={true} onSelectedRowsChange={(selected) => setSelectedRows(selected.selectedRows)}
-                            // columns={columns}
+                            copyEnabled={true}
+                            onSelectedRowsChange={(selected) => setSelectedRows(selected.selectedRows)}
                             onCopy={handleCopy}
                             downloadEnabled={true}
                             onDownloadXLSX={handleDownloadXLSX}
+                            pagination
+                            paginationServer
+                            paginationTotalRows={totalRows}
+                            onChangePage={(page) => setCurrentPage(page)}
+                            onChangeRowsPerPage={(newRowsPerPage) => setRowsPerPage(newRowsPerPage)}
                         />
+
                     </Box>
                 </Grid>
                 <FloatingButton

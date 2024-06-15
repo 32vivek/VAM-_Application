@@ -8,7 +8,7 @@ import RemoveIcon from '@mui/icons-material/Remove';
 import Texxt from '../../../components/Textfield';
 import Autocmp from '../../../components/AutoComplete';
 import CustomDataTable from '../../../components/ReactDataTable';
-import { user_api } from '../../../Api/Api';
+import { addDepartment, deleteDepartmentsData, unitIdDD, getDepartmentsData, downloadDepartmentsData, updateDepartment } from '../../../Api/Api';
 import axios from 'axios';
 import FloatingButton from '../../../components/FloatingButton';
 import { Add } from "@mui/icons-material";
@@ -19,6 +19,8 @@ import 'react-toastify/dist/ReactToastify.css';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
 import colors from '../../colors';
+import axiosInstance from '../../../components/Auth';
+import Swal from 'sweetalert2';
 
 const dateOptions = [
     { label: "Date Wise", value: "dateWise" },
@@ -38,10 +40,28 @@ const ViewDepartment = () => {
     const [visitorsData, setVisitorsData] = useState([]);
     const [filteredData, setFilteredData] = useState([]);
     const [status, setStatus] = useState("active");
-    const [departments, setDepartments] = useState([{ department: '', departmentCode: '' }]);
-    const [errors, setErrors] = useState([{ department: '', departmentCode: '' }]);
+    const [unitIds, setUnitIds] = useState([]);
     const [selectedRows, setSelectedRows] = useState([]);
+    const [formData, setFormData] = useState([{
+        unitId: null,
+        departmentName: "",
+        departmentCode: ""
+    }]);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
+    const [currentPage, setCurrentPage] = useState(1);
+    const [rowsPerPage, setRowsPerPage] = useState(10);
+    const [totalRows, setTotalRows] = useState(0);
+    const [isEditing, setIsEditing] = useState(false);
+    const [deptToEdit, setdeptToEdit] = useState(null);
+
+    const [errors, setErrors] = useState([
+        {
+            departmentName: '',
+            departmentCode: '',
+            unitId: ''
+        }
+    ]);
     const toggleDrawer = (isOpen) => {
         setOpen(isOpen);
     };
@@ -65,27 +85,70 @@ const ViewDepartment = () => {
             cell: (row) => <input type="checkbox" checked={row.selected} onChange={() => handleRowSelected(row)} />,
             sortable: false,
         },
-        { name: 'name', selector: row => row.name, sortable: true },
-        { name: 'email', selector: row => row.email, sortable: true },
-        { name: 'number', selector: row => row.number, sortable: true },
-        { name: 'address', selector: row => row.address, sortable: true },
-        { name: 'department', selector: row => row.department, sortable: true },
-        { name: 'number', selector: row => row.number, sortable: true },
+        { name: 'Department Name', selector: row => row.departmentName, sortable: true },
+        { name: 'Department Code', selector: row => row.departmentCode, sortable: true },
+        { name: 'Created By', selector: row => row.createdBy, sortable: true },
+        { name: 'Updated By', selector: row => row.updatedBy, sortable: true },
+        {
+            name: 'Created At',
+            selector: row => formatDate(row.createdAt),
+            sortable: true
+        },
+        {
+            name: 'Status',
+            cell: (row) => row.status ? 'Active' : 'Inactive',
+            sortable: true,
+        },
     ];
 
-    const fetchData = async () => {
+
+    const fetchUnitIds = async () => {
         try {
-            const response = await axios.get(user_api);
-            setVisitorsData(response.data);
-            setFilteredData(response.data);
+            const response = await axiosInstance.get(`${unitIdDD}`);
+            const unitIdOptions = response.data.map(unit => ({ label: unit.name, value: unit.id }));
+            setUnitIds(unitIdOptions);
+            console.log('Unit IDs:', unitIdOptions); // Log unitIds after fetching
+
         } catch (error) {
-            console.error('Error fetching data:', error);
+            console.error('Error fetching unit IDs:', error.message);
         }
     };
 
+
+    const fetchData = async (page = 1, size = 10) => {
+        try {
+            // console.log(`Fetching data for page ${page} with size ${size}`);
+            const response = await axiosInstance.get(`${getDepartmentsData}`, {
+                params: {
+                    page: page - 1, // Adjust if necessary for 0-based index
+                    size: size
+                }
+            });
+            // console.log('API Response:', response.data); // Log the response data
+            const activePlants = response.data.content.filter(plant => plant.status === true);
+            setFilteredData(activePlants);
+            setVisitorsData(activePlants);
+            setTotalRows(response.data.totalElements);
+        } catch (error) {
+            console.error('Error fetching data:', error.message);
+        }
+    };
+    const formatDate = (dateString) => {
+        const date = new Date(dateString);
+        const day = date.getDate().toString().padStart(2, '0');
+        const month = (date.getMonth() + 1).toString().padStart(2, '0');
+        const year = date.getFullYear().toString().slice(-2);
+        const hours = date.getHours().toString().padStart(2, '0');
+        const minutes = date.getMinutes().toString().padStart(2, '0');
+        const seconds = date.getSeconds().toString().padStart(2, '0');
+        return `${day}/${month}/${year}, ${hours}:${minutes}:${seconds}`;
+    };
+
     useEffect(() => {
-        fetchData();
-    }, []);
+        fetchData(currentPage, rowsPerPage);
+        fetchUnitIds();
+    }, [currentPage, rowsPerPage]);
+
 
     const floatingActionButtonOptions = selectedRows.length === 0 ? [
         { label: 'Add', icon: <Add /> },
@@ -95,7 +158,45 @@ const ViewDepartment = () => {
     ] : [
         { label: 'Delete', icon: <DeleteIcon /> },
     ];
+    const handleAddDepartment = () => {
+        setFormData([
+            ...formData,
+            {
+                unitId: null,
+                departmentName: "",
+                departmentCode: ""
+            }
+        ]);
+        setErrors([
+            ...errors,
+            {
+                departmentName: '',
+                departmentCode: '',
+                unitId: ''
+            }
+        ]);
+    };
 
+    const handleRemoveDepartment = (index) => {
+
+        const updatedFormData = [...formData];
+        updatedFormData[index] = {
+            ...updatedFormData[index],
+            departmentName: "New Department Name"
+        };
+        setFormData(updatedFormData);
+
+
+        const updatedErrors = [...errors];
+        updatedErrors.splice(index, 1);
+        setErrors(updatedErrors);
+    };
+
+    const handleInputChange = (index, field, value) => {
+        const updatedFormData = [...formData];
+        updatedFormData[index][field] = value;
+        setFormData(updatedFormData);
+    };
     const handleRowSelected = (row) => {
         const updatedData = filteredData.map((item) =>
             item === row ? { ...item, selected: !item.selected } : item
@@ -113,94 +214,194 @@ const ViewDepartment = () => {
         );
         setFilteredData(filtered);
     };
-
-    const handleInputChange = (index, field, value) => {
-        const newDepartments = [...departments];
-        newDepartments[index][field] = value;
-        setDepartments(newDepartments);
-
-        // Clear validation error for the field
-        const newErrors = [...errors];
-        newErrors[index][field] = '';
-        setErrors(newErrors);
+    const handleAutocompleteChange = (index, event, newValue) => {
+        const updatedFormData = [...formData];
+        updatedFormData[index].unitId = newValue ? newValue.value : null;
+        setFormData(updatedFormData);
     };
 
-    const handleAddDepartment = () => {
-        setDepartments(prevDepartments => [...prevDepartments, { department: '', departmentCode: '' }]);
-        setErrors(prevErrors => [...prevErrors, { department: '', departmentCode: '' }]);
-    };
-
-    const handleRemoveDepartment = (index) => {
-        setDepartments(prevDepartments => prevDepartments.filter((_, i) => i !== index));
-        setErrors(prevErrors => prevErrors.filter((_, i) => i !== index));
-    };
-
-    const validate = () => {
-        let tempErrors = [];
-        let isValid = true;
-
-        departments.forEach((department, index) => {
-            let error = { department: '', departmentCode: '' };
-            if (!department.department) {
-                error.department = "Department is required";
-                isValid = false;
+    const validateForm = () => {
+        const newErrors = formData.map(data => {
+            const errors = {};
+            if (!data.departmentName) {
+                errors.departmentName = "Department is required";
             }
-            if (!department.departmentCode) {
-                error.departmentCode = "Department Code is required";
-                isValid = false;
+
+            if (!data.unitId) {
+                errors.unitId = "Unit ID is required";
             }
-            tempErrors.push(error);
+
+            if (!data.departmentCode) {
+                errors.departmentCode = "Department Code is required";
+            }
+
+            return errors;
         });
 
-        setErrors(tempErrors);
-        return isValid;
+        setErrors(newErrors);
+
+        return newErrors.every(error => Object.keys(error).length === 0);
     };
 
-    const handleSubmit = (event) => {
+
+    // const handleSubmit = async (e) => {
+    //     e.preventDefault();
+    //     if (validateForm()) {
+    //         try {
+
+    //             const formDataToSend = {
+    //                 unitId: formData[0].unitId,
+    //                 departmentName: formData[0].departmentName,
+    //                 departmentCode: formData[0].departmentCode
+    //             };
+
+    //             // Get token from axiosInstance or wherever it's stored
+    //             // const token = axiosInstance.defaults.headers.common['Authorization'];
+
+    //             // Sending POST request to the API with token in headers
+    //             const response = await axiosInstance.post(`${addDepartment}`, formDataToSend, {
+    //                 // headers: {
+    //                 //     'Authorization': token
+    //                 // }
+    //             });
+
+    //             console.log('Form submitted:', formData);
+
+    //             // Reset form and close drawer
+    //             setFormData([{ unitId: null, departmentName: "", departmentCode: "" }]);
+    //             setOpen(false);
+    //             toast.success("Department added successfully!", {
+    //                 autoClose: 3000,
+    //                 position: "top-right",
+    //                 style: {
+    //                     color: "#0075a8"
+    //                 },
+    //             });
+    //             fetchData(currentPage, rowsPerPage);
+    //         } catch (error) {
+    //             toast.error("Failed to add department", {
+    //                 autoClose: 3000,
+    //                 position: "top-right",
+    //                 style: {
+    //                     color: "red"
+    //                 },
+    //             });
+    //         }
+    //     }
+    // };
+
+
+    const handleSubmit = async (event) => {
         event.preventDefault();
+        if (!validateForm()) return;
 
-        if (validate()) {
-            console.log('Form data before submission:', departments);
-            toast.success("Form submitted successfully!", {
+        setIsSubmitting(true);
+        try {
+            if (isEditing) {
+                // Update existing plan
+                const response = await axiosInstance.put(`${updateDepartment}/${deptToEdit.id}`, formData[0]);
+                toast.success("Plant updated successfully!", {
+                    autoClose: 3000,
+                    position: "top-right",
+                    style: {
+                        backgroundColor: 'color: "#0075a8"',
+                    },
+                });
+            } else {
+                // Create new plant
+                const response = await axiosInstance.post(addDepartment, formData);
+                toast.success("Plant added successfully!", {
+                    autoClose: 3000,
+                    position: "top-right",
+                    style: {
+                        backgroundColor: 'color: "#0075a8"',
+                    },
+                });
+            }
+
+            fetchData();
+            handleCloseDrawer();
+            setFormData([{
+                unitId: null,
+                departmentName: "",
+                departmentCode: ""
+            }]);
+            setIsEditing(false);
+        } catch (error) {
+            toast.error(`Error ${isEditing ? 'updating' : 'adding'} plant: ${error.message}`, {
                 autoClose: 3000,
                 position: "top-right",
-                style: {
-                    // backgroundColor: "rgb(60,86,91)",
-                    color: "#0075a8"
-                },
             });
-            // Reset form data state
-            setDepartments([{ department: '', departmentCode: '' }]);
-            setErrors([{ department: '', departmentCode: '' }]);
-            console.log('Form data state after update:', departments);
-        } else {
-            toast.error("Please fill in all required fields.", {
-                autoClose: 3000,
-                position: "top-right",
-                style: {
-                    // backgroundColor: "rgb(60,86,91)",
-                    color: "#0075a8"
-                },
-            });
+            console.error(`Error ${isEditing ? 'updating' : 'adding'} plant:`, error.message);
+        } finally {
+            setIsSubmitting(false);
         }
+    };
+
+    const handleEdit = () => {
+        const dept = selectedRows[0];
+        setdeptToEdit(dept);
+        setFormData([
+            {
+                unitId: dept.unitId,
+                departmentName: dept.departmentName,
+                departmentCode: dept.departmentCode,
+            }
+        ]);
+        setIsEditing(true);
+        setOpen(true);
     };
 
 
 
-    const handleDelete = () => {
-        if (selectedRows.length > 0) {
-            const remainingData = filteredData.filter(item => !selectedRows.includes(item));
-            setFilteredData(remainingData);
-            setSelectedRows([]);
-            toast.success("Selected rows deleted successfully!", {
-                autoClose: 3000,
-                position: "top-right",
-                style: {
-                    // backgroundColor: "rgb(60,86,91)",
-                    color: "#0075a8"
-                },
-            });
+    const handleDelete = async () => {
+        if (selectedRows.length === 0) {
+            return;
         }
+
+        Swal.fire({
+            title: 'Are you sure?',
+            text: 'Are you sure you want to delete the selected departments?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            width: 350,
+            height: 350,
+            confirmButtonText: 'Yes, delete it!',
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                try {
+                    const deleteRequests = selectedRows.map(row =>
+                        axiosInstance.delete(`${deleteDepartmentsData}/${row.id}`)
+                    );
+                    await Promise.all(deleteRequests);
+
+                    Swal.fire({
+                        title: 'Deleted!',
+                        text: 'Departments deleted successfully!',
+                        icon: 'success',
+                        confirmButtonColor: '#3085d6',
+                        width: 350,
+                        height: 350, // Custom width
+                        timer: 3000,
+                        timerProgressBar: true
+                    });
+
+                    fetchData(currentPage, rowsPerPage);
+                } catch (error) {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: `Error deleting departments: ${error.message}`,
+                        icon: 'error',
+                        confirmButtonColor: '#d33',
+                        timer: 3000,
+                        timerProgressBar: true
+                    });
+                    console.error('Error deleting departments:', error.message);
+                }
+            }
+        });
     };
     const styles = {
         navbar: {
@@ -211,7 +412,6 @@ const ViewDepartment = () => {
         resetButton: {
             backgroundColor: colors.resetButtonBackground,
             color: colors.resetButtonColor,
-            // padding: '8px 16px',
             border: 'none',
             borderRadius: '4px',
             cursor: 'pointer',
@@ -224,8 +424,20 @@ const ViewDepartment = () => {
         } else if (label === 'Delete') {
             handleDelete();
         } else if (label === 'Edit') {
-            // Handle edit action here
+            handleEdit()
         }
+    };
+
+    const handlePageChange = (page) => {
+        // console.log(`Page changed to ${page}`);
+        setCurrentPage(page);
+        fetchData(page, rowsPerPage);
+    };
+
+    const handleRowsPerPageChange = (newRowsPerPage) => {
+        setRowsPerPage(newRowsPerPage);
+        setCurrentPage(1); // Reset to the first page when changing rows per page
+        fetchData(1, newRowsPerPage);
     };
 
 
@@ -233,82 +445,98 @@ const ViewDepartment = () => {
         <>
             <ToastContainer style={{ marginTop: '45px' }} />
 
-            <Box component="form" sx={{ mt: "63px", mb: "20px", gap: "10px" }} >
+            <Box component="form" sx={{ mt: "63px", mb: "20px", gap: "10px" }}>
                 <Grid container>
                     <Grid item lg={12} md={12} sm={12} xs={12}>
-                        <Box display="flex" justifyContent="space-between" backgroundColor={colors.navbar}>
-                            <Typography variant="h6" color="white" ml="10px">Add Department</Typography>
-                            <IconButton onClick={handleCloseDrawer}>
-                                <CloseIcon style={{ color: "white" }} />
-                            </IconButton>
+                        <Box component="form" sx={{ mt: "0px", mb: "20px", gap: "10px" }} >
+                            <Grid container>
+                                <Grid item lg={12} md={12} sm={12} xs={12}>
+                                    <Box display="flex" justifyContent="space-between" backgroundColor={colors.navbar}>
+                                        <Typography variant="h6" color="white" ml="10px">Add Department</Typography>
+                                        <IconButton onClick={handleCloseDrawer}>
+                                            <CloseIcon style={{ color: "white" }} />
+                                        </IconButton>
+                                    </Box>
+                                </Grid>
+                            </Grid>
+                        </Box>
+                    </Grid>
+                    <Grid item lg={12} md={12} sm={12} xs={12}>
+                        <Box px={2}>
+                            {formData.map((data, index) => (
+                                <Box key={index} mb={2} style={{ marginBottom: '20px' }}>
+                                    <Grid container spacing={2} alignItems="center">
+                                        <Grid item lg={6} md={6} sm={6} xs={12}>
+                                            <Autocmp
+                                                id={`unitId-${index}`}
+                                                options={unitIds}
+                                                value={unitIds.find((option) => option.value === data.unitId) || null}
+                                                label="Unit Name"
+                                                size="small"
+                                                required
+                                                onChange={(event, newValue) => handleAutocompleteChange(index, event, newValue)}
+                                                error={Boolean(errors[index]?.unitId)}
+                                                helperText={errors[index]?.unitId}
+                                            />
+                                        </Grid>
+                                        <Grid item lg={6} md={6} sm={6} xs={12}>
+                                            <Texxt
+                                                id={`departmentName-${index}`}
+                                                value={data.departmentName}
+                                                label="Department Name"
+                                                size="small"
+                                                required
+                                                onChange={(e) => handleInputChange(index, 'departmentName', e.target.value)}
+                                                error={Boolean(errors[index]?.departmentName)}
+                                                helperText={errors[index]?.departmentName}
+                                            />
+                                        </Grid>
+                                        <Grid item lg={6} md={6} sm={6} xs={12}>
+                                            <Texxt
+                                                id={`departmentCode-${index}`}
+                                                value={data.departmentCode}
+                                                label="Department Code"
+                                                size="small"
+                                                required
+                                                onChange={(e) => handleInputChange(index, 'departmentCode', e.target.value)}
+                                                error={Boolean(errors[index]?.departmentCode)}
+                                                helperText={errors[index]?.departmentCode}
+                                            />
+                                        </Grid>
+                                        <Grid item lg={6} md={6} sm={6} xs={12}>
+                                            {index === formData.length - 1 && (
+                                                <Grid item lg={12} md={12} sm={12} xs={12} sx={{ textAlign: 'center' }}>
+                                                    <Box style={{ gap: "20px" }}>
+                                                        <IconButton onClick={handleAddDepartment}>
+                                                            <AddIcon style={{ color: "white", backgroundColor: "green", borderRadius: "50%", width: "40px", height: "40px" }} />
+                                                        </IconButton>
+                                                        {formData.length > 1 && (
+                                                            <IconButton onClick={() => handleRemoveDepartment(index)} >
+                                                                <RemoveIcon style={{ color: "white", backgroundColor: "red", borderRadius: "50%", width: "40px", height: "40px" }} />
+                                                            </IconButton>
+                                                        )}
+                                                    </Box>
+                                                </Grid>
+                                            )}
+                                        </Grid>
+                                    </Grid>
+                                </Box>
+                            ))}
                         </Box>
                     </Grid>
                 </Grid>
-            </Box>
-
-            <Grid container spacing={1} sx={{ p: 3 }}>
-                {departments.map((department, index) => (
-                    <React.Fragment key={index}>
-                        <Grid item lg={6} md={6} sm={12} xs={12}>
-                            <Box>
-                                <Texxt
-                                    label="Department"
-                                    name={`department-${index}`}
-                                    required
-                                    placeholder="Enter Data"
-                                    size="small"
-                                    value={department.department}
-                                    onChange={(e) => handleInputChange(index, 'department', e.target.value)}
-                                    error={Boolean(errors[index]?.department)}
-                                    helperText={errors[index]?.department}
-                                />
-                            </Box>
-                        </Grid>
-                        <Grid item lg={6} md={6} sm={12} xs={12}>
-                            <Box>
-                                <Texxt
-                                    label="Department Code"
-                                    name={`departmentCode-${index}`}
-                                    required
-                                    placeholder="Enter Data"
-                                    size="small"
-                                    value={department.departmentCode}
-                                    onChange={(e) => handleInputChange(index, 'departmentCode', e.target.value)}
-                                    error={Boolean(errors[index]?.departmentCode)}
-                                    helperText={errors[index]?.departmentCode}
-                                />
-                            </Box>
-                        </Grid>
-                        {index === departments.length - 1 && (
-                            <Grid item lg={12} md={12} sm={12} xs={12} sx={{ textAlign: 'right' }}>
-                                <Box style={{ gap: "20px" }}>
-                                    <IconButton onClick={handleAddDepartment}>
-                                        <AddIcon style={{ color: "white", backgroundColor: "green", borderRadius: "50%", width: "40px", height: "40px" }} />
-                                    </IconButton>
-                                    {departments.length > 1 && (
-                                        <IconButton onClick={() => handleRemoveDepartment(index)} >
-                                            <RemoveIcon style={{ color: "white", backgroundColor: "red", borderRadius: "50%", width: "40px", height: "40px" }} />
-                                        </IconButton>
-                                    )}
-                                </Box>
-                            </Grid>
-                        )}
-                    </React.Fragment>
-                ))}
                 <Grid item lg={12} md={12} sm={12} xs={12}>
                     <Box display="flex" justifyContent="center" alignItems="center" style={{ gap: "10px" }}>
                         <ButtonComponent name="Save" variant="contained" size="small" backgroundColor={colors.navbar} onClick={handleSubmit} />
-                        <ButtonComponent name="Reset" variant="contained" size="small" style={styles.resetButton} onClick={() => {
-                            setDepartments([{ department: '', departmentCode: '' }]);
-                            setErrors([{ department: '', departmentCode: '' }]);
-                        }} />
+                        {/* <ButtonComponent name="Reset" variant="contained" size="small" style={styles.resetButton} onClick={handleReset} /> */}
                         <ButtonComponent name="Cancel" variant="contained" style={{ color: "white", backgroundColor: "red" }} size="small" onClick={handleCloseDrawer} />
 
                     </Box>
                 </Grid>
-            </Grid>
+            </Box>
         </>
     );
+
     const handleCopy = () => {
         const dataString = filteredData.map(row => Object.values(row).join('\t')).join('\n');
         navigator.clipboard.writeText(dataString);
@@ -322,22 +550,26 @@ const ViewDepartment = () => {
         });
     };
 
-    const handleDownloadXLSX = () => {
-        const worksheet = XLSX.utils.json_to_sheet(filteredData);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, worksheet, "Sheet1");
-        const wbout = XLSX.write(wb, { type: 'array', bookType: "xlsx" }); // Changed to 'array'
-        const blob = new Blob([wbout], { type: "application/octet-stream" });
-        const fileName = 'table_data.xlsx';
-        saveAs(blob, fileName);
-        toast.success("Table data downloaded as XLSX successfully!", {
-            autoClose: 3000,
-            position: "top-right",
-            style: {
-                // backgroundColor: "rgb(60,86,91)",
-                color: "#0075a8"
-            },
-        });
+    const handleDownloadXLSX = async () => {
+        try {
+            const response = await axiosInstance.get(downloadDepartmentsData, {
+                responseType: 'arraybuffer',
+            });
+
+            const blob = new Blob([response.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+            saveAs(blob, 'departments.xlsx');
+
+            toast.success("Departments data downloaded successfully!", {
+                autoClose: 3000,
+                position: "top-right",
+            });
+        } catch (error) {
+            console.error('Error downloading Departments data:', error.message);
+            toast.error("Error downloading Departments data. Please try again later.", {
+                autoClose: 3000,
+                position: "top-right",
+            });
+        }
     };
 
     const handleAddVisitorClick = () => {
@@ -347,13 +579,12 @@ const ViewDepartment = () => {
     const handleFormClick = () => {
         setOpen(true);
     };
-    const handleAutocompleteChange = (value) => {
-        // console.log("Selected value:", value);
-        // Handle the selected value here
-    };
+
 
     return (
         <>
+
+            {/* <ToastContainer style={{ marginTop: '45px', color: "white" }} /> */}
             <SwipeableDrawer
                 anchor="right"
                 open={open}
@@ -414,7 +645,7 @@ const ViewDepartment = () => {
                 <Grid item lg={12} md={12} sm={12} xs={12}>
                     <Box boxShadow={3} borderRadius={2} bgcolor={colors.navbar} height="35px" borderWidth="0">
                         <Box display="flex" justifyContent="space-between" alignItems="center">
-                            <Typography ml="10px" mt="8px" variant="h10" fontSize="10px" color="white">Filtered By : </Typography>
+                            <Typography ml="10px" mt="8px" variant="h10" fontSize="12px" color="white">Filtered By : Active</Typography>
                             {/* <Typography mr="10px" variant="h10" color="white">Count = 0 </Typography> */}
                         </Box>
                     </Box>
@@ -422,15 +653,31 @@ const ViewDepartment = () => {
                 <Grid item lg={12} md={12} sm={12} xs={12}>
                     <Box width="100%" boxShadow={3} padding={2} borderRadius={2} bgcolor='white'>
                         <CustomDataTable
+                            title="Visitors"
                             columns={columns}
                             data={filteredData}
+                            selectableRows
+                            onSelectedRowsChange={(selectedRows) => setSelectedRows(selectedRows)}
+                            clearSelectedRows={!selectedRows.length}
+                            pagination
+                            paginationServer={false} // Ensure this is false for client-side pagination
+                            paginationTotalRows={totalRows} // Ensure paginationTotalRows reflects the totalRows state
+                            onChangePage={handlePageChange}
+                            onChangeRowsPerPage={handleRowsPerPageChange}
+                            subHeader
+                            subHeaderComponent={<>
+                                <IconButton color="primary" onClick={handleRefresh}>
+                                    <RefreshIcon />
+                                </IconButton>
+                            </>}
                             onSearch={handleSearch}
-                            copyEnabled={true}
+                            searchPlaceholder="Search Department"
+                            copyEnabled
+                            downloadEnabled
                             onCopy={handleCopy}
-                            downloadEnabled={true}
-                            onSelectedRowsChange={(selected) => setSelectedRows(selected.selectedRows)}
                             onDownloadXLSX={handleDownloadXLSX}
                         />
+
                     </Box>
                 </Grid>
 

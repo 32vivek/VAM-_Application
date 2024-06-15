@@ -1,29 +1,55 @@
+// userSlice.js
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 import Cookies from 'js-cookie';
+import { userDetails } from '../../Api/Api';
 
-export const getUserDetails = () => async (dispatch) => {
-    try {
-        // Token ko cookie se retrieve karo
-        // const token = document.cookie.split('; ').find(row => row.startsWith('token=')).split('=')[1];
-        const token = Cookies.get('token');
-        dispatch({ type: 'USER_DETAILS_REQUEST' });
-
-        const config = {
-            headers: {
-                Authorization: `Bearer ${token}`
-            }
-        };
-
-        const { data } = await axios.get('http://192.168.1.7:8080/api/get-user-details', config);
-
-        dispatch({
-            type: 'USER_DETAILS_SUCCESS',
-            payload: data
-        });
-    } catch (error) {
-        dispatch({
-            type: 'USER_DETAILS_FAIL',
-            payload: error.message
-        });
-    }
+const initialState = {
+    loading: false,
+    user: {},
+    error: null
 };
+
+// Async thunk for fetching user details
+export const getUserDetails = createAsyncThunk(
+    'user/getUserDetails',
+    async (_, { rejectWithValue }) => {
+        try {
+            const token = Cookies.get('token');
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            };
+
+            const { data } = await axios.get(`${userDetails}`, config);
+            return data;
+        } catch (error) {
+            return rejectWithValue(error.message);
+        }
+    }
+);
+
+const userSlice = createSlice({
+    name: 'user',
+    initialState,
+    reducers: {},
+    extraReducers: (builder) => {
+        builder
+            .addCase(getUserDetails.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(getUserDetails.fulfilled, (state, action) => {
+                state.loading = false;
+                state.user = action.payload;
+                state.error = null;
+            })
+            .addCase(getUserDetails.rejected, (state, action) => {
+                state.loading = false;
+                state.user = {};
+                state.error = action.payload;
+            });
+    }
+});
+
+export default userSlice.reducer;

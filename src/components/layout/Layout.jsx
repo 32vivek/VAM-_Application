@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { styled, useTheme } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import MuiDrawer from '@mui/material/Drawer';
@@ -6,7 +6,7 @@ import MuiAppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import List from '@mui/material/List';
 import CssBaseline from '@mui/material/CssBaseline';
-import Typography from '@mui/material/Typography';
+// import Typography from '@mui/material/Typography';
 import Divider from '@mui/material/Divider';
 import ListItemText from '@mui/material/ListItemText';
 import IconButton from '@mui/material/IconButton';
@@ -35,6 +35,11 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import Footer from "./Footer";
 import Cookies from 'js-cookie';
 import colors from "../.././pages/colors";
+import { userDetails } from '../../Api/Api';
+import axiosInstance from '../Auth';
+import { useDispatch, useSelector } from 'react-redux';
+import { getUserDetails } from '../../pages/redux/Actions';
+import { Typography } from '@mui/material';
 
 const drawerWidth = 240;
 
@@ -118,7 +123,8 @@ export default function MiniDrawer() {
     const [anchorElUser, setAnchorElUser] = React.useState(null);
     const navigate = useNavigate();
     const location = useLocation();
-
+    const [data, setData] = useState([])
+    const dispatch = useDispatch();
     const handleDrawerOpen = () => {
         setOpen(true);
     };
@@ -158,14 +164,20 @@ export default function MiniDrawer() {
         }
     };
 
+    useEffect(() => {
+        const fetchData = async () => {
+            const userData = await dispatch(getUserDetails());
+            console.log('User Details:', userData);
+        };
+        fetchData();
+    }, [dispatch]);
 
 
     const handleLogout = () => {
-
-        localStorage.removeItem('token')
+        Cookies.remove('token');
+        // localStorage.removeItem('token');
         navigate('/');
     };
-
 
 
 

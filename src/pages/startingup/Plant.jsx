@@ -120,9 +120,9 @@ const Plant = () => {
     const fetchUnitIds = async () => {
         try {
             const response = await axiosInstance.get(`${unitIdDD}`);
-            const unitIdOptions = response.data.map(unit => ({ label: unit.id, value: unit.id }));
+            const unitIdOptions = response.data.map(unit => ({ label: unit.name, value: unit.id }));
             setUnitIds(unitIdOptions);
-            console.log('Unit IDs:', unitIdOptions); // Log unitIds after fetching
+            // console.log('Unit IDs:', unitIdOptions); // Log unitIds after fetching
 
         } catch (error) {
             console.error('Error fetching unit IDs:', error.message);
@@ -229,7 +229,7 @@ const Plant = () => {
         setIsSubmitting(true);
         try {
             if (isEditing) {
-                // Update existing plant
+                // Update existing plan
                 const response = await axiosInstance.put(`${updatePlants}/${plantToEdit.id}`, formData);
                 toast.success("Plant updated successfully!", {
                     autoClose: 3000,
@@ -386,7 +386,7 @@ const Plant = () => {
                 </IconButton>
             </Box>
 
-            <Grid container spacing={2} sx={{ p: 3 }}>
+            <Grid container spacing={1} sx={{ p: 3 }}>
                 <Grid item lg={6} md={6} sm={12} xs={12}>
                     <Box>
                         <Texxt
@@ -427,6 +427,7 @@ const Plant = () => {
                             value={unitIds.find(option => option.value === formData.unitId) || null}
                             onChange={handleAutocompleteChange}
                             options={unitIds}
+                            required
                             getOptionLabel={(option) => option.value}
                             getOptionSelected={(option, value) => option.value === value.value}
                             size="small"
@@ -554,10 +555,10 @@ const Plant = () => {
                                 </>
                             )}
                             <Box style={{ gap: "10px", marginTop: "15px", display: "flex", justifyContent: "space-between" }}>
-                                <ButtonComponent size="small" backgroundColor={colors.navbar} variant="contained" style={{ marginLeft: "10px", fontSize: "10px" }}
+                                <ButtonComponent size="small" backgroundColor={colors.navbar} variant="contained" style={{ borderRadius: "8px", fontSize: "12px", textTransform: "none" }}
                                     name="Submit" />
                                 <ButtonComponent size="small"
-                                    style={{ marginLeft: "10px", fontSize: "10px" }}
+                                    style={{ borderRadius: "8px", fontSize: "12px", textTransform: "none" }}
                                     backgroundColor={colors.navbar}
                                     variant="contained"
                                     name={showMoreFilters ? "Hide Filters" : "More Filters"}
@@ -570,7 +571,7 @@ const Plant = () => {
                 <Grid item lg={12} md={12} sm={12} xs={12}>
                     <Box boxShadow={3} borderRadius={2} backgroundColor={colors.navbar} height="35px" borderWidth="0">
                         <Box display="flex" justifyContent="space-between" alignItems="center">
-                            <Typography ml="10px" mt="8px" variant="h10" fontSize="10px" color="white">Filtered By : Active </Typography>
+                            <Typography ml="10px" mt="8px" variant="h10" fontSize="12px" color="white">Filtered By : Active </Typography>
                             {/* <Typography mr="10px" variant="h10" color="white">Count = 0 </Typography> */}
                         </Box>
                     </Box>

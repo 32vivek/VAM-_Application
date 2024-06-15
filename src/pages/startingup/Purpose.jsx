@@ -6,7 +6,7 @@ import Autocmp from '../../components/AutoComplete';
 import ButtonComponent from '../../components/Button';
 import CustomDataTable from '../../components/ReactDataTable';
 import axios from 'axios';
-import { unitIdDD, getAllPurpose, deletePurpose, downloadPurpose } from '../../Api/Api';
+import { unitIdDD, createPurpose, departmentDropDown, getAllPurpose, deletePurposeData, downloadExcelPurposeData, userDD, updatePurpose } from '../../Api/Api';
 import FloatingButton from '../../components/FloatingButton';
 import ReusableRadioButton from '../../components/RadioButton';
 import { toast, ToastContainer, POSITION } from 'react-toastify';
@@ -19,6 +19,7 @@ import axiosInstance from '../../components/Auth';
 import CustomTimePicker from '../../components/TimePicker';
 import TimePicker from '../../components/TimePicker';
 import Swal from 'sweetalert2';
+import ReusableTimePicker from '../../components/TimePicker';
 
 
 const data = [
@@ -36,27 +37,38 @@ const Purpose = () => {
     const [filteredData, setFilteredData] = useState([]);
     const [visitorsData, setVisitorsData] = useState([]);
     const [isExtendedPassRequestChecked, setIsExtendedPassRequestChecked] = useState(false);
-    const [errors, setErrors] = useState({});
+    // const [errors, setErrors] = useState({});
     const [selectedRows, setSelectedRows] = useState([]);
     const [showAdditionalFields, setShowAdditionalFields] = useState(false);
     const [searchNumber, setSearchNumber] = useState('');
     const [formData, setFormData] = useState({
-        visitorName: null,
-        visitorMobile: null,
-        visitorEmail: '',
-        visitorOrganization: null,
-        purpose: null,
-        address: "",
-        possessionAllowed: '',
-        confrenceRoom: '',
-        laptop: '',
-        notifyEmployee: []
+
+        purposeBrief: "",
+        purposeFor: null,
+        unitId: null,
+        alertTime: '',
+        userId: null,
+        alert: false,
+        departmentId: null,
     });
 
     const [currentPage, setCurrentPage] = useState(1);
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [totalRows, setTotalRows] = useState(0);
     const [unitIds, setUnitIds] = useState([]);
+    const [departmentData, setDepartmentData] = useState([]);
+    const [user, setUser] = useState([]);
+
+    const [editingRow, setEditingRow] = useState(null);
+    const [errors, setErrors] = useState({
+        purposeBrief: "",
+        purposeFor: "",
+        unitId: "",
+        alertTime: "",
+        userId: "",
+        departmentId: "",
+    });
+
 
     const styles = {
         navbar: {
@@ -74,11 +86,17 @@ const Purpose = () => {
         },
     };
 
-    const [selectedTime, setSelectedTime] = useState(null);
+    const [selectedTime, setSelectedTime] = useState();
 
     const handleTimeChange = (newTime) => {
+        console.log("New Time Selected:", newTime);
         setSelectedTime(newTime);
+        setFormData((prevFormData) => ({
+            ...prevFormData,
+            alertTime: newTime,
+        }));
     };
+
 
     const floatingActionButtonOptions = selectedRows.length === 0 ? [
         { label: 'Add', icon: <Add /> },
@@ -101,12 +119,9 @@ const Purpose = () => {
                 purposeBrief, sortable: true
         },
         { name: 'Purpose For', selector: row => row.purposeFor, sortable: true },
-        { name: 'Alert After', selector: row => row.alertAfter, sortable: true },
-        { name: 'Alert To', selector: row => row.alertTo, sortable: true },
-        {
-            name: 'Employee Name', selector: row => row.createdBy, sortable: true
-        },
-        { name: 'updated By', selector: row => row.updatedBy, sortable: true },
+        { name: 'Alert After', selector: row => row.alertTime, sortable: true },
+        { name: 'Alert To', selector: row => row.department?.departmentName ?? 'NA', sortable: true },
+        // { name: 'updated By', selector: row => row.updatedBy, sortable: true },
         {
             name: 'Created On', selector: row => row.createdAt, sortable: true
         },
@@ -124,21 +139,22 @@ const Purpose = () => {
     };
 
 
-    const fetchData = async () => {
+    const fetchData = async (page, pageSize) => {
         try {
             const response = await axiosInstance.get(`${getAllPurpose}`, {
-                // params: {
-                //     page: page - 1,
-                //     size: rowsPerPage
-                // }
+                params: {
+                    page: page - 1,
+                    size: pageSize
+                }
             });
 
-            // const activePlants = response.data.content.filter(plant => plant.status === true);
-            console.log(response.data);
+            const activePlants = response.data.content.filter(plant => plant.status === true);
+            // console.log(response.data, "purpose");
 
             setFilteredData(response.data.content);
             setVisitorsData(response.data.content);
-            // setTotalRows(response.data.totalElements);
+            setTotalRows(response.data.totalElements);
+
         } catch (error) {
             console.error('Error fetching data:', error.message);
         }
@@ -149,7 +165,7 @@ const Purpose = () => {
     const fetchUnitIds = async () => {
         try {
             const response = await axiosInstance.get(`${unitIdDD}`);
-            const unitIdOptions = response.data.map(unit => ({ label: unit.id, value: unit.id }));
+            const unitIdOptions = response.data.map(unit => ({ label: unit.name, value: unit.id }));
             setUnitIds(unitIdOptions);
             console.log('Unit IDs:', unitIdOptions); // Log unitIds after fetching
 
@@ -157,9 +173,33 @@ const Purpose = () => {
             console.error('Error fetching unit IDs:', error.message);
         }
     };
+
+    const fetchDepartmentDD = async () => {
+        try {
+            const response = await axiosInstance.get(`${departmentDropDown}`);
+            const departmentOptions = response.data.map(unit => ({ label: unit.name, value: unit.id }));
+            setDepartmentData(departmentOptions)
+            console.log('Department:', departmentOptions);
+        } catch (error) {
+            console.error('Error fetching department:', error.message);
+        }
+    };
+    const fetchUserDD = async () => {
+        try {
+            const response = await axiosInstance.get(`${userDD}`);
+            const userOptions = response.data.map(unit => ({ label: unit.name, value: unit.id }));
+            setUser(userOptions)
+            console.log('Department:', userOptions);
+        } catch (error) {
+            console.error('Error fetching department:', error.message);
+        }
+    };
+
     useEffect(() => {
         fetchData(currentPage, rowsPerPage);
         fetchUnitIds();
+        fetchDepartmentDD();
+        fetchUserDD();
     }, [currentPage, rowsPerPage]);
 
     const handleSearch = (searchText) => {
@@ -191,52 +231,136 @@ const Purpose = () => {
         setIsExtendedPassRequestChecked(event.target.checked);
     };
 
-    const handleChange = (name, value) => {
-        setFormData({
-            ...formData,
-            [name]: value
-        });
-        setErrors({
-            ...errors,
-            [name]: ''
-        });
+    const handleChange = (e) => {
+        const { name, value } = e.target || e;
+        setFormData((prevFormData) => ({
+            ...prevFormData,
+            [name]: value,
+        }));
+        validateField(name, value);
     };
 
-    const validateForm = () => {
-        let formErrors = {};
-        if (!formData.visitorOrganization) formErrors.visitorOrganization = 'Visitor Organization is required';
-        if (!formData.visitorName) formErrors.visitorName = 'Visitor Name is required';
-        if (!formData.visitorMobile) formErrors.visitorMobile = 'Visitor Mobile No is required';
-        // if (!formData.visitorEmail) formErrors.visitorEmail = 'Visitor Email is required';
-        if (!formData.purpose) formErrors.purpose = 'Purpose of Meeting is required';
-        setErrors(formErrors);
-        return Object.keys(formErrors).length === 0;
+    const validateField = (fieldName, value) => {
+        let errorMsg = "";
+        switch (fieldName) {
+            case "purposeBrief":
+                if (!value) {
+                    errorMsg = "Purpose brief is required.";
+                }
+                break;
+            case "purposeFor":
+                if (!value) {
+                    errorMsg = "Purpose For is required.";
+                }
+                break;
+            case "unitId":
+                if (!value) {
+                    errorMsg = "Unit ID is required.";
+                }
+                break;
+            case "alertTime":
+                if (!value) {
+                    errorMsg = "Alert time is required.";
+                }
+                break;
+            case "userId":
+                if (!value) {
+                    errorMsg = "Employee name is required.";
+                }
+                break;
+            case "departmentId":
+                if (!value) {
+                    errorMsg = "Department is required.";
+                }
+                break;
+            default:
+                break;
+        }
+        setErrors((prevErrors) => ({
+            ...prevErrors,
+            [fieldName]: errorMsg,
+        }));
     };
 
-    const handleSubmit = (event) => {
+
+
+
+    const handleSubmit = async (event) => {
         event.preventDefault();
-        if (validateForm()) {
-            console.log(formData, "Data");
-            toast.success("Form submitted successfully!", {
-                autoClose: 3000,
-                position: "top-right",
-                style: {
-                    // backgroundColor: 'rgb(60,86,91)',
-                    color: "#0075a8"
-                },
+        try {
+            const updatedFormData = {
+                ...formData,
+                alertTime: (new Date(selectedTime)).toLocaleTimeString('en-GB', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: false
+                }),
+            };
+
+            if (editingRow) {
+                await axiosInstance.put(`${updatePurpose}/${editingRow.id}`, updatedFormData);
+                toast.success("Form updated successfully!", {
+                    autoClose: 3000,
+                    position: "top-right",
+                    style: {
+                        color: "#0075a8"
+                    },
+                });
+            } else {
+                await axiosInstance.post(createPurpose, updatedFormData);
+                toast.success("Form submitted successfully!", {
+                    autoClose: 3000,
+                    position: "top-right",
+                    style: {
+                        color: "#0075a8"
+                    },
+                });
+            }
+
+            setFormData({
+                purposeBrief: "",
+                purposeFor: null,
+                unitId: null,
+                alertTime: '',
+                userId: null,
+                alert: false,
+                departmentId: null,
             });
-        } else {
-            console.log("Validation Failed");
-            toast.error("Validation Error! Please check the form for errors.", {
+            handleCloseDrawer();
+            fetchData();
+        } catch (error) {
+            console.error('Error submitting form:', error.message);
+            toast.error("Error submitting form. Please try again later.", {
                 autoClose: 3000,
                 position: "top-right",
                 style: {
-                    // backgroundColor: 'rgb(60,86,91)',
                     color: "#0075a8"
                 },
             });
         }
     };
+
+    const handleEdit = () => {
+        if (selectedRows.length !== 1) {
+            return;
+        }
+
+        const rowToEdit = selectedRows[0];
+        setFormData({
+            purposeBrief: rowToEdit.purposeBrief,
+            purposeFor: rowToEdit.purposeFor,
+            unitId: rowToEdit.unitId,
+            alertTime: rowToEdit.alertTime,
+            userId: rowToEdit.userId,
+            alert: rowToEdit.alert,
+            departmentId: rowToEdit.departmentId,
+        });
+
+        setEditingRow(rowToEdit);
+        setOpen(true);
+    };
+
 
     const handleCopy = () => {
         const dataString = filteredData.map(row => Object.values(row).join('\t')).join('\n');
@@ -256,28 +380,29 @@ const Purpose = () => {
         fetchData(page, rowsPerPage);
     };
 
-    const handleRowsPerPageChange = (newPerPage) => {
-        setRowsPerPage(newPerPage);
-        setCurrentPage(1);
-        fetchData(1, newPerPage);
+
+    const handleRowsPerPageChange = (newRowsPerPage) => {
+        setRowsPerPage(newRowsPerPage);
+        setCurrentPage(1); // Reset to first page
+        fetchData(1, newRowsPerPage);
     };
 
     const handleDownloadXLSX = async () => {
         try {
-            const response = await axiosInstance.get(downloadPurpose, {
+            const response = await axiosInstance.get(downloadExcelPurposeData, {
                 responseType: 'arraybuffer',
             });
 
             const blob = new Blob([response.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-            saveAs(blob, 'purpose.xlsx');
+            saveAs(blob, 'Purpose.xlsx');
 
             toast.success("Purpose data downloaded successfully!", {
                 autoClose: 3000,
                 position: "top-right",
             });
         } catch (error) {
-            console.error('Error downloading purpose data:', error.message);
-            toast.error("Error downloading purpose data. Please try again later.", {
+            console.error('Error downloading Purpose data:', error.message);
+            toast.error("Error downloading Purpose data. Please try again later.", {
                 autoClose: 3000,
                 position: "top-right",
             });
@@ -285,12 +410,12 @@ const Purpose = () => {
     };
 
     const handleDelete = async () => {
-        // if (selectedRows.length === 0) {
-        //     return;
-        // }
+        if (selectedRows.length === 0) {
+            return;
+        }
         Swal.fire({
             title: 'Are you sure?',
-            text: 'Are you sure you want to delete the selected plants?',
+            text: 'Are you sure you want to delete the selected Purpose?',
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#3085d6',
@@ -299,9 +424,9 @@ const Purpose = () => {
         }).then(async (result) => {
             if (result.isConfirmed) {
                 try {
-                    const deleteRequests = selectedRows.map(row => axiosInstance.delete(`${deletePurpose}/${row.id}`));
+                    const deleteRequests = selectedRows.map(row => axiosInstance.delete(`${deletePurposeData}/${row.id}`));
                     await Promise.all(deleteRequests);
-                    toast.success("Plants deleted successfully!", {
+                    toast.success("Purpose deleted successfully!", {
                         autoClose: 3000,
                         position: "top-right",
                         style: {
@@ -309,13 +434,13 @@ const Purpose = () => {
                         },
                     });
 
-                    fetchData();
+                    fetchData(currentPage, rowsPerPage);
                 } catch (error) {
-                    toast.error(`Error deleting plants: ${error.message}`, {
+                    toast.error(`Error deleting purpose: ${error.message}`, {
                         autoClose: 3000,
                         position: "top-right",
                     });
-                    console.error('Error deleting plants:', error.message);
+                    console.error('Error deleting purpose:', error.message);
                 }
             }
         });
@@ -327,9 +452,10 @@ const Purpose = () => {
         } else if (label === 'Delete') {
             handleDelete();
         } else if (label === 'Edit') {
-            // Handle edit action here
+            handleEdit(); // Trigger edit functionality
         }
     };
+
 
     const handleAutocompleteChange = (event, newValue) => {
         setFormData((prevFormData) => ({
@@ -337,6 +463,40 @@ const Purpose = () => {
             unitId: newValue ? newValue.value : null,
         }));
     };
+    const handleAutocompleteChangeDept = (event, newValue) => {
+        setFormData((prevFormData) => ({
+            ...prevFormData,
+            departmentId: newValue ? newValue.value : null,
+        }));
+    };
+    const handleAutocompleteChangeEmp = (event, newValue) => {
+        setFormData((prevFormData) => ({
+            ...prevFormData,
+            userId: newValue ? newValue.value : null,
+        }));
+    };
+    const handleAutocompleteChangePurpose = (event, newValue) => {
+        setFormData((prevFormData) => ({
+            ...prevFormData,
+            purposeFor: newValue ? newValue.value : null,
+        }));
+    };
+
+    const handleReset = () => {
+        setFormData({
+            purposeBrief: "",
+            purposeFor: null,
+            unitId: null,
+            alertTime: '',
+            userId: null,
+            alert: true,
+            departmentId: null,
+        });
+        setErrors({});
+    };
+
+
+
 
     const addInstantVisitors = (
         <>
@@ -350,23 +510,24 @@ const Purpose = () => {
                 <Grid item lg={6} md={6} xs={12} sm={12}>
                     <Box>
                         <Autocmp
-                            options={data}
-                            name="purposeFor"
                             label="Purpose For"
-                            required
-                            size="small"
-                        // options={data}
+                            options={data}
+                            value={data.find(option => option.value === formData.purposeFor) || null}
+                            onChange={handleAutocompleteChangePurpose}
+                            error={!!errors.purposeFor}
+                            helperText={errors.purposeFor}
                         />
                     </Box>
                 </Grid>
                 <Grid item lg={6} md={6} xs={12} sm={12}>
                     <Box>
                         <Texxt
-                            name="purposeBrief"
                             label="Purpose"
-                            required
-                            size="small"
-
+                            name="purposeBrief"
+                            value={formData.purposeBrief}
+                            onChange={handleChange}
+                            error={!!errors.purposeBrief}
+                            helperText={errors.purposeBrief}
                         />
                     </Box>
                 </Grid>
@@ -381,6 +542,7 @@ const Purpose = () => {
                             ]}
                             defaultValue="no"
                             onChange={(value) => {
+
                                 handleChange('approvalRequired', value);
                                 setShowAdditionalFields(value === "yes");
                             }}
@@ -391,18 +553,13 @@ const Purpose = () => {
                     <Box>
                         <Autocmp
                             label="Unit ID"
-                            name="unitId"
+                            options={unitIds}
                             value={unitIds.find(option => option.value === formData.unitId) || null}
                             onChange={handleAutocompleteChange}
-                            options={unitIds}
-                            getOptionLabel={(option) => option.value} // Display label in dropdown
-                            getOptionSelected={(option, value) => option.value === value.value} // Compare by value
-                            size="small"
-                        // error={errors.unitId}
+                            error={!!errors.unitId}
+                            helperText={errors.unitId}
                         />
-                        {errors.unitId && (
-                            <Typography variant="caption" color="error">{errors.unitId}</Typography>
-                        )}
+
 
                     </Box>
                 </Grid>
@@ -410,10 +567,9 @@ const Purpose = () => {
                     <>
                         <Grid item lg={6} md={6} xs={12} sm={12}>
                             <Box>
-                                <TimePicker
+                                <ReusableTimePicker
                                     label="Alert After"
                                     value={selectedTime}
-                                    required
                                     onChange={handleTimeChange}
                                 />
                             </Box>
@@ -421,21 +577,26 @@ const Purpose = () => {
                         <Grid item lg={6} md={6} xs={12} sm={12}>
                             <Box>
                                 <Autocmp
-                                    // options={department}
-                                    size="small"
-                                    name="Department"
                                     label="Department"
-                                    required
+                                    options={departmentData}
+                                    value={departmentData.find(option => option.value === formData.departmentId) || null}
+                                    onChange={handleAutocompleteChangeDept}
+                                    error={!!errors.departmentId}
+                                    helperText={errors.departmentId}
                                 />
+
                             </Box>
                         </Grid>
                         <Grid item lg={6} md={6} xs={12} sm={12}>
                             <Box>
                                 <Autocmp
+                                    name="userId"
                                     label="Employee Name"
-                                    required
-                                    size="small"
-                                // data={employee}
+                                    value={user.find(option => option.value === formData.userId) || null}
+                                    options={user}
+                                    onChange={handleAutocompleteChangeEmp}
+                                    error={!!errors.userId}
+                                    helperText={errors.userId}
                                 />
                             </Box>
                         </Grid>
@@ -463,6 +624,7 @@ const Purpose = () => {
                                 type="submit"
                                 variant="contained"
                                 fontSize="12px"
+                                onClick={handleReset}
                                 style={styles.resetButton}
                             />
                         </Box>
@@ -554,12 +716,12 @@ const Purpose = () => {
                             )}
                             <Box style={{ gap: "10px", marginTop: "15px", display: "flex", justifyContent: "space-between" }}>
                                 <ButtonComponent
-                                    variant="contained" style={{ fontSize: "10px" }} backgroundColor={colors.navbar}
+                                    variant="contained" style={{ borderRadius: "8px", fontSize: "12px", textTransform: "none" }} backgroundColor={colors.navbar}
                                     name="Submit" size="small" />
                                 <ButtonComponent
                                     size="small"
                                     variant="contained"
-                                    style={{ marginLeft: "10px", fontSize: "10px" }}
+                                    style={{ borderRadius: "8px", fontSize: "12px", textTransform: "none" }}
                                     backgroundColor={colors.navbar}
                                     name={showMoreFilters ? "Hide Filters" : "More Filters"}
                                     onClick={handleMoreFiltersClick}
@@ -572,7 +734,7 @@ const Purpose = () => {
                 <Grid item lg={12} md={12} sm={12} xs={12}>
                     <Box boxShadow={3} borderRadius={2} backgroundColor={colors.navbar} height="35px" borderWidth="0">
                         <Box display="flex" justifyContent="space-between" alignItems="center">
-                            <Typography ml="10px" mt="8px" variant="h10" fontSize="10px" color="white">Filtered By : </Typography>
+                            <Typography ml="10px" mt="8px" variant="h10" fontSize="12px" color="white">Filtered By : </Typography>
                             {/* <Typography mr="10px" variant="h10" color="white">Count = 0 </Typography> */}
                         </Box>
                     </Box>
@@ -588,8 +750,8 @@ const Purpose = () => {
                             pagination
                             paginationServer
                             paginationTotalRows={totalRows}
-                            onChangePage={handlePageChange}
-                            onChangeRowsPerPage={handleRowsPerPageChange}
+                            onChangePage={(page) => setCurrentPage(page)}
+                            onChangeRowsPerPage={(newRowsPerPage) => setRowsPerPage(newRowsPerPage)}
                             copyEnabled={true}
                             onCopy={handleCopy}
                             downloadEnabled={true}

@@ -83,7 +83,7 @@ const VisitorStatus = () => {
     return (
         <>
             {location.pathname === '/dashboard/visitorsstatus' && <Navigate to="/dashboard/visitorsstatus/status" replace />}
-            <Grid container spacing={1} mt="15px">
+            <Grid container spacing={1}  >
                 <Grid item lg={4} md={4} sm={6} xs={6}>
                     <Autocmp
                         name="dateWise"
@@ -113,13 +113,13 @@ const VisitorStatus = () => {
                     </Box>
                 </Grid>
                 <Grid item lg={5} md={5} sm={6} xs={6}>
-                    <Box mt="68px">
+                    <Box mt="62px">
                         <ButtonComponent
                             name="Search"
                             variant="contained"
                             backgroundColor={colors.navbar}
                             size="medium"
-                            style={{ marginLeft: "10px", fontSize: "10px" }}
+                            style={{ marginLeft: "10px", fontSize: "15px", borderRadius: "8px" }}
                         // style={{ fontSize: '14px', padding: '8px 16px' }}
                         />
                     </Box>

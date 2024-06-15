@@ -7,7 +7,7 @@ import Paper from '@mui/material/Paper';
 import Box from '@mui/material/Box';
 import { Card, CardContent } from '@mui/material';
 import Grid from '@mui/material/Grid';
-import Typography from '@mui/material/Typography';
+// import Typography from '@mui/material/Typography';
 import InputAdornment from '@mui/material/InputAdornment';
 import IconButton from '@mui/material/IconButton';
 import Visibility from '@mui/icons-material/Visibility';
@@ -17,6 +17,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { auth_api } from '../../Api/Api';
 import Cookies from 'js-cookie';
+import { Typography } from '@mui/material';
 
 export default function SignInSide() {
     const [showPassword, setShowPassword] = useState(false);

@@ -327,7 +327,7 @@ const VehicleEntry = () => {
                     </Box>
                 </Grid>
 
-                <Grid item lg={12} md={12} sm={12} xs={12}>
+                <Grid item lg={12} md={12} sm={12} xs={12} style={{ marginTop: "10px" }}>
                     <Box width="100%" bgcolor={colors.navbar}>
                         <Box display="flex" justifyContent="space-between" alignItems="center">
                             <Typography ml="10px" variant="h10" color="white">Filtered By : </Typography>

@@ -3,7 +3,27 @@ import DataTable from "react-data-table-component";
 import { Box, IconButton, CircularProgress, createTheme, ThemeProvider, Tooltip } from "@mui/material";
 import { FileCopy, GetApp } from '@mui/icons-material'; // Import icons for copy, download as XLSX
 
-const CustomDataTable = ({ columns, data, onSearch, copyEnabled, onCopy, downloadEnabled, onDownloadXLSX, paginationTotalRows, onChangePage, onChangeRowsPerPage }) => {
+const CustomDataTable = ({
+    title,
+    columns,
+    data,
+    selectableRows,
+    onSelectedRowsChange,
+    clearSelectedRows,
+    pagination,
+    paginationServer,
+    paginationTotalRows,
+    onChangePage,
+    onChangeRowsPerPage,
+    subHeader,
+    subHeaderComponent,
+    onSearch,
+    searchPlaceholder,
+    onCopy, // New prop for copy functionality
+    onDownloadXLSX, // New prop for download functionality
+    copyEnabled, // New prop to enable/disable copy button
+    downloadEnabled // New prop to enable/disable download button
+}) => {
     const [loading, setLoading] = useState(true);
 
     const tableCustomStyles = {
@@ -94,6 +114,19 @@ const CustomDataTable = ({ columns, data, onSearch, copyEnabled, onCopy, downloa
         }
     };
 
+    const handlePageChange = (page) => {
+        if (onChangePage) {
+            onChangePage(page);
+        }
+    };
+
+    const handleRowsPerPageChange = (newRowsPerPage, currentPage) => {
+        if (onChangeRowsPerPage) {
+            onChangeRowsPerPage(newRowsPerPage);
+        }
+    };
+
+
     return (
         <ThemeProvider theme={theme}>
             <Box>
@@ -114,11 +147,10 @@ const CustomDataTable = ({ columns, data, onSearch, copyEnabled, onCopy, downloa
                         highlightOnHover
                         striped
                         dense
-
                         paginationServer
                         paginationTotalRows={paginationTotalRows}
-                        onChangePage={onChangePage}
-                        onChangeRowsPerPage={onChangeRowsPerPage}
+                        onChangePage={handlePageChange}
+                        onChangeRowsPerPage={handleRowsPerPageChange}
                         subHeader
                         subHeaderComponent={
                             <Box display="flex" alignItems="center">

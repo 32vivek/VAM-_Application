@@ -1,14 +1,14 @@
 export const user_api = "https://6635d120415f4e1a5e256645.mockapi.io/VAM"
 export const auth_api = "http://localhost:8080/api/authenticate-user"
 export const unitIdDD = "http://localhost:8080/api/units/drop-down"
-export const userDetails = "http://localhost:8080/api/get-user-details"
+export const userDetails = "http://localhost:8080/api/users/get-all"
+export const userDD = "http://localhost:8080/api/users/get-dropdown"
 export const auth_apiRefresh = "http://localhost:8080/api/regenerate-token"
 export const createUnit = "http://localhost:8080/api/units/create-unit"
 export const getUnit = "http://localhost:8080/api/units/get-all-units"
 export const downloadUnit = "http://localhost:8080/api/units/download-excel-data"
 export const updateUnit = "http://localhost:8080/api/units/update-unit"
 export const deleteUnit = "http://localhost:8080/api/units/delete-unit"
-export const getDL = "http://localhost:8080/api/driving-licence/get-all"
 export const getAllPlants = "http://localhost:8080/api/plants/get-all-plants"
 export const createPlants = "http://localhost:8080/api/plants/create-plant"
 export const deletePlants = "http://localhost:8080/api/plants/delete-plant"
@@ -17,6 +17,22 @@ export const updatePlants = "http://localhost:8080/api/plants/update-plant"
 export const getAllPurpose = "http://localhost:8080/api/purposes/get-all-purposes"
 export const deletePurpose = "http://localhost:8080/api/purposes/delete-purpose"
 export const downloadPurpose = "http://localhost:8080/api/purposes/download-excel-data"
+export const createPurpose = "http://localhost:8080/api/purposes/create-purpose"
+export const updatePurpose = "http://localhost:8080/api/purposes/update-purpose"
+export const downloadExcelPurposeData = "http://localhost:8080/api/purposes/download-excel-data"
+export const deletePurposeData = "http://localhost:8080/api/purposes/delete-purpose"
+export const getDLData = "http://localhost:8080/api/driving-licence/get-all"
+export const addDLData = "http://localhost:8080/api/driving-licence/add"
+export const updateDLData = "http://localhost:8080/api/driving-licence/update"
+export const downloadDLData = "http://localhost:8080/api/driving-licence/download-driver-data"
+export const deleteDLData = "http://localhost:8080/api/driving-licence/delete"
+export const addDepartment = "http://localhost:8080/api/departments/create-departments"
+export const updateDepartment = "http://localhost:8080/api/departments/update-department"
+export const getDepartmentsData = "http://localhost:8080/api/departments/get-all-departments"
+export const deleteDepartmentsData = "http://localhost:8080/api/departments/delete-department"
+export const downloadDepartmentsData = "http://localhost:8080/api/departments/download-excel-data"
+export const departmentDropDown = "http://localhost:8080/api/departments/drop-down"
+
 
 
 
@@ -25,10 +41,10 @@ export const downloadPurpose = "http://localhost:8080/api/purposes/download-exce
 export default {
     user_api,
     auth_api,
+    userDetails,
     createUnit,
     getUnit,
     deleteUnit,
-    getDL,
     getAllPlants,
     createPlants,
     unitIdDD,
@@ -39,5 +55,20 @@ export default {
     updatePlants,
     updateUnit,
     deletePurpose,
-    downloadPurpose
+    getDLData,
+    addDLData,
+    addDepartment,
+    getDepartmentsData,
+    deleteDepartmentsData,
+    downloadDepartmentsData,
+    updateDepartment,
+    downloadDLData,
+    deleteDLData,
+    updateDLData,
+    createPurpose,
+    departmentDropDown,
+    userDD,
+    updatePurpose,
+    downloadExcelPurposeData,
+    deletePurposeData
 };

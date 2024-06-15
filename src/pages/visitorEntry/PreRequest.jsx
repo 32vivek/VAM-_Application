@@ -558,12 +558,12 @@ const PreRequest = () => {
                             </>
                         )}
                         <Box style={{ gap: "10px", marginTop: "15px", display: "flex", justifyContent: "space-between" }}>
-                            <ButtonComponent backgroundColor={colors.navbar} variant="contained" style={{ textTransform: "none", borderRadius: "8px", fontSize: "12px" }} size="small" name="Submit" />
+                            <ButtonComponent backgroundColor={colors.navbar} variant="contained" style={{ borderRadius: "8px", fontSize: "12px", textTransform: "none" }} size="small" name="Submit" />
                             <ButtonComponent backgroundColor={colors.navbar} variant="contained"
-                                style={{ textTransform: "none", borderRadius: "8px", fontSize: "10px" }}
+                                style={{ borderRadius: "8px", fontSize: "12px", textTransform: "none" }}
                                 name={showMoreFilters ? "Hide Filters" : "More Filters"}
                                 onClick={handleMoreFiltersClick}
-                                size="medium"
+                                size="small"
                             />
                         </Box>
                     </Box>

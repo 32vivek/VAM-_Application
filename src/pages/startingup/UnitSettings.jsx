@@ -157,7 +157,7 @@ const UnitSettings = () => {
     const fetchUnitIds = async () => {
         try {
             const response = await axiosInstance.get(unitIdDD);
-            const unitIdOptions = response.data.map(unit => ({ label: unit.id, value: unit.id }));
+            const unitIdOptions = response.data.map(unit => ({ label: unit.name, value: unit.id }));
             setUnitIds(unitIdOptions);
         } catch (error) {
             console.error('Error fetching unit IDs:', error.message);
@@ -443,7 +443,7 @@ const UnitSettings = () => {
                         />
                     </Box>
                 </Grid>
-                <Grid item lg={6} md={6} sm={12} xs={12}>
+                {/* <Grid item lg={6} md={6} sm={12} xs={12}>
                     <Box>
                         <Autocmp
                             label="Unit ID"
@@ -459,7 +459,7 @@ const UnitSettings = () => {
                         )}
 
                     </Box>
-                </Grid>
+                </Grid> */}
                 <Grid item lg={6} md={6} sm={12} xs={12}>
                     <Box>
                         <Texxt

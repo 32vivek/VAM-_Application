@@ -693,13 +693,13 @@ const VehicleLicence = () => {
                                     size="small"
                                     variant="contained"
                                     backgroundColor={colors.navbar}
-                                    style={{ marginLeft: "10px", fontSize: "10px" }}
+                                    style={{ borderRadius: "8px", fontSize: "12px", textTransform: "none" }}
                                     name="Submit"
                                 />
                                 <ButtonComponent
                                     size="small"
                                     variant="contained"
-                                    style={{ marginLeft: "10px", fontSize: "10px" }}
+                                    style={{ borderRadius: "8px", fontSize: "12px", textTransform: "none" }}
                                     name={showMoreFilters ? "Hide Filters" : "More Filters"}
                                     onClick={handleMoreFiltersClick}
                                     backgroundColor={colors.navbar}
@@ -711,7 +711,7 @@ const VehicleLicence = () => {
                 <Grid item lg={12} md={12} sm={12} xs={12}>
                     <Box boxShadow={3} borderRadius={2} backgroundColor={colors.navbar} height="35px" borderWidth="0">
                         <Box display="flex" justifyContent="space-between" alignItems="center">
-                            <Typography ml="10px" mt="8px" variant="h10" fontSize="10px" color="white">Filtered By : </Typography>
+                            <Typography ml="10px" mt="8px" variant="h10" fontSize="12px" color="white">Filtered By : </Typography>
                             {/* <Typography mr="10px" variant="h10" color="white">Count = 0 </Typography> */}
                         </Box>
                     </Box>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Grid } from '@mui/material';
+import { Box, FormControl, Grid } from '@mui/material';
 import { NavLink, Outlet, useLocation, Navigate, useNavigate } from 'react-router-dom';
 import ButtonComponent from '../components/Button';
 import ReusableTabs from '../components/Tabs';
@@ -63,7 +63,7 @@ const Home = () => {
         <>
             {location.pathname === '/home' && <Navigate to="/home/today" replace />}
 
-            <Box style={{ marginTop: "20px" }} justifyContent="center" alignItems="center">
+            <Box justifyContent="center" alignItems="center">
                 <Grid container spacing={3}>
                     <Grid item lg={12} md={12} sm={12} xs={12}>
                         <Box backgroundColor={colors.navbar} display="flex">
@@ -75,7 +75,7 @@ const Home = () => {
                         </Box>
                     </Grid>
                     <Grid item lg={8} md={8} sm={12} xs={12}>
-                        <Box display="flex" gap="10px">
+                        <Box display="flex" gap="5px">
                             <DatePickers
                                 label="From Date"
                                 name="fromDate"
@@ -92,15 +92,31 @@ const Home = () => {
                                 handleInputChange={handleInputChange}
                                 dateFormat="yyyy/MM/dd"
                             />
-                            <ButtonComponent
+                            {/* <ButtonComponent
                                 name="Show Visitors"
-                                size="small"
+                                size="medium"
                                 variant="contained"
                                 backgroundColor={colors.navbar}
                                 style={{ fontSize: "12px", marginTop: "5px" }}
-                            />
+                            /> */}
+
+                        </Box>
+
+                    </Grid>
+                    <Grid item lg={2} md={2} sm={12} xs={12} >
+                        <Box >
+                            <FormControl fullWidth>
+                                <ButtonComponent
+                                    name="Show Visitors"
+                                    size="small"
+                                    variant="contained"
+                                    backgroundColor={colors.navbar}
+                                    style={{ fontSize: "12px", marginTop: "5px", width: "100px" }}
+                                />
+                            </FormControl>
                         </Box>
                     </Grid>
+
                 </Grid>
                 <Box marginTop="30px">
                     <Outlet />
