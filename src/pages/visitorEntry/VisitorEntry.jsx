@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Box, Grid, Typography, FormControl, IconButton, Tooltip, SwipeableDrawer, Divider } from '@mui/material';
 import Texxt from '../../components/Textfield';
@@ -6,7 +7,7 @@ import ButtonComponent from '../../components/Button';
 import ReusablePieChart from '../../components/PieChart';
 import Autocmp from '../../components/AutoComplete';
 import CustomDataTable from '../../components/ReactDataTable';
-import { user_api } from '../../Api/Api';
+import { getAllVisitors, downloadExcelPurposeData } from '../../Api/Api';
 import axios from 'axios';
 import { SaveAlt, FileCopy, Add, ExitToApp, Print } from "@mui/icons-material";
 import * as XLSX from "xlsx";
@@ -17,6 +18,8 @@ import { Outlet, useNavigate } from 'react-router-dom';
 import { Close as CloseIcon } from '@mui/icons-material';
 import DatePickers from '../../components/DateRangePicker';
 import colors from '../colors';
+import axiosInstance from '../../components/Auth';
+import { toast, ToastContainer } from "react-toastify";
 
 const data1 = [
     { label: 'IN', value: 200, color: '#0088FE' },
@@ -41,6 +44,8 @@ const VisitorActivity = () => {
         fromDate: null,
         toDate: null
     });
+    const [selectedRows, setSelectedRows] = useState([]);
+
     const toggleDrawer = (isOpen) => {
         setOpen(isOpen);
     };
@@ -59,20 +64,46 @@ const VisitorActivity = () => {
             cell: (row) => <input type="checkbox" checked={row.selected} onChange={() => handleRowSelected(row)} />,
             sortable: false,
         },
-        { name: 'name', selector: row => row.name, sortable: true },
-        { name: 'email', selector: row => row.email, sortable: true },
-        { name: 'number', selector: row => row.number, sortable: true },
-        { name: 'address', selector: row => row.address, sortable: true },
-        { name: 'department', selector: row => row.department, sortable: true },
-        { name: 'number', selector: row => row.number, sortable: true },
+        {
+            name: 'Visitor Name',
+            selector: row => row.visitorName, sortable: true
+        },
+        { name: 'Visitor Company', selector: row => row.visitorCompany, sortable: true },
+        { name: 'Visitor Address', selector: row => row.visitorAddress, sortable: true },
+        { name: 'Driver Name', selector: row => row.driverName, sortable: true },
+        { name: 'Purpose', selector: row => row.purpose.purposeFor, sortable: true },
+        { name: 'Exp Date', selector: row => row.expDate, sortable: true },
+        { name: 'Employee Mobile', selector: row => row.user.mobile, sortable: true },
+        { name: 'Department', selector: row => row.department.departmentName, sortable: true },
+        { name: 'Time In', selector: row => row.createdAt, sortable: true },
+        { name: 'possessionAllowed', selector: row => row.possessionAllowed, sortable: true },
+        { name: 'Visitor CardNumber', selector: row => row.visitorCardNumber, sortable: true },
+        { name: 'Visitor Card Number', selector: row => row.visitorCardNumber, sortable: true },
+        { name: 'Vehicle Number', selector: row => row.vehicleNumber, sortable: true },
+        { name: 'laptop', selector: row => row.laptop, sortable: true },
+
+
+
+        {
+            name: 'Status',
+            cell: (row) => row.status ? 'Active' : 'Inactive',
+            sortable: true,
+        },
+        // { name: 'unitId', selector: row => row.unitId, sortable: true },
     ];
 
+    const handleRowSelected = (row) => {
+        const updatedData = filteredData.map((item) =>
+            item === row ? { ...item, selected: !item.selected } : item
+        );
+        setFilteredData(updatedData);
+        setSelectedRows(updatedData.filter((item) => item.selected));
+    };
     const floatingActionButtonOptions = [
-        { label: 'Visitor Entry', icon: <Add /> },
-        // { label: 'Visitor Exit', icon: <ExitToApp /> },
-        // { label: 'Re-print', icon: <Print /> }
+        { label: 'Visitor Entry', icon: <Add title="Visitor Entry" /> },
+        { label: 'Visitor Exit', icon: <ExitToApp title="Visitor Exit" /> },
+        { label: 'Re-print', icon: <Print title="Re-print" /> }
     ];
-
     const tabs = [
         { label: 'Add Instant Visitors', route: '/visitor/visitoractivity' },
         { label: 'Add Pre Visitors', route: '/visitor/visitoractivity/addprevisitors' }
@@ -95,14 +126,15 @@ const VisitorActivity = () => {
 
     const fetchData = async () => {
         try {
-            const response = await axios.get(user_api);
-            setVisitorsData(response.data);
-            setFilteredData(response.data);
+            const response = await axiosInstance.get(getAllVisitors);
+            setVisitorsData(response.data.content);
+            setFilteredData(response.data.content);
         } catch (error) {
             console.error('Error fetching data:', error);
         }
     };
-
+    console.log(visitorsData, "1");
+    console.log(filteredData, "2");
     useEffect(() => {
         fetchData();
     }, []);
@@ -116,21 +148,28 @@ const VisitorActivity = () => {
         setFilteredData(filtered);
     };
 
-    const handleRowSelected = (row) => {
-        const updatedData = filteredData.map((item) =>
-            item === row ? { ...item, selected: true } : { ...item, selected: false }
-        );
-        setFilteredData(updatedData);
-    };
 
 
-    const exportToExcel = () => {
-        const worksheet = XLSX.utils.json_to_sheet(filteredData);
-        const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, "VisitorsData");
-        const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
-        const data = new Blob([excelBuffer], { type: "application/octet-stream" });
-        saveAs(data, "VisitorsData.xlsx");
+    const handleDownloadXLSX = async () => {
+        try {
+            const response = await axiosInstance.get(downloadExcelPurposeData, {
+                responseType: 'arraybuffer',
+            });
+
+            const blob = new Blob([response.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+            saveAs(blob, 'Visitors.xlsx');
+
+            toast.success("Visitors data downloaded successfully!", {
+                autoClose: 3000,
+                position: "top-right",
+            });
+        } catch (error) {
+            console.error('Error downloading Visitors data:', error.message);
+            toast.error("Error downloading Visitors data. Please try again later.", {
+                autoClose: 3000,
+                position: "top-right",
+            });
+        }
     };
 
     const copyTableData = () => {
@@ -198,6 +237,7 @@ const VisitorActivity = () => {
 
     return (
         <>
+            <ToastContainer style={{ marginTop: "45px" }} />
             <SwipeableDrawer
                 anchor="right"
                 open={open}
@@ -329,25 +369,18 @@ const VisitorActivity = () => {
                     <Box width="100%" bgcolor={colors.navbar}>
                         <Box display="flex" justifyContent="space-between" alignItems="center">
                             <Typography ml="10px" variant="h10" color="white">Filtered By : </Typography>
-                            {/* <Typography variant="h10" color="white">Count = {filteredData.length} </Typography> */}
-                            <Box display="flex" alignItems="center">
-                                <Tooltip title="Export to Excel">
-                                    <IconButton onClick={exportToExcel} style={{ color: 'white' }}>
-                                        <SaveAlt />
-                                    </IconButton>
-                                </Tooltip>
-                                <Tooltip title="Copy Data">
-                                    <IconButton onClick={copyTableData} style={{ color: 'white' }}>
-                                        <FileCopy />
-                                    </IconButton>
-                                </Tooltip>
-                            </Box>
                         </Box>
                     </Box>
                 </Grid>
                 <Grid item lg={12} md={12} sm={12} xs={12}>
                     <Box width="100%" boxShadow={3} padding={2} borderRadius={2} bgcolor='white'>
-                        <CustomDataTable columns={columns} filteredData={filteredData} onSearch={handleSearch}
+                        <CustomDataTable
+                            columns={columns}
+                            data={filteredData}
+                            downloadEnabled={true}
+                            copyEnabled={true}
+                            onSelectedRowsChange={(selected) => setSelectedRows(selected.selectedRows)}
+                            onDownloadXLSX={handleDownloadXLSX}
                         />
                     </Box>
                 </Grid>

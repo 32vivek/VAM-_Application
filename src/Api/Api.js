@@ -1,3 +1,4 @@
+
 export const user_api = "https://6635d120415f4e1a5e256645.mockapi.io/VAM"
 export const auth_api = "http://localhost:8080/api/authenticate-user"
 export const unitIdDD = "http://localhost:8080/api/units/drop-down"
@@ -21,6 +22,7 @@ export const createPurpose = "http://localhost:8080/api/purposes/create-purpose"
 export const updatePurpose = "http://localhost:8080/api/purposes/update-purpose"
 export const downloadExcelPurposeData = "http://localhost:8080/api/purposes/download-excel-data"
 export const deletePurposeData = "http://localhost:8080/api/purposes/delete-purpose"
+export const dropDownPurpose = "http://localhost:8080/api/purposes/drop-down"
 export const getDLData = "http://localhost:8080/api/driving-licence/get-all"
 export const addDLData = "http://localhost:8080/api/driving-licence/add"
 export const updateDLData = "http://localhost:8080/api/driving-licence/update"
@@ -32,6 +34,12 @@ export const getDepartmentsData = "http://localhost:8080/api/departments/get-all
 export const deleteDepartmentsData = "http://localhost:8080/api/departments/delete-department"
 export const downloadDepartmentsData = "http://localhost:8080/api/departments/download-excel-data"
 export const departmentDropDown = "http://localhost:8080/api/departments/drop-down"
+export const createInstantVisitors = "http://localhost:8080/api/visitors/create-visitor"
+export const getAllVisitors = "http://localhost:8080/api/visitors/get-all-visitors"
+export const downloadVisitorsExcel = "http://localhost:8080/api/visitors/download-excel-data"
+export const deleteVisitorsData = "http://localhost:8080/api/visitors/delete-visitors"
+
+
 
 
 
@@ -70,5 +78,11 @@ export default {
     userDD,
     updatePurpose,
     downloadExcelPurposeData,
-    deletePurposeData
+    deletePurposeData,
+    dropDownPurpose,
+    createInstantVisitors,
+    getAllVisitors,
+    downloadVisitorsExcel,
+    deleteVisitorsData
 };
+
