@@ -1,122 +1,92 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import Paper from '@mui/material/Paper';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TablePagination from '@mui/material/TablePagination';
-import TableRow from '@mui/material/TableRow';
-import { styled } from '@mui/system';
+import React, { useState } from 'react';
+import './table.css';
+import '@fortawesome/fontawesome-free/css/all.min.css';
 
-// Create styled components to make the table compact
-const CompactTableCell = styled(TableCell)(({ theme }) => ({
-    padding: '4px 8px',
-}));
+const ReusableTable = ({ columns, rows, rowsPerPageOptions = [10, 20, 50], defaultRowsPerPage = 10 }) => {
+    const [currentPage, setCurrentPage] = useState(0);
+    const [rowsPerPage, setRowsPerPage] = useState(defaultRowsPerPage);
 
-const CompactTableRow = styled(TableRow)(({ theme }) => ({
-    height: 24,
-}));
+    const totalPages = Math.ceil(rows.length / rowsPerPage);
 
-// Styled TableHead component to change background color
-const StyledTableHead = styled(TableHead)(({ theme }) => ({
-    background: 'green',
-}));
-
-// Styled TablePagination component to change background color and make it smaller
-const StyledTablePagination = styled(TablePagination)(({ theme }) => ({
-    background: 'green',
-    padding: '10px', // Adjust padding to reduce height
-    minHeight: 'unset', // Override minHeight if needed
-    '& .MuiTablePagination-spacer': {
-        flex: 'none', // To prevent stretching
-    },
-    '& .MuiTablePagination-actions': {
-        flex: 'none', // To prevent stretching
-    },
-}));
-
-const StickyHeadTable = ({ columns, rows }) => {
-    const [page, setPage] = React.useState(0);
-    const [rowsPerPage, setRowsPerPage] = React.useState(10);
-
-    const handleChangePage = (event, newPage) => {
-        setPage(newPage);
+    const handleChangePage = (newPage) => {
+        setCurrentPage(newPage);
     };
 
     const handleChangeRowsPerPage = (event) => {
-        setRowsPerPage(+event.target.value);
-        setPage(0);
+        setRowsPerPage(parseInt(event.target.value, 10));
+        setCurrentPage(0);
     };
 
+    const start = currentPage * rowsPerPage;
+    const end = start + rowsPerPage;
+    const currentRows = rows.slice(start, end);
+
     return (
-        <Paper>
-            <TableContainer sx={{ maxHeight: 250, overflowX: 'auto' }}>
-                <Table stickyHeader size="small" aria-label="sticky table">
-                    <StyledTableHead>
-                        <CompactTableRow>
-                            {columns.map((column) => (
-                                <CompactTableCell
-                                    key={column.id}
-                                    align={column.align}
-                                    style={{ minWidth: column.minWidth }}
-                                >
-                                    {column.label}
-                                </CompactTableCell>
+        <div className="table-container">
+            <div className="table-wrapper">
+                <table className="table">
+                    <thead>
+                        <tr>
+                            {columns.map((column, index) => (
+                                <th key={index}>{column.name}</th>
                             ))}
-                        </CompactTableRow>
-                    </StyledTableHead>
-                    <TableBody>
-                        {rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => (
-                            <CompactTableRow hover role="checkbox" tabIndex={-1} key={row.code}>
-                                {columns.map((column) => {
-                                    const value = row[column.id];
-                                    return (
-                                        <CompactTableCell key={column.id} align={column.align}>
-                                            {column.format && typeof value === 'number'
-                                                ? column.format(value)
-                                                : value}
-                                        </CompactTableCell>
-                                    );
-                                })}
-                            </CompactTableRow>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {currentRows.map((row, rowIndex) => (
+                            <tr key={rowIndex}>
+                                {columns.map((column, colIndex) => (
+                                    <td key={colIndex}>
+                                        {column.selector(row)}
+                                    </td>
+                                ))}
+                            </tr>
                         ))}
-                    </TableBody>
-                </Table>
-            </TableContainer>
-            <StyledTablePagination
-                rowsPerPageOptions={[10, 25, 100]}
-                component="div"
-                count={rows.length}
-                rowsPerPage={rowsPerPage}
-                page={page}
-                onPageChange={handleChangePage}
-                onRowsPerPageChange={handleChangeRowsPerPage}
-            />
-        </Paper>
+                    </tbody>
+                </table>
+            </div>
+            <div className="pagination">
+                <button
+                    onClick={() => handleChangePage(0)}
+                    disabled={currentPage === 0}
+                    className="pagination-btn"
+                >
+                    <i className="fas fa-angle-double-left"></i>
+                </button>
+                <button
+                    onClick={() => handleChangePage(currentPage - 1)}
+                    disabled={currentPage === 0}
+                    className="pagination-btn"
+                >
+                    <i className="fas fa-angle-left"></i>
+                </button>
+                <span>
+                    Page {currentPage + 1} of {totalPages}
+                </span>
+                <button
+                    onClick={() => handleChangePage(currentPage + 1)}
+                    disabled={currentPage >= totalPages - 1}
+                    className="pagination-btn"
+                >
+                    <i className="fas fa-angle-right"></i>
+                </button>
+                <button
+                    onClick={() => handleChangePage(totalPages - 1)}
+                    disabled={currentPage >= totalPages - 1}
+                    className="pagination-btn"
+                >
+                    <i className="fas fa-angle-double-right"></i>
+                </button>
+                <select value={rowsPerPage} onChange={handleChangeRowsPerPage} className="pagination-select">
+                    {rowsPerPageOptions.map((option) => (
+                        <option key={option} value={option}>
+                            {option} rows per page
+                        </option>
+                    ))}
+                </select>
+            </div>
+        </div>
     );
 };
 
-StickyHeadTable.propTypes = {
-    columns: PropTypes.arrayOf(
-        PropTypes.shape({
-            id: PropTypes.string.isRequired,
-            label: PropTypes.string.isRequired,
-            minWidth: PropTypes.number,
-            align: PropTypes.string,
-            format: PropTypes.func,
-        })
-    ).isRequired,
-    rows: PropTypes.arrayOf(
-        PropTypes.shape({
-            name: PropTypes.string.isRequired,
-            code: PropTypes.string.isRequired,
-            population: PropTypes.number,
-            size: PropTypes.number,
-            density: PropTypes.number,
-        })
-    ).isRequired,
-};
-
-export default StickyHeadTable;
+export default ReusableTable;

@@ -89,7 +89,7 @@ const Purpose = () => {
     const [selectedTime, setSelectedTime] = useState();
 
     const handleTimeChange = (newTime) => {
-        console.log("New Time Selected:", newTime);
+        // console.log("New Time Selected:", newTime);
         setSelectedTime(newTime);
         setFormData((prevFormData) => ({
             ...prevFormData,

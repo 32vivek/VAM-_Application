@@ -5,7 +5,6 @@ const colors = {
     resetButtonColor: '#ffffff',
     cancelButtonBackground: '#F70D1A',
     cancelButtonColor: "#ffffff"
-
 };
 
 

@@ -10,7 +10,7 @@ import { toast, ToastContainer } from 'react-toastify';
 import CustomCheckbox from './../../components/CheckBox';
 import colors from '../colors';
 import { Search as SearchIcon } from '@mui/icons-material';
-import { departmentDropDown, userDD, dropDownPurpose, unitIdDD, createInstantVisitors } from '../../Api/Api';
+import { departmentDropDown, userDD, dropDownPurpose, unitIdDD, createInstantVisitors, getAllVisitorsCount } from '../../Api/Api';
 import axiosInstance from '../../components/Auth';
 import DatePickers from '../../components/DateRangePicker';
 
@@ -61,7 +61,7 @@ const AddInstantVisitors = () => {
         visitorCardNo: '',
         vehicleNumber: '',
         laptop: '',
-        approvalRequired: 'yes',
+        approvalRequired: true,
         validFrom: null,
         validTill: null,
         mail: true,
@@ -106,9 +106,18 @@ const AddInstantVisitors = () => {
         if (!values.userId) {
             errors.userId = "Employee Name is required";
         }
+        if (!values.expDate) {
+            errors.expDate = "Date field is required";
+        }
 
         if (!values.purposeId) {
             errors.purposeId = "purposeId is required";
+        }
+        if (!values.unitId) {
+            errors.unitId = "unitId is required";
+        }
+        if (!values.departmentId) {
+            errors.departmentId = "departmentId is required";
         }
         if (!values.possessionAllowed) {
             errors.possessionAllowed = "possessionAllowed is required";
@@ -119,7 +128,6 @@ const AddInstantVisitors = () => {
         if (!values.visitorAddress) {
             errors.visitorAddress = "Visitor Address is required";
         }
-
 
         return errors;
     };
@@ -167,7 +175,7 @@ const AddInstantVisitors = () => {
         formDataToSubmit.append('mail', formData.mail);
         formDataToSubmit.append('sms', formData.sms);
 
-        // Convert and append date fields
+        // Convert and append date fields 
         if (formData.validFrom) {
             let validFromValue = new Date(formData.validFrom.target.value);
             let formattedValidFrom = validFromValue.toISOString().substring(0, 19); // Extract the first 19 characters for YYYY-MM-DDTHH:MM:SS
@@ -268,7 +276,6 @@ const AddInstantVisitors = () => {
             console.error('Error fetching department:', error.message);
         }
     };
-
     const fetchPurposeDD = async () => {
         try {
             const response = await axiosInstance.get(`${dropDownPurpose}`);
@@ -290,7 +297,6 @@ const AddInstantVisitors = () => {
             console.error('Error fetching unit IDs:', error.message);
         }
     };
-
 
     const handleAutocompleteChangeEmp = (event, newValue) => {
         setFormData((prevFormData) => ({
@@ -356,14 +362,9 @@ const AddInstantVisitors = () => {
                             <Texxt
                                 name="number"
                                 size="small"
-                                // required
                                 type="number"
                                 label="Number"
                                 placeholder="Enter Number"
-                            // error={formErrors.number}
-                            // helperText={formErrors.number}
-                            // value={formData.number}
-                            // onChange={(e) => handleChange(e.target.name, e.target.value)}
                             />
                         </Box>
                     </Grid>
@@ -416,11 +417,13 @@ const AddInstantVisitors = () => {
                                 options={unitIds}
                                 value={unitIds.find(option => option.value === formData.unitId) || null}
                                 onChange={handleAutocompleteChange}
-                                error={!!errors.unitId}
+                                // error={!!errors.unitId}
                                 size="small"
-                                helperText={errors.unitId}
+                            // helperText={errors.unitId}
                             />
-
+                            {formErrors.unitId && (
+                                <Typography fontSize="12px" color="error">{formErrors.unitId}</Typography>
+                            )}
 
                         </Box>
                     </Grid>
@@ -450,9 +453,12 @@ const AddInstantVisitors = () => {
                                 required
                                 value={departmentData.find(option => option.value === formData.departmentId) || null}
                                 onChange={handleAutocompleteChangeDept}
-                                error={!!errors.departmentId}
-                                helperText={errors.departmentId}
+                            // error={!!errors.departmentId}
+                            // helperText={errors.departmentId}
                             />
+                            {formErrors.departmentId && (
+                                <Typography fontSize="12px" color="error">{formErrors.departmentId}</Typography>
+                            )}
                         </Box>
                     </Grid>
                     <Grid item lg={6} md={6} xs={12} sm={12}>
@@ -465,9 +471,12 @@ const AddInstantVisitors = () => {
                                 options={user}
                                 size="small"
                                 onChange={handleAutocompleteChangeEmp}
-                                error={!!errors.userId}
-                                helperText={errors.userId}
+                            // error={!!errors.userId}
+                            // helperText={errors.userId}
                             />
+                            {formErrors.userId && (
+                                <Typography fontSize="12px" color="error">{formErrors.userId}</Typography>
+                            )}
                         </Box>
                     </Grid>
                     <Grid item lg={6} md={6} xs={12} sm={12}>
@@ -538,9 +547,12 @@ const AddInstantVisitors = () => {
                                 value={purpose.find(option => option.value === formData.purposeId) || null}
                                 options={purpose}
                                 onChange={handleAutocompleteChangePurposeDD}
-                                error={formErrors.purposeId}
-                                helperText={formErrors.purposeId}
+                            // error={formErrors.purposeId}
+                            // helperText={formErrors.purposeId}
                             />
+                            {formErrors.purposeId && (
+                                <Typography fontSize="12px" color="error">{formErrors.purposeId}</Typography>
+                            )}
                         </Box>
                     </Grid>
                     <Grid item lg={6} md={6} sm={12} xs={12}>
@@ -552,6 +564,9 @@ const AddInstantVisitors = () => {
                                 handleInputChange={handleDateChangeFrom}
                                 required
                             />
+                            {formErrors.expDate && (
+                                <Typography fontSize="12px" color="error">{formErrors.expDate}</Typography>
+                            )}
                         </Box>
                     </Grid>
                     <Grid item lg={6} md={6} sm={12} xs={12}>
@@ -563,6 +578,9 @@ const AddInstantVisitors = () => {
                                 handleInputChange={handleDateChangeTill}
                                 required
                             />
+                            {formErrors.expDate && (
+                                <Typography fontSize="12px" color="error">{formErrors.expDate}</Typography>
+                            )}
 
                         </Box>
                     </Grid>

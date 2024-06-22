@@ -37,7 +37,16 @@ export const departmentDropDown = "http://localhost:8080/api/departments/drop-do
 export const createInstantVisitors = "http://localhost:8080/api/visitors/create-visitor"
 export const getAllVisitors = "http://localhost:8080/api/visitors/get-all-visitors"
 export const downloadVisitorsExcel = "http://localhost:8080/api/visitors/download-excel-data"
-export const deleteVisitorsData = "http://localhost:8080/api/visitors/delete-visitors"
+export const deleteVisitorsData = "http://localhost:8080/api/visitors/delete-visitor"
+export const getAllVisitorsCount = "http://localhost:8080/api/visitors/get-all-visitor-count"
+export const createPreVisitor = "http://localhost:8080/api/visitors-prerequest/create"
+export const getAllPreVisitor = "http://localhost:8080/api/visitors-prerequest/get-all"
+export const getAllPreVisitorStatusCount = "http://localhost:8080/api/visitors-prerequest/get-status-count"
+export const downloadPreVisitorsExcel = "http://localhost:8080/api/visitors-prerequest/download-excel-data"
+export const otpPreRequest = "http://localhost:8080/api/visitors-prerequest/get-by-otp"
+
+
+
 
 
 
@@ -83,6 +92,12 @@ export default {
     createInstantVisitors,
     getAllVisitors,
     downloadVisitorsExcel,
-    deleteVisitorsData
+    deleteVisitorsData,
+    createPreVisitor,
+    getAllVisitorsCount,
+    getAllPreVisitor,
+    getAllPreVisitorStatusCount,
+    downloadPreVisitorsExcel,
+    otpPreRequest
 };
 

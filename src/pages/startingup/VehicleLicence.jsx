@@ -437,32 +437,32 @@ const VehicleLicence = () => {
                 <Grid item lg={6} md={6} sm={12} xs={12}>
                     <Box style={{ marginTop: "15px" }}>
                         <DatePickers
-                            placeholder="From Date"
+                            label="From Date"
                             value={formData.fromDate}
                             handleInputChange={handleInputChange}
                         />
                         {errors.pucDate && (
-                            <Typography color="error">{errors.pucDate}</Typography>
+                            <Typography fontSize="12px" color="error">{errors.pucDate}</Typography>
                         )}
                     </Box>
                 </Grid>
                 <Grid item lg={6} md={6} sm={12} xs={12}>
                     <Box style={{ marginTop: "15px" }}>
                         <DatePickers
-                            placeholder="From Date"
+                            label="From Date"
                             value={formData.fromDate}
                             handleInputChange={handleInputChange}
                         />
 
                         {errors.regDate && (
-                            <Typography color="error">{errors.regDate}</Typography>
+                            <Typography fontSize="12px" color="error">{errors.regDate}</Typography>
                         )}
                     </Box>
                 </Grid>
                 <Grid item lg={6} md={6} sm={12} xs={12}>
                     <Box style={{ marginTop: "15px" }}>
                         <DatePickers
-                            placeholder="From Date"
+                            label="From Date"
                             value={formData.fromDate}
                             handleInputChange={handleInputChange}
                         />
