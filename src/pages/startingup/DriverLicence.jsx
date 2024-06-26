@@ -148,7 +148,7 @@ const DriverLicence = () => {
             const response = await axiosInstance.get(`${unitIdDD}`);
             const unitIdOptions = response.data.map(unit => ({ label: unit.name, value: unit.id }));
             setUnitIds(unitIdOptions);
-            console.log('Unit IDs:', unitIdOptions); // Log unitIds after fetching
+            console.log('Unit IDs:', unitIdOptions);
 
         } catch (error) {
             console.error('Error fetching unit IDs:', error.message);
@@ -324,9 +324,6 @@ const DriverLicence = () => {
             });
         }
     };
-
-
-
     const handleCopy = () => {
         const dataString = filteredData
             .map((row) => Object.values(row).join("\t"))
@@ -586,11 +583,11 @@ const DriverLicence = () => {
                     <Box style={{ marginTop: "10px" }}>
                         <DatePickers
                             placeholder="From Date"
+                            label="From Date"
                             value={formData.expDate}
                             handleInputChange={handleDateChange}
                             required
                         />
-
                     </Box>
                 </Grid>
                 <Grid item lg={6} md={6} sm={12} xs={12}>

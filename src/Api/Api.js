@@ -1,4 +1,3 @@
-
 export const user_api = "https://6635d120415f4e1a5e256645.mockapi.io/VAM"
 export const auth_api = "http://localhost:8080/api/authenticate-user"
 export const unitIdDD = "http://localhost:8080/api/units/drop-down"
@@ -44,6 +43,12 @@ export const getAllPreVisitor = "http://localhost:8080/api/visitors-prerequest/g
 export const getAllPreVisitorStatusCount = "http://localhost:8080/api/visitors-prerequest/get-status-count"
 export const downloadPreVisitorsExcel = "http://localhost:8080/api/visitors-prerequest/download-excel-data"
 export const otpPreRequest = "http://localhost:8080/api/visitors-prerequest/get-by-otp"
+export const addVehicleLicence = "http://localhost:8080/api/vehicle-licence/add"
+export const getVehicleLicence = "http://localhost:8080/api/vehicle-licence/get-all"
+export const deleteVehicleLicence = "http://localhost:8080/api/vehicle-licence/delete"
+export const downloadVehicleLicence = "http://localhost:8080/api/vehicle-licence/download-vehicle-data"
+export const updateVehicleLicence = "http://localhost:8080/api/vehicle-licence/update"
+
 
 
 
@@ -98,6 +103,11 @@ export default {
     getAllPreVisitor,
     getAllPreVisitorStatusCount,
     downloadPreVisitorsExcel,
-    otpPreRequest
+    otpPreRequest,
+    addVehicleLicence,
+    getVehicleLicence,
+    deleteVehicleLicence,
+    downloadVehicleLicence,
+    updateVehicleLicence
 };
 

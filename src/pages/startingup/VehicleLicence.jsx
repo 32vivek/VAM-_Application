@@ -11,7 +11,7 @@ import Autocmp from "../../components/AutoComplete";
 import ButtonComponent from "../../components/Button";
 import CustomDataTable from "../../components/ReactDataTable";
 import axios from "axios";
-import { user_api } from "../../Api/Api";
+import { user_api, addVehicleLicence, unitIdDD, getVehicleLicence, deleteVehicleLicence, downloadVehicleLicence, updateVehicleLicence } from "../../Api/Api";
 import FloatingButton from "../../components/FloatingButton";
 import { toast, ToastContainer } from "react-toastify";
 import Texxt from "../../components/Textfield";
@@ -27,6 +27,8 @@ import {
 import DatePickers from "../../components/DateRangePicker";
 import InputFileUpload from "../../components/FileUpload";
 import colors from "../colors";
+import axiosInstance from "../../components/Auth";
+import Swal from 'sweetalert2';
 
 const statuss = [
     {
@@ -50,25 +52,26 @@ const VehicleLicence = () => {
     const [showAdditionalFields, setShowAdditionalFields] = useState(false);
     const [attachedFile, setAttachedFile] = useState(null);
     const [selectedStatus, setSelectedStatus] = useState([statuss[0]]);
+    const [editingRowId, setEditingRowId] = useState(null);
+    const [isEditing, setIsEditing] = useState(false);
+
     const [formData, setFormData] = useState({
         vehicleNumber: "",
         vehicleType: "",
         vehicleOwner: "",
         brief: "",
-        expDate: null,
         pucDate: null,
-        regDate: null,
+        registrationDate: null,
         insuranceDate: null,
-        fromDate: null,
-        toDate: null,
         attachedFiles: {
-            puc: null,
-            insurance: null,
-            registration: null
+            pucFile: null,
+            insuranceFile: null,
+            registrationFile: null
         }
     });
 
     const [searchNumber, setSearchNumber] = useState('');
+    const [unitIds, setUnitIds] = useState([]);
 
 
     const floatingActionButtonOptions =
@@ -94,12 +97,13 @@ const VehicleLicence = () => {
             ),
             sortable: false,
         },
-        { name: "name", selector: (row) => row.name, sortable: true },
-        { name: "email", selector: (row) => row.email, sortable: true },
-        { name: "number", selector: (row) => row.number, sortable: true },
-        { name: "address", selector: (row) => row.address, sortable: true },
-        { name: "department", selector: (row) => row.department, sortable: true },
-        { name: "number", selector: (row) => row.number, sortable: true },
+        { name: "Vehicle Owner", selector: (row) => row.vehicleOwner, sortable: true },
+        { name: "Vehicle Number ", selector: (row) => row.vehicleNumber, sortable: true },
+        { name: "Vehicle Type", selector: (row) => row.vehicleType, sortable: true },
+        { name: "Puc Date", selector: (row) => row.pucDate, sortable: true },
+        { name: "Registration Date", selector: (row) => row.registrationDate, sortable: true },
+        { name: "Insurance Date", selector: (row) => row.insuranceDate, sortable: true },
+        { name: "Brief", selector: (row) => row.brief, sortable: true },
     ];
 
     const styles = {
@@ -124,38 +128,14 @@ const VehicleLicence = () => {
 
     const fetchData = async () => {
         try {
-            const response = await axios.get(user_api);
-            setVisitorsData(response.data);
-            setFilteredData(response.data);
+            const response = await axiosInstance.get(getVehicleLicence);
+            // console.log(response.data.content, "Vehicle");
+            const activeData = response.data.content.filter(item => item.status === true);
+            setVisitorsData(activeData);
+            setFilteredData(activeData);
         } catch (error) {
             console.error("Error fetching data:", error);
         }
-    };
-
-    const validateForm = () => {
-        const newErrors = {};
-
-        if (!formData.vehicleNumber) {
-            newErrors.vehicleNumber = "Vehicle Number is required";
-        }
-        if (!formData.vehicleOwner) {
-            newErrors.vehicleOwner = "Vehicle Owner Name is required";
-        }
-        if (!formData.vehicleType) {
-            newErrors.vehicleType = "Vehicle Type is required";
-        }
-        if (!formData.pucDate) {
-            newErrors.pucDate = "PUC Date is required";
-        }
-        if (!formData.regDate) {
-            newErrors.regDate = "Registration Date is required";
-        }
-        if (!formData.insuranceDate) {
-            newErrors.insuranceDate = "Insurance Date is required";
-        }
-
-        setErrors(newErrors);
-        return Object.keys(newErrors).length === 0;
     };
 
     useEffect(() => {
@@ -202,50 +182,152 @@ const VehicleLicence = () => {
         }
     };
 
-    const handleFormSubmit = (e) => {
+    const validateForm = () => {
+        const newErrors = {};
+
+        if (!formData.vehicleNumber) {
+            newErrors.vehicleNumber = "Vehicle Number is required";
+        }
+        // if (!formData.driverMobile) {
+        //     newErrors.driverMobile = 'Mobile Number is required';
+        // } else if (!/^\d{10}$/.test(formData.driverMobile)) {
+        //     newErrors.driverMobile = 'Mobile Number should be 10 digits long';
+        // }
+        if (!formData.vehicleType) {
+            newErrors.vehicleType = "Vehicle Type is required";
+        }
+        if (!formData.vehicleOwner) {
+            newErrors.vehicleOwner = "Vehicle Owner is required";
+        } if (!formData.unitId) {
+            newErrors.unitId = "Unit Id is required";
+        } if (!formData.insuranceDate) {
+            newErrors.insuranceDate = "Insurance Date  is required";
+        } if (!formData.pucDate) {
+            newErrors.pucDate = "PUC Date is required";
+        }
+        if (!formData.registrationDate) {
+            newErrors.registrationDate = "Registration Date is required";
+        }
+        if (!formData.brief) {
+            newErrors.brief = "Brief is required";
+        }
+        if (!formData.pucFile) {
+            newErrors.pucFile = "Puc File is required";
+        }
+        if (!formData.insuranceFile) {
+            newErrors.insuranceFile = "Insurance File is required";
+        }
+        if (!formData.registrationFile) {
+            newErrors.registrationFile = "Registration File File is required";
+        }
+
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
+    const handleFormSubmit = async (e) => {
         e.preventDefault();
 
-        if (validateForm()) {
+        try {
+            const formDataToSend = new FormData();
+            const jsonString = {
+                vehicleNumber: formData.vehicleNumber,
+                vehicleType: formData.vehicleType,
+                vehicleOwner: formData.vehicleOwner,
+                brief: formData.brief,
+                unitId: formData.unitId,
+                pucDate: formData.pucDate.target.value.substring(0, 10),
+                registrationDate: formData.registrationDate.target.value.substring(0, 10),
+                insuranceDate: formData.insuranceDate.target.value.substring(0, 10)
+            };
 
-            console.log("Form Data:", formData);
+            formDataToSend.append('jsonString', JSON.stringify(jsonString));
 
-            // Reset the form after successful submission
-            setFormData({
-                vehicleNumber: "",
-                vehicleOwner: "",
-                brief: "",
-                vehicleType: "",
-                expDate: null,
-                pucDate: null,
-                regDate: null,
-                insuranceDate: null,
-                attachedFiles: {
-                    puc: null,
-                    insurance: null,
-                    registration: null
-                }
-            });
-            setAttachedFile(null);
+            if (formData.attachedFiles.pucFile) {
+                formDataToSend.append('pucFile', formData.attachedFiles.pucFile);
+            }
+            if (formData.attachedFiles.insuranceFile) {
+                formDataToSend.append('insuranceFile', formData.attachedFiles.insuranceFile);
+            }
+            if (formData.attachedFiles.registrationFile) {
+                formDataToSend.append('registrationFile', formData.attachedFiles.registrationFile);
+            }
 
-            toast.success("Form submitted successfully!", {
+            let response;
+            if (formData.id) {
+                // Update existing entry
+                response = await axiosInstance.put(updateVehicleLicence, formDataToSend, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    }
+                });
+            } else {
+                // Add new entry
+                response = await axiosInstance.post(addVehicleLicence, formDataToSend, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    }
+                });
+            }
+
+            if (response.status === 200 || response.status === 201) {
+                // Reset the form after successful submission
+                toast.success(formData.id ? "Vehicle license updated successfully!" : "Vehicle license added successfully!", {
+                    autoClose: 3000,
+                    position: "top-right",
+                    style: { color: "#0075a8" },
+                });
+                fetchData(); // Example function to fetch updated data
+                // Reset form data state
+                setFormData({
+                    vehicleNumber: "",
+                    vehicleType: "",
+                    vehicleOwner: "",
+                    brief: "",
+                    pucDate: null,
+                    registrationDate: null,
+                    insuranceDate: null,
+                    attachedFiles: {
+                        pucFile: null,
+                        insuranceFile: null,
+                        registrationFile: null
+                    }
+                });
+            } else {
+                // Handle unexpected status codes if needed
+                console.error("Unexpected status:", response.status);
+                toast.error("Failed to submit form. Please try again later.", {
+                    autoClose: 3000,
+                    position: "top-right",
+                    style: { color: "#ff0000" },
+                });
+            }
+        } catch (error) {
+            console.error("Error submitting form:", error);
+            toast.error("Failed to submit form. Please try again later.", {
                 autoClose: 3000,
                 position: "top-right",
-                style: {
-                    // backgroundColor: "rgb(60,86,91)",
-                    color: "#0075a8"
-                },
-            });
-        } else {
-            toast.error("Please fill all the required fields.", {
-                autoClose: 3000,
-                position: "top-right",
-                style: {
-                    // backgroundColor: "rgb(60,86,91)",
-                    color: "#0075a8"
-                },
+                style: { color: "#ff0000" },
             });
         }
     };
+
+
+    const fetchUnitIds = async () => {
+        try {
+            const response = await axiosInstance.get(`${unitIdDD}`);
+            const unitIdOptions = response.data.map(unit => ({ label: unit.name, value: unit.id }));
+            setUnitIds(unitIdOptions);
+            console.log('Unit IDs:', unitIdOptions); // Log unitIds after fetching
+
+        } catch (error) {
+            console.error('Error fetching unit IDs:', error.message);
+        }
+    };
+
+    useEffect(() => {
+        fetchUnitIds();
+    }, [])
 
     const handleCopy = () => {
         const dataString = filteredData
@@ -262,36 +344,28 @@ const VehicleLicence = () => {
         });
     };
 
-    const handleDownloadXLSX = () => {
-        const worksheet = XLSX.utils.json_to_sheet(filteredData);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, worksheet, "Sheet1");
-        const wbout = XLSX.write(wb, { type: "array", bookType: "xlsx" });
-        const blob = new Blob([wbout], { type: "application/octet-stream" });
-        const fileName = "table_data.xlsx";
-        saveAs(blob, fileName);
-        toast.success("Table data downloaded as XLSX successfully!", {
-            autoClose: 3000,
-            position: "top-right",
-            style: {
-                // backgroundColor: "rgb(60,86,91)",
-                color: "#0075a8"
-            },
-        });
-    };
+    const handleDownloadXLSX = async () => {
+        try {
+            const response = await axiosInstance.get(downloadVehicleLicence, {
+                responseType: 'arraybuffer',
+            });
 
-    const handleFileUpload = (event, type) => {
-        const file = event.target.files[0];
-        if (file) {
-            setFormData((prevFormData) => ({
-                ...prevFormData,
-                attachedFiles: {
-                    ...prevFormData.attachedFiles,
-                    [type]: file,
-                },
-            }));
+            const blob = new Blob([response.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+            saveAs(blob, 'VehicleLicence.xlsx');
+
+            toast.success("VehicleLicence data downloaded successfully!", {
+                autoClose: 3000,
+                position: "top-right",
+            });
+        } catch (error) {
+            console.error('Error downloading VehicleLicence data:', error.message);
+            toast.error("Error downloading VehicleLicence data. Please try again later.", {
+                autoClose: 3000,
+                position: "top-right",
+            });
         }
     };
+
 
     const removeFile = (type) => {
         setFormData((prevFormData) => ({
@@ -303,15 +377,27 @@ const VehicleLicence = () => {
         }));
     };
 
+    const handleFileUpload = (file, type) => {
+        if (file) {
+            setFormData((prevFormData) => ({
+                ...prevFormData,
+                attachedFiles: {
+                    ...prevFormData.attachedFiles,
+                    [`${type}File`]: file,
+                },
+            }));
+        }
+    };
+
     const handleReset = () => {
         setFormData({
             vehicleNumber: "",
             vehicleOwner: "",
             brief: "",
             vehicleType: "",
-            expDate: null,
+
             pucDate: null,
-            regDate: null,
+            registrationDate: null,
             insuranceDate: null,
             attachedFiles: {
                 puc: null,
@@ -320,10 +406,34 @@ const VehicleLicence = () => {
             }
         });
         setAttachedFile(null);
+
     }
 
+    const handlePucDateChange = (date) => {
+        if (date) {
+            setFormData((prevData) => ({
+                ...prevData,
+                pucDate: date,
+            }));
+        }
+    };
+    const handleRegDateChange = (date) => {
+        if (date) {
+            setFormData((prevData) => ({
+                ...prevData,
+                registrationDate: date,
+            }));
+        }
+    };
 
-
+    const handleInsuranceDateChange = (date) => {
+        if (date) {
+            setFormData((prevData) => ({
+                ...prevData,
+                insuranceDate: date,
+            }));
+        }
+    };
 
 
     const handleStatusChange = (event, name, newValue) => {
@@ -336,35 +446,93 @@ const VehicleLicence = () => {
         }));
     };
 
-    const handleDelete = () => {
-        if (selectedRows.length > 0) {
-            const remainingData = filteredData.filter(item => !selectedRows.includes(item));
-            setFilteredData(remainingData);
-            setSelectedRows([]);
-            toast.success("Selected rows deleted successfully!", {
-                autoClose: 3000,
-                position: "top-right",
-                style: {
-                    // backgroundColor: "rgb(60,86,91)",
-                    color: "#0075a8"
-                },
-            });
+    const handleDelete = async () => {
+        if (selectedRows.length === 0) {
+            return;
         }
+        Swal.fire({
+            title: 'Are you sure?',
+            text: 'Are you sure you want to delete the selected plants?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!',
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                try {
+                    const deleteRequests = selectedRows.map(row => axiosInstance.delete(`${deleteVehicleLicence}/${row.id}`));
+                    await Promise.all(deleteRequests);
+                    toast.success("Vehicle Licence Data deleted successfully!", {
+                        autoClose: 3000,
+                        position: "top-right",
+                        style: {
+                            backgroundColor: 'color: "#0075a8"',
+                        },
+                    });
+                    fetchData();
+                    // setTotalRows(prevTotalRows => prevTotalRows - 1);
+
+                    // If deleting the last item on the current page, move to the previous page
+                    // if (filteredData.length === 1 && currentPage > 1) {
+                    //     setCurrentPage(currentPage - 1);
+                    //     fetchData(currentPage - 1, rowsPerPage);
+                    // } else {
+                    //     fetchData(currentPage, rowsPerPage);
+                    // }
+                } catch (error) {
+                    toast.error(`Error deleting Driver Licence: ${error.message}`, {
+                        autoClose: 3000,
+                        position: "top-right",
+                    });
+                    console.error('Error deleting Driver Licence:', error.message);
+                }
+            }
+        });
     };
 
-    const handleFloatingButtonClick = (label) => {
+    const handleFloatingButtonClick = (label, row) => {
         if (label === 'Add') {
             handleAddVisitorClick();
         } else if (label === 'Delete') {
             handleDelete();
-        } else if (label === 'Edit') {
-            // Handle edit action here
+        } else if (label === 'Edit' && selectedRows.length === 1) {
+            handleEdit(selectedRows[0]);
         }
+    };
+
+
+    const handleEdit = (row) => {
+        setEditingRowId(row.id);
+        setIsEditing(true);
+
+        setFormData({
+            vehicleNumber: row.vehicleNumber,
+            vehicleType: row.vehicleType,
+            vehicleOwner: row.vehicleOwner,
+            brief: row.brief,
+            pucDate: row.pucDate,
+            registrationDate: row.registrationDate,
+            insuranceDate: row.insuranceDate,
+            attachedFiles: {
+                pucFile: row.pucFile,
+                insuranceFile: row.insuranceFile,
+                registrationFile: row.registrationFile
+            }
+        });
+        setOpen(true);
     };
 
     const handleInputChange = (event) => {
         const { name, value } = event.target;
         setFormData((prevValues) => ({ ...prevValues, [name]: value }));
+    };
+
+    const handleAutocompleteChange = (event, newValue) => {
+        setFormData((prevFormData) => ({
+            ...prevFormData,
+            unitId: newValue ? newValue.value : null,
+        }));
     };
 
     const addInstantVisitors = (
@@ -415,6 +583,7 @@ const VehicleLicence = () => {
                             onChange={handleChange}
                             error={errors.vehicleType}
                             helperText={errors.vehicleType}
+
                         />
                     </Box>
                 </Grid>
@@ -431,44 +600,74 @@ const VehicleLicence = () => {
                             value={formData.vehicleOwner}
                             error={errors.vehicleOwner}
                             helperText={errors.vehicleOwner}
+
                         />
+                    </Box>
+                </Grid>
+                <Grid item lg={6} md={6} sm={12} xs={12}>
+                    <Box>
+                        <Autocmp
+                            label="Unit ID"
+                            name="unitId"
+                            value={unitIds.find(option => option.value === formData.unitId) || null}
+                            onChange={handleAutocompleteChange}
+                            options={unitIds}
+                            required
+                            getOptionLabel={(option) => option.value}
+                            getOptionSelected={(option, value) => option.value === value.value}
+                            size="small"
+                            error={errors.unitId}
+                        />
+
+                        {errors.unitId && (
+                            <Typography variant="caption" color="error">{errors.unitId}</Typography>
+                        )}
                     </Box>
                 </Grid>
                 <Grid item lg={6} md={6} sm={12} xs={12}>
                     <Box style={{ marginTop: "15px" }}>
                         <DatePickers
-                            label="From Date"
-                            value={formData.fromDate}
-                            handleInputChange={handleInputChange}
+                            placeholder="Insurance Date"
+                            label="Insurance Date"
+                            value={formData.insuranceDate}
+                            handleInputChange={handleInsuranceDateChange}
+                            required
+                        />
+                        {errors.insuranceDate && (
+                            <Typography fontSize="12px" color="error">{errors.insuranceDate}</Typography>
+                        )}
+
+                    </Box>
+                </Grid>
+                <Grid item lg={6} md={6} sm={12} xs={12}>
+                    <Box style={{ marginTop: "15px" }}>
+                        <DatePickers
+                            placeholder="PUC Date"
+                            label="PUC Date"
+                            value={formData.pucDate}
+                            handleInputChange={handlePucDateChange}
+                            required
                         />
                         {errors.pucDate && (
                             <Typography fontSize="12px" color="error">{errors.pucDate}</Typography>
                         )}
-                    </Box>
-                </Grid>
-                <Grid item lg={6} md={6} sm={12} xs={12}>
-                    <Box style={{ marginTop: "15px" }}>
-                        <DatePickers
-                            label="From Date"
-                            value={formData.fromDate}
-                            handleInputChange={handleInputChange}
-                        />
 
-                        {errors.regDate && (
-                            <Typography fontSize="12px" color="error">{errors.regDate}</Typography>
-                        )}
+
                     </Box>
                 </Grid>
                 <Grid item lg={6} md={6} sm={12} xs={12}>
                     <Box style={{ marginTop: "15px" }}>
                         <DatePickers
-                            label="From Date"
-                            value={formData.fromDate}
-                            handleInputChange={handleInputChange}
+                            label="Registration Date"
+                            placeholder="Registration Date"
+                            value={formData.registrationDate}
+                            handleInputChange={handleRegDateChange}
+                            required
                         />
-                        {errors.insuranceDate && (
-                            <Typography color="error">{errors.insuranceDate}</Typography>
+                        {errors.registrationDate && (
+                            <Typography fontSize="12px" color="error">{errors.registrationDate}</Typography>
                         )}
+
                     </Box>
                 </Grid>
                 <Grid item lg={6} md={6} sm={12} xs={12}>
@@ -477,22 +676,23 @@ const VehicleLicence = () => {
                             label="Brief"
                             placeholder="Enter Data"
                             size="small"
-                            // required
+                            required
                             name="brief"
                             // variant="standard"
                             onChange={handleChange}
                             value={formData.brief}
-
+                            error={errors.brief}
+                            helperText={errors.brief}
                         />
                     </Box>
 
                 </Grid>
                 <Grid item lg={6} md={6} sm={12} xs={12}>
                     <Box display="flex" justifyContent="center" alignItems="center" style={{ gap: "10px", marginTop: "20px" }}>
-                        {formData.attachedFiles.puc ? (
+                        {formData.attachedFiles.pucFile ? (
                             <>
-                                <Typography>{formData.attachedFiles.puc.name}</Typography>
-                                <IconButton onClick={() => removeFile('puc')}>
+                                <Typography>{formData.attachedFiles.pucFile.name}</Typography>
+                                <IconButton onClick={() => removeFile('pucFile')}>
                                     <CloseIcon style={{ color: "red" }} />
                                 </IconButton>
                             </>
@@ -501,9 +701,9 @@ const VehicleLicence = () => {
                                 <Typography>No file attached</Typography>
                                 <InputFileUpload
                                     name="PUC"
-                                    onFileSelect={(event) => handleFileUpload(event, 'puc')}
-                                    backgroundColor={colors.navbar}
-                                // style={{ backgroundColor: "rgb(60,86,91)", color: "white" }}
+                                    required
+                                    onFileSelect={(file) => handleFileUpload(file, 'puc')}
+                                    style={{ backgroundColor: colors.navbar }}
                                 />
                             </>
                         )}
@@ -511,10 +711,10 @@ const VehicleLicence = () => {
                 </Grid>
                 <Grid item lg={6} md={6} sm={12} xs={12}>
                     <Box display="flex" justifyContent="center" alignItems="center" style={{ gap: "10px", marginTop: "20px" }}>
-                        {formData.attachedFiles.insurance ? (
+                        {formData.attachedFiles.insuranceFile ? (
                             <>
-                                <Typography>{formData.attachedFiles.insurance.name}</Typography>
-                                <IconButton onClick={() => removeFile('insurance')}>
+                                <Typography>{formData.attachedFiles.insuranceFile.name}</Typography>
+                                <IconButton onClick={() => removeFile('insuranceFile')}>
                                     <CloseIcon style={{ color: "red" }} />
                                 </IconButton>
                             </>
@@ -523,9 +723,9 @@ const VehicleLicence = () => {
                                 <Typography>No file attached</Typography>
                                 <InputFileUpload
                                     name="Insurance"
-                                    backgroundColor={colors.navbar}
-                                    // style={{ backgroundColor: "rgb(60,86,91)", color: "white" }}
-                                    onFileSelect={(event) => handleFileUpload(event, 'insurance')}
+                                    required
+                                    onFileSelect={(file) => handleFileUpload(file, 'insurance')}
+                                    style={{ backgroundColor: colors.navbar }}
                                 />
                             </>
                         )}
@@ -533,27 +733,26 @@ const VehicleLicence = () => {
                 </Grid>
                 <Grid item lg={6} md={6} sm={12} xs={12}>
                     <Box display="flex" justifyContent="center" alignItems="center" style={{ gap: "10px", marginTop: "20px" }}>
-                        {formData.attachedFiles.registration ? (
+                        {formData.attachedFiles.registrationFile ? (
                             <>
-                                <Typography>{formData.attachedFiles.registration.name}</Typography>
-                                <IconButton onClick={() => removeFile('registration')}>
+                                <Typography>{formData.attachedFiles.registrationFile.name}</Typography>
+                                <IconButton onClick={() => removeFile('registrationFile')}>
                                     <CloseIcon style={{ color: "red" }} />
                                 </IconButton>
                             </>
                         ) : (
                             <>
-                                <Typography>No file</Typography>
+                                <Typography>No file attached</Typography>
                                 <InputFileUpload
                                     name="Registration"
-                                    backgroundColor={colors.navbar}
-                                    // style={{ backgroundColor: "rgb(60,86,91)", color: "white" }}
-                                    onFileSelect={(event) => handleFileUpload(event, 'registration')}
+                                    required
+                                    onFileSelect={(file) => handleFileUpload(file, 'registration')}
+                                    style={{ backgroundColor: colors.navbar }}
                                 />
                             </>
                         )}
                     </Box>
                 </Grid>
-
             </Grid>
 
             <Grid container spacing={3}>
