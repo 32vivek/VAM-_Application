@@ -1,72 +1,79 @@
-import * as React from 'react';
-import Avatar from '@mui/material/Avatar';
+import React, { useState } from 'react';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
 import Link from '@mui/material/Link';
 import Paper from '@mui/material/Paper';
 import Box from '@mui/material/Box';
+import { Card, CardContent } from '@mui/material';
 import Grid from '@mui/material/Grid';
-import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
+// import Typography from '@mui/material/Typography';
+import InputAdornment from '@mui/material/InputAdornment';
+import IconButton from '@mui/material/IconButton';
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import { useNavigate } from 'react-router-dom';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { auth_api } from '../../Api/Api';
+import Cookies from 'js-cookie';
 import { Typography } from '@mui/material';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
-
-const theme = createTheme();
 
 export default function SignUpSide() {
-    const handleSubmit = (event) => {
-        event.preventDefault();
-        const data = new FormData(event.currentTarget);
-        console.log({
-            name: data.get('name'),
-            email: data.get('email'),
-            password: data.get('password'),
-        });
-    };
+    
+
+     
 
     return (
-        <ThemeProvider theme={theme}>
-            <Grid container component="main" sx={{ height: '100vh' }}>
+        <>
+            <ToastContainer />
+            <Grid container component="main" sx={{ height: '100vh', position: 'relative' }}>
                 <CssBaseline />
                 <Grid
                     item
-                    xs={false}
+                    xs={12}
                     sm={4}
                     md={7}
                     sx={{
-                        backgroundImage: 'url(https://source.unsplash.com/random?wallpapers)',
-                        backgroundRepeat: 'no-repeat',
-                        backgroundColor: (t) =>
-                            t.palette.mode === 'light' ? t.palette.grey[50] : t.palette.grey[900],
-                        backgroundSize: 'cover',
-                        backgroundPosition: 'center',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        p: 4,
+                        backgroundColor: "rgb(240,242,245)"
                     }}
-                />
-                <Grid item xs={12} sm={8} md={5} component={Paper} elevation={6} square>
-                    <Box
-                        sx={{
-                            my: 8,
-                            mx: 4,
-                            display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                        }}
-                    >
-                        <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
-                            <LockOutlinedIcon />
-                        </Avatar>
-                        <Typography component="h1" variant="h5" sx={{ mb: 2 }}>
-                            Sign Up
-                        </Typography>
-                        <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1, width: '100%' }}>
+                >
+                    <Box>
+                        <Box mb="30px" display="flex" justifyContent="center" alignItems="center" flexDirection="column">
+                            <img src="/jbmlogo.png" alt="JBM Logo" style={{ width: "30%" }} />
+                            <Typography variant='h5' mt="20px" fontWeight="bold" color="rgb(9,90,163)">
+                                VISITOR ALERT MANAGEMENT SYSTEM
+                            </Typography>
+                        </Box>
+                        <Box mt="30px" style={{ display: "flex", justifyContent: "center", alignItems: "center" }} >
+                            <Typography>
+                                For any help or assistance please reach out to
+                                <Link href="https://dreamsol.biz/contact/" target="_blank" style={{ cursor: "pointer", fontWeight: "bold" }}> DreamSol</Link>
+                            </Typography>
+                        </Box>
+                    </Box>
+                </Grid>
+                <Grid item xs={12} sm={8} md={5} component={Paper} square sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: "center" }}>
+                    <Card sx={{ my: 8, mx: 4, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: "center", boxShadow: 3 }}>
+                        <CardContent sx={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                            <Box mb="30px" display="flex" justifyContent="center" alignItems="center" flexDirection="column">
+                                <Typography variant='h5' mt="20px" fontWeight="bold" color="rgb(9,90,163)">
+                                    SIGN UP
+                                </Typography>
+                            </Box>
+                            <Box component="form"   sx={{ mt: 1, width: '100%' }}>
                             <TextField
                                 margin="normal"
                                 // required
                                 fullWidth
                                 id="name"
                                 label="Name"
-                                name="name"
+                                name="name" variant='standard'
+                                size='small'
                                 autoComplete="name"
                                 autoFocus
                                 sx={{ mb: 1 }}
@@ -75,8 +82,8 @@ export default function SignUpSide() {
                                 margin="normal"
                                 // required
                                 fullWidth
-                                id="email"
-                                label="Email Address"
+                                id="email"size='small'
+                                label="Email Address" variant='standard'
                                 name="email"
                                 autoComplete="email"
                                 sx={{ mb: 1 }}
@@ -86,14 +93,14 @@ export default function SignUpSide() {
                                 // required
                                 fullWidth
                                 name="password"
-                                label="Password"
+                                label="Password"size='small' variant='standard'
                                 type="password"
                                 id="password"
                                 autoComplete="current-password"
                                 sx={{ mb: 2 }}
                             />
                             <Button
-                                type="submit"
+                                type="submit"size='small'
                                 fullWidth
                                 variant="contained"
                                 sx={{ mt: 3, mb: 2 }}
@@ -108,9 +115,11 @@ export default function SignUpSide() {
                                 </Grid>
                             </Grid>
                         </Box>
-                    </Box>
+                   
+                        </CardContent>
+                    </Card>
                 </Grid>
             </Grid>
-        </ThemeProvider>
+        </>
     );
 }

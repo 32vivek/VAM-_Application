@@ -45,7 +45,7 @@ function App() {
         <Routes>
           <Route element={<PrivateRoutes />}>
             <Route path='/' element={<SignInSide />} />
-            <Route path='/signup' element={<SingUpInSide />} />
+            {/* <Route path='/signup' element={<SingUpInSide />} /> */}
             <Route path='/' element={<PersistentDrawerLeft />}>
               <Route path="/home" element={<Home />} >
                 <Route path='/home/today' element={<Todays_Visitor />} />
@@ -86,6 +86,7 @@ function App() {
               </Route>
             </Route>
           </Route>
+          <Route path='/signup' element={<SingUpInSide />} />
         </Routes>
         {/* </TokenRefresh> */}
       </BrowserRouter>
